@@ -28,6 +28,10 @@ return array(
 	'version' => '2.5',
 	'author' => 'Open Assessment Technologies',
 	'dependencies' => array('tao'),
+    'managementRole' => 'http://www.tao.lu/Ontologies/TAO.rdf#TaoDevToolsRole',
+    'acl' => array(
+        array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#SysAdminRole', array('ext'=>'taoDevTools')),
+    ),
 	'constants' => array(
 		# actions directory
 		"DIR_ACTIONS"			=> $extpath."actions".DIRECTORY_SEPARATOR,
