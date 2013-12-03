@@ -58,7 +58,7 @@ class taoDevTools_actions_DataCreation extends tao_actions_Main
                 PROPERTY_USER_UILG	=> 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
                 PROPERTY_USER_DEFLG => 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
                 PROPERTY_USER_LOGIN	=> 'tt'.$i,
-                PROPERTY_USER_PASSWORD => md5('pass'.$i),
+                PROPERTY_USER_PASSWORD => core_kernel_users_AuthAdapter::getPasswordHash()->encrypt('pass'.$i),
                 PROPERTY_USER_ROLES => 'http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole',
                 PROPERTY_USER_FIRSTNAME => 'Testtaker '.$i,
                 PROPERTY_USER_LASTNAME => 'Family '.$generationId
