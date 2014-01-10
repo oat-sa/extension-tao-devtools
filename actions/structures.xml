@@ -4,7 +4,7 @@
 	<structure id="user_settings" name="User Settings" level="12" visible="false">
 		<description />
 		<sections>
-			<section id="settings_debug_roles" name="Change role" url="/taoDevTools/UserDebug/roles" />
+			<section id="settings_debug_roles" name="Restrict Roles" url="/taoDevTools/UserDebug/roles" />
 		</sections>
 	</structure>
 </structures>

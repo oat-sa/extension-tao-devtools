@@ -70,7 +70,7 @@ class taoDevTools_actions_UserDebug extends tao_actions_CommonModule {
     				$this->setData('message', __('Session restricted'));
 	            }
 	        }
-	        $this->setData('formTitle'	, __("Change password"));
+	        $this->setData('formTitle'	, __("Restrict Roles"));
 	        $this->setData('myForm'		, $myForm->render());
 	        
 	        $this->setView('userdebug/roles.tpl');
