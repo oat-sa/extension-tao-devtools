@@ -25,7 +25,8 @@ $taopath = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'tao'.DIRECTORY_SEPARA
 return array(
 	'name' => 'taoDevTools',
 	'description' => 'TAO Development Tools',
-	'version' => '2.5',
+    'license' => 'GPL-2.0',
+    'version' => '2.5',
 	'author' => 'Open Assessment Technologies',
 	'dependencies' => array('tao'),
     'managementRole' => 'http://www.tao.lu/Ontologies/TAO.rdf#TaoDevToolsRole',
