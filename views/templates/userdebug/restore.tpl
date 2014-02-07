@@ -7,7 +7,7 @@
 </head>
 
 <body>
-	<div id="main" class="ui-widget-content ui-corner-all">
+	<div id="main" class=tao-scope ui-widget-content ui-corner-all">
 		<h2><?=__('You are currently restricted to the following roles');?></h2>
 		<ul>
 		<?php foreach (get_data('roles') as $role):?>
@@ -15,10 +15,11 @@
 		<?php endforeach;?>
 		</ul>
 		<div class='message'>
-            <a href="<?=_url('restore')?>" class="button"> 
+            <a href="<?=_url('restore')?>" class="btn-info" type="button""> 
     			<?=__('Restore');?>
 			</a>
 		</div>
+	</div>
 </body>
 
 </html>
