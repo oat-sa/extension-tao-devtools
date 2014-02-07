@@ -110,6 +110,12 @@ define(['jquery', 'i18n', 'context', 'helpers'], function($, __, context, helper
             styleTables();
 
             $('#installProgress').hide();
+            
+            $('#addButton').click(function() {
+                var uri = helpers._url('create', 'ExtensionsManager', 'taoDevTools') + '?' + $.param({'uri': $('#openuri').val()});
+                helpers.openTab(__('Create new extension'), uri);
+                return false;
+            });
 
             //Detect wich extension is already installed
             $('#extensions-manager-container .ext-id').each(function() {

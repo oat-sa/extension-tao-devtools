@@ -26,13 +26,21 @@ return array(
 	'name' => 'taoDevTools',
 	'description' => 'TAO Development Tools',
     'license' => 'GPL-2.0',
-    'version' => '2.5',
+    'version' => '2.6',
 	'author' => 'Open Assessment Technologies',
 	'dependencies' => array('tao'),
     'managementRole' => 'http://www.tao.lu/Ontologies/TAO.rdf#TaoDevToolsRole',
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#SysAdminRole', array('ext'=>'taoDevTools')),
     ),
+    'autoload' => array (
+        'psr-4' => array(
+            'oat\\taoDevTools\\' => $extpath
+        )
+    ),
+    'routes' => array(
+        '/taoDevTools' => 'oat\\taoDevTools\\actions'
+    ),    
 	'constants' => array(
 		# actions directory
 		"DIR_ACTIONS"			=> $extpath."actions".DIRECTORY_SEPARATOR,

@@ -1,0 +1,105 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: TAO v2.6-alpha3\n"
+"PO-Revision-Date: 2014-02-05T13:08:31\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: en-US\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "%s extension(s) to install."
+msgstr ""
+
+msgid "> Extension %s succesfully installed."
+msgstr ""
+
+msgid "> Installation done."
+msgstr ""
+
+msgid "A fatal error occured during the installation process."
+msgstr ""
+
+msgid "Apply"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Do you wish to install the following extension(s):\n"
+"%s?"
+msgstr ""
+
+msgid "Extensions"
+msgstr ""
+
+#, tao-public
+msgid "Extensions manager"
+msgstr ""
+
+msgid "Generating cache..."
+msgstr ""
+
+msgid "Installation done."
+msgstr ""
+
+msgid "Installation..."
+msgstr ""
+
+msgid "Installing extension %s..."
+msgstr ""
+
+msgid "Keep roles"
+msgstr ""
+
+msgid "License"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "No extensions available."
+msgstr ""
+
+msgid "Nothing to install !"
+msgstr ""
+
+msgid "Preparing installation..."
+msgstr ""
+
+msgid "Requires"
+msgstr ""
+
+msgid "Restore"
+msgstr ""
+
+msgid "Restrict"
+msgstr ""
+
+#, tao-public
+msgid "Restrict Roles"
+msgstr ""
+
+msgid "Restricted session"
+msgstr ""
+
+msgid "Session restricted"
+msgstr ""
+
+#, tao-public
+msgid "Settings"
+msgstr ""
+
+#, tao-public
+msgid "User Settings"
+msgstr ""
+
+msgid "Version"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "You are currently restricted to the following roles"
+msgstr ""
+

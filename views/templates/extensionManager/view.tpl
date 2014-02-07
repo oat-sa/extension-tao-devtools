@@ -7,6 +7,7 @@
 <? endif; ?>
 <div class="actions tao-scope">
   <button class="btn-success" type="button" id="installButton" disabled="disabled"><span class="icon-tools"></span> <?= __('Apply') ?></button>
+  <button class="btn-info" type="button" id="addButton"><span class="icon-add"></span> <?= __('Create new') ?></button>
 </div>
 <div id="available-extensions-title" class="ui-widget-header ui-corner-top ui-state-default">
 	<?= __('Extensions') ?>
@@ -26,10 +27,10 @@
 			</thead>
 			<tbody>
 				<? foreach(get_data('extensions') as $k => $ext): ?>
-				<tr id="<?= $ext->getID();?>">
+				<tr id="<?= $ext->getId();?>">
 					<td class="bordered install">
 					   <?php if (!$ext->isInstalled()) :?>
-						<input name="ext_<?= $ext->getID();?>" type="checkbox" />
+						<input name="ext_<?= $ext->getId();?>" type="checkbox" />
 						<?php else:?>
 						<span class="icon-checkbox-checked" style="color: #0E914B"></span>
 						<?php endif;?>

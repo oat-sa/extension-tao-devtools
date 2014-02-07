@@ -1,5 +1,4 @@
 <?php
-
 /**  
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,6 +19,8 @@
  * 
  */
 
+namespace oat\taoDevTools\actions;
+
 /**
  * The Main Module of tao development tools
  *
@@ -28,7 +29,7 @@
  * @license GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
  *         
  */
-class taoDevTools_actions_DataCreation extends tao_actions_Main
+class DataCreation extends \tao_actions_Main
 {
 
     public function __construct()
@@ -39,18 +40,18 @@ class taoDevTools_actions_DataCreation extends tao_actions_Main
     public function createTesttakers()
     {
         $generationId = $this->generateRandomString(4);
-        $count = 1000;
+        $count = $this->hasRequestParameter('count') ? $this->getRequestParameter('count') : 1000;
         
         set_time_limit($count);
         
-        $ext = common_ext_ExtensionsManager::singleton()->getExtensionById('taoGroups');
+        $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoGroups');
         
-        $class = new core_kernel_classes_Class(TAO_GROUP_CLASS);
+        $class = new \core_kernel_classes_Class(TAO_GROUP_CLASS);
         $group = $class->createInstanceWithProperties(array(
             RDFS_LABEL => 'Generation '.$generationId
         ));
         
-        $topClass = new core_kernel_classes_Class(TAO_SUBJECT_CLASS);
+        $topClass = new \core_kernel_classes_Class(TAO_SUBJECT_CLASS);
         $class = $topClass->createSubClass('Generation '.$generationId);
         for ($i = 0; $i < $count; $i++) {
             $tt = $class->createInstanceWithProperties(array(
@@ -58,12 +59,12 @@ class taoDevTools_actions_DataCreation extends tao_actions_Main
                 PROPERTY_USER_UILG	=> 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
                 PROPERTY_USER_DEFLG => 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
                 PROPERTY_USER_LOGIN	=> 'tt'.$i,
-                PROPERTY_USER_PASSWORD => core_kernel_users_AuthAdapter::getPasswordHash()->encrypt('pass'.$i),
+                PROPERTY_USER_PASSWORD => \core_kernel_users_AuthAdapter::getPasswordHash()->encrypt('pass'.$i),
                 PROPERTY_USER_ROLES => 'http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole',
                 PROPERTY_USER_FIRSTNAME => 'Testtaker '.$i,
                 PROPERTY_USER_LASTNAME => 'Family '.$generationId
             ));
-            $group->setPropertyValue(new core_kernel_classes_Property(TAO_GROUP_MEMBERS_PROP), $tt);
+            $group->setPropertyValue(new \core_kernel_classes_Property(TAO_GROUP_MEMBERS_PROP), $tt);
         }
         echo 'created '.$count.' testakers';
     }
