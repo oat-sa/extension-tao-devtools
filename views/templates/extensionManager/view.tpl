@@ -41,7 +41,7 @@
 					<td class="bordered"><?= $ext->getManifest()->getLicense(); ?></td>
 					<td class="dependencies ">
 						<ul>
-						<? foreach ($ext->getDependencies() as $req): ?>
+						<? foreach ($ext->getDependencies() as $req => $version): ?>
 						  <?php if (!in_array($req, get_data('installedIds'))) : ?>
 							<li class="ext-id ext-<?= $req ?>" rel="<?= $req ?>"><?= $req ?></li>
 							<?php endif;?>
