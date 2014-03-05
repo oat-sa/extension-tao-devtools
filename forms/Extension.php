@@ -46,8 +46,6 @@ class Extension
      */
     protected function initForm()
     {
-        // section 127-0-1-1-56df1631:1284f2fd9c5:-8000:000000000000249F begin
-        
     	(isset($this->options['name'])) ? $name = $this->options['name'] : $name = ''; 
     	if(empty($name)){
 			$name = 'form_'.(count(self::$forms)+1);
@@ -58,11 +56,9 @@ class Extension
 		
 		//create action in toolbar
 		$createElt = \tao_helpers_form_FormFactory::getElement('create', 'Free');
-		$createElt->setValue('<button class="btn-info form-submiter" type="button" id="addButton"><span class="'.\tao_helpers_Icon::ICON_ADD.'"></span>'.__('Create').'</button>');
+		$createElt->setValue('<button class="btn-info form-submiter" type="button" id="addButton">'.\tao_helpers_Icon::iconAdd().__('Create').'</button>');
 		$this->form->setActions(array(), 'top');
 		$this->form->setActions(array($createElt), 'bottom');
-    	
-        // section 127-0-1-1-56df1631:1284f2fd9c5:-8000:000000000000249F end
     }
 
     /**
@@ -74,8 +70,6 @@ class Extension
      */
     protected function initElements()
     {
-        // section 127-0-1-1-56df1631:1284f2fd9c5:-8000:00000000000024A1 begin
-        
 		$idElt = \tao_helpers_form_FormFactory::getElement('id', 'Textbox');
 		$idElt->addValidator(\tao_helpers_form_FormFactory::getValidator('NotEmpty'));
 		$idElt->addValidator(\tao_helpers_form_FormFactory::getValidator('AlphaNum'));

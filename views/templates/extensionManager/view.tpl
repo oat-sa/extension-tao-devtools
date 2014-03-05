@@ -29,7 +29,7 @@
 				<? foreach(get_data('extensions') as $k => $ext): ?>
 				<tr id="<?= $ext->getId();?>">
 					<td class="bordered install">
-					   <?php if (!$ext->isInstalled()) :?>
+					   <?php if (!common_ext_ExtensionsManager::singleton()->isInstalled($ext->getId())) :?>
 						<input name="ext_<?= $ext->getId();?>" type="checkbox" />
 						<?php else:?>
 						<span class="icon-checkbox-checked" style="color: #0E914B"></span>

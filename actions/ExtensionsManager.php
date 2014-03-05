@@ -49,7 +49,7 @@ class ExtensionsManager extends \tao_actions_ExtensionsManager {
 		foreach ($extensionManager->getAvailableExtensions() as $ext) {
 		    $all[] = $ext;
 		}
-		usort($all, function($a, $b) { return strcasecmp($a->getId(),$b->getId());});
+		$all = \helpers_ExtensionHelper::sortById($all);
 		$this->setData('extensions',$all);
 		$this->setData('installedIds',$installed);
 		$this->setView('extensionManager/view.tpl');
