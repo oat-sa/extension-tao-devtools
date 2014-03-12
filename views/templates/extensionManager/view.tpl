@@ -35,8 +35,8 @@
 						<span class="icon-checkbox-checked" style="color: #0E914B"></span>
 						<?php endif;?>
 					</td>
-				<td class="ext-name bordered"><?= $ext->getName(); ?></td>
-					<td class="bordered"><?= $ext->getManifest()->getDescription(); ?></td>
+				<td class="ext-name bordered"><?= $ext->getId(); ?></td>
+					<td class="bordered"><?= $ext->getName(); ?> (<?= $ext->getManifest()->getDescription(); ?>)</td>
 					<td class="bordered version"><?= $ext->getVersion(); ?></td>
 					<td class="bordered"><?= $ext->getManifest()->getLicense(); ?></td>
 					<td class="dependencies ">
