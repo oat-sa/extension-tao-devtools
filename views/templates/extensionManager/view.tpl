@@ -12,7 +12,7 @@
 <div id="available-extensions-title" class="ui-widget-header ui-corner-top ui-state-default">
 	<?= __('Extensions') ?>
 </div>
-<div id="available-extensions-container" class="ui-widget-content ui-corner-bottom">
+<div id="available-extensions-container" class="ui-widget-content ui-corner-bottom tao-scope">
 	<form action="<?= BASE_URL; ?>/ExtensionsManager/install" metdod="post">
 		<table summary="modules" class="maximal">
 			<thead>
@@ -20,9 +20,11 @@
 					<th class="bordered install"></th>
 				<th class="bordered"></th>
 					<th class="bordered"><?= __('Description'); ?></th>
-					<th class="bordered version"><?= __('Version'); ?></th>
 					<th class="bordered"><?= __('License'); ?></th>
-					<th class="require"><?= __('Requires'); ?></th>
+					<th class="bordered require"><?= __('Requires'); ?></th>
+					<th class="bordered version"><?= __('Version'); ?></th>
+					<th class="bordered version"><?= __('Installed'); ?></th>
+					<th style="width: 100px"><?= __('Actions'); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -37,9 +39,8 @@
 					</td>
 				<td class="ext-name bordered"><?= $ext->getId(); ?></td>
 					<td class="bordered"><?= $ext->getName(); ?> (<?= $ext->getManifest()->getDescription(); ?>)</td>
-					<td class="bordered version"><?= $ext->getVersion(); ?></td>
 					<td class="bordered"><?= $ext->getManifest()->getLicense(); ?></td>
-					<td class="dependencies ">
+					<td class="dependencies bordered">
 						<ul>
 						<? foreach ($ext->getDependencies() as $req => $version): ?>
 						  <?php if (!in_array($req, get_data('installedIds'))) : ?>
@@ -47,6 +48,18 @@
 							<?php endif;?>
 						<? endforeach; ?>
 						</ul>
+					</td>
+					<td class="bordered version"><?= $ext->getVersion(); ?></td>
+					<td class="bordered version"><?= common_ext_ExtensionsManager::singleton()->getInstalledVersion($ext->getId()); ?></td>
+					<td class="">
+					   <?php if (common_ext_ExtensionsManager::singleton()->isInstalled($ext->getId())
+					       && !helpers_ExtensionHelper::isRequired($ext)) : ?>
+					       <?php if (common_ext_ExtensionsManager::singleton()->isEnabled($ext->getId())) : ?>
+					           <button class="btn-warning small disableButton" type="button" data-extid="<?=$ext->getId()?>"> <?= __('Disable') ?></button>
+					       <?php else :?>
+					           <button class="btn-info small enableButton" type="button" data-extid="<?=$ext->getId()?>"> <?= __('Enable') ?></button>
+					       <?php endif;?>
+					   <?php endif;?>
 					</td>
 				</tr>
 				<? endforeach; ?>
