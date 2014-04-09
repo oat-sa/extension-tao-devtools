@@ -220,6 +220,23 @@ define(['jquery', 'i18n', 'context', 'helpers'], function($, __, context, helper
                     }
             	});
             });
+            
+            $('.uninstallButton').click(function(event) {
+            	var id = $(event.target).data('extid');
+            	$.ajax({
+                    type: "POST",
+                    url: context.root_url + "taoDevTools/ExtensionsManager/uninstall",
+                    data: 'id='+id,
+                    dataType: 'json',
+                    success: function(data) {
+                        helpers.loaded();
+                        helpers.createInfoMessage(data.message);
+                        if (data.success) {
+                            window.location.reload();
+                        }
+                    }
+            	});
+            });
         }
     };
 

@@ -38,6 +38,8 @@ return array(
             'oat\\taoDevTools\\' => $extpath
         )
     ),
+    'uninstall' => array(
+    ),
     'routes' => array(
         '/taoDevTools' => 'oat\\taoDevTools\\actions'
     ),    

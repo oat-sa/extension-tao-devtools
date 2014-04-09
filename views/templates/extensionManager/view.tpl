@@ -24,7 +24,7 @@
 					<th class="bordered require"><?= __('Requires'); ?></th>
 					<th class="bordered version"><?= __('Version'); ?></th>
 					<th class="bordered version"><?= __('Installed'); ?></th>
-					<th style="width: 100px"><?= __('Actions'); ?></th>
+					<th style="width: 200px"><?= __('Actions'); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -52,12 +52,14 @@
 					<td class="bordered version"><?= $ext->getVersion(); ?></td>
 					<td class="bordered version"><?= common_ext_ExtensionsManager::singleton()->getInstalledVersion($ext->getId()); ?></td>
 					<td class="">
-					   <?php if (common_ext_ExtensionsManager::singleton()->isInstalled($ext->getId())
-					       && !helpers_ExtensionHelper::isRequired($ext)) : ?>
-					       <?php if (common_ext_ExtensionsManager::singleton()->isEnabled($ext->getId())) : ?>
-					           <button class="btn-warning small disableButton" type="button" data-extid="<?=$ext->getId()?>"> <?= __('Disable') ?></button>
-					       <?php else :?>
-					           <button class="btn-info small enableButton" type="button" data-extid="<?=$ext->getId()?>"> <?= __('Enable') ?></button>
+					<?php if (common_ext_ExtensionsManager::singleton()->isInstalled($ext->getId())) :
+                            if (!common_ext_ExtensionsManager::singleton()->isEnabled($ext->getId())) : ?>
+    					           <button class="btn-info small enableButton" type="button" data-extid="<?=$ext->getId()?>"><?= __('Enable') ?></button>
+    					    <?php elseif (!helpers_ExtensionHelper::mustBeEnabled($ext)) : ?>
+    					           <button class="btn-warning small disableButton" type="button" data-extid="<?=$ext->getId()?>"><?= __('Disable') ?></button>
+				            <?php endif;?>
+    					    <?php if (!helpers_ExtensionHelper::isRequired($ext) && !is_null($ext->getManifest()->getUninstallData())) : ?>
+    					           <button class="btn-warning small uninstallButton" type="button" data-extid="<?=$ext->getId()?>"><?= __('Uninstall') ?></button>
 					       <?php endif;?>
 					   <?php endif;?>
 					</td>
