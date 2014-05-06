@@ -70,13 +70,9 @@ class Extension
      */
     protected function initElements()
     {
-		$idElt = \tao_helpers_form_FormFactory::getElement('id', 'Textbox');
-		$idElt->addValidator(\tao_helpers_form_FormFactory::getValidator('NotEmpty'));
-		$idElt->addValidator(\tao_helpers_form_FormFactory::getValidator('AlphaNum'));
-		$this->form->addElement($idElt);
-
 		$idElt = \tao_helpers_form_FormFactory::getElement('name', 'Textbox');
 		$idElt->addValidator(\tao_helpers_form_FormFactory::getValidator('NotEmpty'));
+		$idElt->addValidator(\tao_helpers_form_FormFactory::getValidator('AlphaNum'));
 		$this->form->addElement($idElt);
 
 		$verElt = \tao_helpers_form_FormFactory::getElement('version', 'Textbox');
@@ -100,6 +96,10 @@ class Extension
 		$licenseElt->setValue('GPL-2.0');
 		$this->form->addElement($licenseElt);
 		
+		$idElt = \tao_helpers_form_FormFactory::getElement('label', 'Textbox');
+		$idElt->addValidator(\tao_helpers_form_FormFactory::getValidator('NotEmpty'));
+		$this->form->addElement($idElt);
+
 		$descElt = \tao_helpers_form_FormFactory::getElement('description', 'Textarea');
 		//$descElt->setValue(__('Use the * character to replace any string'));
 		$this->form->addElement($descElt);

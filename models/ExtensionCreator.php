@@ -29,7 +29,7 @@ class ExtensionCreator {
     
     private $id;
     
-    private $name;
+    private $label;
     
     private $version;
     
@@ -47,7 +47,7 @@ class ExtensionCreator {
 
     public function __construct($id, $name, $version, $author, $namespace, $license, $description, $dependencies, $options) {
         $this->id = $id;
-        $this->name = $name;
+        $this->label = $name;
         $this->version = $version;
         $this->author = $author;
         $this->authorNamespace = $namespace;
@@ -75,10 +75,10 @@ class ExtensionCreator {
             if (in_array('structure', $this->options)) {
                 $this->addSampleStructure();
             }
-            return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, __('Extension %s created.', $this->name));
+            return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, __('Extension %s created.', $this->label));
         } catch (Exception $e) {
             \common_Logger::w('Failed creating extension "'.$this->id.'": '.$e->getMessage());
-            return new \common_report_Report(\common_report_Report::TYPE_ERROR, __('Unable to create extension %s, please consult log.', $this->name));
+            return new \common_report_Report(\common_report_Report::TYPE_ERROR, __('Unable to create extension %s, please consult log.', $this->label));
         }
     }
     
@@ -86,7 +86,7 @@ class ExtensionCreator {
         $extDir = ROOT_PATH . $this->id. DIRECTORY_SEPARATOR;
         $dirs = array(
             $extDir.'locales',
-            $extDir.'models'
+            $extDir.'model'
         );
         
         foreach ($dirs as $dirPath) {
@@ -105,11 +105,11 @@ class ExtensionCreator {
         }
         $map = array(
         	'{id}' => $this->id,
-            '{name}' => $this->name,
-            '{version}' => $this->version,
-            '{author}' => $this->author,
-            '{license}' => $this->license,
-            '{description}' => $this->description,
+            '{name}' => self::escape($this->label),
+            '{version}' => self::escape($this->version),
+            '{author}' => self::escape($this->author),
+            '{license}' => self::escape($this->license),
+            '{description}' => self::escape($this->description),
             '{authorNs}' => $this->authorNamespace,
             '{dependencies}' => 'array(\''.implode('\',\'', array_keys($this->requires)).'\')',
             '{requires}' => \common_Utils::toPHPVariableString($this->requires),
@@ -172,5 +172,9 @@ class ExtensionCreator {
             array(date("Y"), $this->author, $this->license),
             $content
         );
+    }
+    
+    protected static function escape($value) {
+        return str_replace('\'', '\\\'', str_replace('\\', '\\\\', $value));
     }
 }

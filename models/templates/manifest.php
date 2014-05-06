@@ -2,8 +2,8 @@
 {licenseBlock}               
 
 return array(
-    'id' => '{id}',
-	'name' => '{name}',
+    'name' => '{id}',
+	'label' => '{name}',
 	'description' => '{description}',
     'license' => '{license}',
     'version' => '{version}',
@@ -14,6 +14,8 @@ return array(
 	'managementRole' => '{managementRole}',
     'acl' => array(
         array('grant', '{managementRole}', array('ext'=>'{id}')),
+    ),
+    'uninstall' => array(
     ),
     'autoload' => array (
         'psr-4' => array(

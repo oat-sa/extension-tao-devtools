@@ -65,8 +65,8 @@ class ExtensionsManager extends \tao_actions_ExtensionsManager {
 	    
 	    if ($myForm->isValid() && $myForm->isSubmited()) {
 	        $creator = new ExtensionCreator(
-	            $myForm->getValue('id'),
 	            $myForm->getValue('name'),
+	            $myForm->getValue('label'),
 	            $myForm->getValue('version'),
 	            $myForm->getValue('author'),
 	            $myForm->getValue('authorNs'),
