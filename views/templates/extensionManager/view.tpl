@@ -38,7 +38,7 @@
 						<?php endif;?>
 					</td>
 				<td class="ext-name bordered"><?= $ext->getId(); ?></td>
-					<td class="bordered"><?= $ext->getName(); ?> (<?= $ext->getManifest()->getDescription(); ?>)</td>
+					<td class="bordered"><?= $ext->getManifest()->getLabel(); ?> (<?= $ext->getManifest()->getDescription(); ?>)</td>
 					<td class="bordered"><?= $ext->getManifest()->getLicense(); ?></td>
 					<td class="dependencies bordered">
 						<ul>
