@@ -99,15 +99,23 @@ $inputFormat = array(
 );
 
 //
-$exts = array();
-foreach (common_ext_ExtensionsManager::singleton()->getInstalledExtensions() as $ext) {
-    $exts[] = $ext->getId();
-}
+$exts = common_ext_ExtensionsManager::singleton()->getInstalledExtensions();
 foreach (common_ext_ExtensionsManager::singleton()->getAvailableExtensions() as $ext) {
-    $exts[] = $ext->getId();
+    $exts[] = $ext;
 }
 
-foreach ($exts as $extId) {
+$exts = helpers_ExtensionHelper::sortByDependencies($exts);
+
+$extIds = array();
+foreach ($exts as $ext) {
+    if (file_exists($ext->getDir().'locales')) {
+        $extIds[] = $ext->getId();
+    } else {
+        echo 'Skipping '.$ext->getId().PHP_EOL;
+    }
+}
+
+foreach ($extIds as $extId) {
     $options = array(
     	'argv' => array(
     	    "taoTranslate.php"
@@ -115,6 +123,17 @@ foreach ($exts as $extId) {
     	    ,$extId
     	    ,"-a"
     	    ,"updateAll"
+        ) 
+    );
+    echo PHP_EOL.'Updating and compiling '.$extId.PHP_EOL;
+    new tao_scripts_TaoTranslate($inputFormat, $options);
+    $options = array(
+    	'argv' => array(
+    	    "taoTranslate.php"
+    	    ,"-e"
+    	    ,$extId
+    	    ,"-a"
+    	    ,"compileAll"
         ) 
     );
     new tao_scripts_TaoTranslate($inputFormat, $options);
