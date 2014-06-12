@@ -68,7 +68,7 @@ class taoDevTools_scripts_ApacheConfCreator extends tao_scripts_Runner
             if($file->getFileName() == '.htaccess' 
                 && strpos($file->getPath(), 'install/checks/testRewrite') ===false){
               
-               
+          
                $pathName = $file->getPathname();
                $path = $file->getPath();
                
