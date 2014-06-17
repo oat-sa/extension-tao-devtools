@@ -87,4 +87,3 @@ class UserDebug extends \tao_actions_CommonModule {
 	    $this->redirect(_url('index','main','tao'));
 	}
 }
-?>
