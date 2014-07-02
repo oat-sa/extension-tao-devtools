@@ -30,7 +30,7 @@ return array(
     'version' => '2.6',
 	'author' => 'Open Assessment Technologies',
 	'requires' => array(
-	    'tao' => '2.6'
+	    'tao' => '>=2.6'
 	),
     'managementRole' => 'http://www.tao.lu/Ontologies/TAO.rdf#TaoDevToolsRole',
     'acl' => array(
