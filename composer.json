@@ -57,5 +57,10 @@
     "minimum-stability" : "dev",
     "require": {
         "oat-sa/oatbox-extension-installer": "dev-master"
+    },
+    "autoload" : {
+        "psr-4" : {
+            "oat\\taoDevTools\\" : ""
+        }
     }
 }

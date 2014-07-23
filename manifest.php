@@ -36,11 +36,6 @@ return array(
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#SysAdminRole', array('ext'=>'taoDevTools')),
     ),
-    'autoload' => array (
-        'psr-4' => array(
-            'oat\\taoDevTools\\' => $extpath
-        )
-    ),
     'uninstall' => array(
     ),
     'routes' => array(
