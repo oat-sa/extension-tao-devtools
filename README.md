@@ -1,4 +1,4 @@
 extension-tao-devtools
 ======================
 
-Extension that gather develepment tools for TAO
+extension that gather develepment tools for TAO
