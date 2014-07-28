@@ -83,7 +83,7 @@ class ExtensionCreator {
     }
     
     protected function createDirectoryStructure() {
-        $extDir = ROOT_PATH . $this->id. DIRECTORY_SEPARATOR;
+        $extDir = $this->getDestinationDirectory();
         $dirs = array(
             $extDir.'locales',
             $extDir.'model'
@@ -156,7 +156,7 @@ class ExtensionCreator {
     // UTILS
     
     protected function getDestinationDirectory() {
-        return ROOT_PATH . $this->id. DIRECTORY_SEPARATOR;
+        return EXTENSION_PATH . $this->id. DIRECTORY_SEPARATOR;
     }
     
     protected function getLicense() {
