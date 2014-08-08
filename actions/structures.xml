@@ -13,4 +13,11 @@
 			<section id="settings_debug_roles" name="Restrict Roles" url="/taoDevTools/UserDebug/roles" />
 		</sections>
 	</structure>
+	<structure id="tools" name="DevTools" level="18" visible="true">
+		<description>
+		</description>
+		<sections>
+			<section id="tool" name="Action Viewer" url="/taoDevTools/ControllerMap/index" />
+		</sections>
+	</structure>
 </structures>
