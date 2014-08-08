@@ -123,6 +123,7 @@ class ExtensionCreator {
     
     protected function writeBaseFiles() {
         $this->copyFile('manifest.php');
+        $this->copyFile('composer.json');
         $this->copyFile('.htaccess');
         $this->copyFile('index.php');
     }
