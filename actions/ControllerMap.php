@@ -36,7 +36,7 @@ class ControllerMap extends \tao_actions_CommonModule {
         $extensionId = 'tao';
         
         $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById($extensionId);
-        $map = MapFactory::createControllerMap($ext);
+        $map = MapFactory::singleton()->createControllerMap($ext);
         
         $this->setData('extensions', array($extensionId => $map));
         $this->setView('controllerMap/index.tpl');
