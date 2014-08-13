@@ -1,7 +1,7 @@
 <?php
 {licenseBlock}
 
-namespace {authorNs}\{id}\actions;
+namespace {authorNs}\{id}\controller;
 
 /**
  * Sample controller

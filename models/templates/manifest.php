@@ -23,7 +23,7 @@ return array(
         )
     ),
     'routes' => array(
-        '/{id}' => '{authorNs}\\{id}\\actions'
+        '/{id}' => '{authorNs}\\{id}\\controller'
     ),    
 	'constants' => array(
 	    # views directory
@@ -31,5 +31,8 @@ return array(
 	    
 		#BASE URL (usually the domain root)
 		'BASE_URL' => ROOT_URL.'{id}/'
+	),
+	'extra' => array(
+	    'structures' => dirname(__FILE__).DIRECTORY_SEPARATOR.'controller'.DIRECTORY_SEPARATOR.'structures.xml',
 	)
 );

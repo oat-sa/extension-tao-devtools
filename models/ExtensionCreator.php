@@ -130,8 +130,8 @@ class ExtensionCreator {
     
     protected function addSampleStructure() {
         $controllerName = ucfirst($this->id);
-        $this->copyFile('actions'.DIRECTORY_SEPARATOR.'structures.xml', null, array('{classname}' => $controllerName));
-        $this->copyFile('actions'.DIRECTORY_SEPARATOR.'extId.php', 'actions'.DIRECTORY_SEPARATOR.$controllerName.'.php', array('{classname}' => $controllerName));
+        $this->copyFile('controller'.DIRECTORY_SEPARATOR.'structures.xml', null, array('{classname}' => $controllerName));
+        $this->copyFile('controller'.DIRECTORY_SEPARATOR.'extId.php', 'controller'.DIRECTORY_SEPARATOR.$controllerName.'.php', array('{classname}' => $controllerName));
         $this->copyFile(
             'views'.DIRECTORY_SEPARATOR.'js'.DIRECTORY_SEPARATOR.'extId'.DIRECTORY_SEPARATOR.'controller'.DIRECTORY_SEPARATOR.'routes.js',
             'views'.DIRECTORY_SEPARATOR.'js'.DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR.'controller'.DIRECTORY_SEPARATOR.'routes.js'
