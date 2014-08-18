@@ -19,7 +19,8 @@
  */
 namespace oat\taoDevTools\actions;
 
-use oat\controllerMap\model\MapFactory;
+use oat\controllerMap\parser\Factory;
+
 /**
  * Extensions management controller
  *
@@ -32,13 +33,15 @@ use oat\controllerMap\model\MapFactory;
 class ControllerMap extends \tao_actions_CommonModule {
     
     public function index() {
+
+        $factory = new Factory();
         
-        $extensionId = 'tao';
+        $data = array();
+        foreach (\common_ext_ExtensionsManager::singleton()->getInstalledExtensions() as $ext) {
+            $data[$ext->getId()] = $factory->getControllers($ext->getId());
+        }
         
-        $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById($extensionId);
-        $map = MapFactory::singleton()->createControllerMap($ext);
-        
-        $this->setData('extensions', array($extensionId => $map));
+        $this->setData('extensions', $data);
         $this->setView('controllerMap/index.tpl');
     }
 }

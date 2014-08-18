@@ -2,11 +2,11 @@
 ?>
 <div>
     <ul>
-        <?php foreach (get_data('extensions') as $name => $controllerMap) :?>
+        <?php foreach (get_data('extensions') as $name => $controllers) :?>
         <li><?=$name?>
             <ul>
-            <?php foreach ($controllerMap->getControllers() as $controller) :?>
-                <li><?=$controller->getRoutingName()?>
+            <?php foreach ($controllers as $controller) :?>
+                <li><?=$controller->getClassName()?>
                     <ul>
                         <?php foreach ($controller->getActions() as $action) :?>
                             <li><?=$action->getName()?></li>
