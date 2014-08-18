@@ -1,6 +1,6 @@
 <?php
 ?>
-<div>
+<div id="jqxTree">
     <ul>
         <?php foreach (get_data('extensions') as $name => $controllers) :?>
         <li><?=$name?>
@@ -19,14 +19,3 @@
        <?php endforeach;?> 
    </ul>
 </div>
-<!-- 
-<script type="text/javascript">
-require(['jquery', 'helpers','jsTree'], function($, helpers){
-console.log('loaded');
-$(document).ready(function () {
-    // Create jqxTree
-    $('#jqxTree').tree().set_theme('custom');
-});
-});
-</script>
- -->

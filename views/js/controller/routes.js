@@ -5,5 +5,11 @@ define(function(){
                 'index' : 'controller/settings/extensionManager'
             }
         },
+        'ControllerMap' : {
+            'actions' : {
+                'index' : 'controller/ControllerMap/index'
+            }
+        },
+
     };
 });
