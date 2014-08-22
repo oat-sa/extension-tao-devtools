@@ -13,7 +13,7 @@
 	<?= __('Extensions') ?>
 </div>
 <div id="available-extensions-container" class="ui-widget-content ui-corner-bottom tao-scope">
-	<form action="<?= BASE_URL; ?>/ExtensionsManager/install" metdod="post">
+	<form action="<?=_url('install', 'ExtensionsManager')?>" metdod="post">
 		<table summary="modules" class="maximal">
 			<thead>
 				<tr>
