@@ -84,6 +84,6 @@ class UserDebug extends \tao_actions_CommonModule {
 	    if ($currentSession instanceof \common_session_RestrictedSession) {
 	        $currentSession->restoreOriginal();
 	    }
-	    $this->redirect(_url('index','main','tao'));
+	    $this->redirect(_url('index','Main','tao'));
 	}
 }
