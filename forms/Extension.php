@@ -89,7 +89,7 @@ class Extension
 		$nsElt->setDescription('Author namespace');
 		$nsElt->addValidator(\tao_helpers_form_FormFactory::getValidator('NotEmpty'));
 		$nsElt->addValidator(\tao_helpers_form_FormFactory::getValidator('AlphaNum'));
-		$nsElt->setValue('oat-sa');
+		$nsElt->setValue('oat');
 		$this->form->addElement($nsElt);
 		
 		$licenseElt = \tao_helpers_form_FormFactory::getElement('license', 'Textbox');
