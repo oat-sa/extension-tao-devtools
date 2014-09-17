@@ -1,10 +1,10 @@
 <link rel="stylesheet" type="text/css" href="<?= BASE_WWW ?>css/extensionManager.css" />
 
-<? if(isset($message)): ?>
+<?php if(isset($message)): ?>
 <div id="message">
 	<pre><?= $message; ?></pre>
 </div>
-<? endif; ?>
+<?php endif; ?>
 <div class="actions tao-scope">
   <button class="btn-success small" type="button" id="installButton" disabled="disabled"><span class="icon-tools"></span> <?= __('Apply') ?></button>
   <button class="btn-info small" type="button" id="addButton"><span class="icon-add"></span> <?= __('Create new') ?></button>
@@ -24,7 +24,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<? foreach(get_data('extensions') as $k => $ext): ?>
+				<?php foreach(get_data('extensions') as $k => $ext): ?>
 				<tr id="<?= $ext->getId();?>">
 					<td class="install">
 					   <?php if (!common_ext_ExtensionsManager::singleton()->isInstalled($ext->getId())) :?>
@@ -38,11 +38,11 @@
 					<td><?= $ext->getManifest()->getLicense(); ?></td>
 					<td class="dependencies ">
 						<ul class="plain">
-						<? foreach ($ext->getDependencies() as $req => $version): ?>
+						<?php foreach ($ext->getDependencies() as $req => $version): ?>
 						  <?php if (!in_array($req, get_data('installedIds'))) : ?>
 							<li class="ext-id ext-<?= $req ?>" rel="<?= $req ?>"><?= $req ?></li>
 							<?php endif;?>
-						<? endforeach; ?>
+						<?php endforeach; ?>
 						</ul>
 					</td>
 					<td class=" version"><?= $ext->getVersion(); ?></td>
@@ -60,7 +60,7 @@
 					   <?php endif;?>
 					</td>
 				</tr>
-				<? endforeach; ?>
+				<?php endforeach; ?>
 			</tbody>
 		</table>
 	</form>

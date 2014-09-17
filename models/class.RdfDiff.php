@@ -119,7 +119,7 @@ class taoDevTools_models_RdfDiff
     public function exportDiffToPhp()
     {
         /*
-        return "<? return " . common_Utils::toPHPVariableString(array(
+        return "<?php return " . common_Utils::toPHPVariableString(array(
             'comments' => $this->comments,
             'toAdd' => $this->toAdd,
             'toRemove' => $this->toRemove
