@@ -69,9 +69,13 @@ class FontsConversion extends  \tao_actions_CommonModule{
     }
 
     public function runConversion(){
+        $this->setView('fontsConversion/view.tpl');
         //get the name of the src directory
-        $this->srcPath = $this->dir . DIRECTORY_SEPARATOR .$this->getRequestParameter('src_directory');
-        if(is_dir($this->srcPath . '/fonts')){
+        $this->srcPath = $this->dir . DIRECTORY_SEPARATOR . $this->getRequestParameter('src_directory');
+
+        if(is_dir($this->srcPath.DIRECTORY_SEPARATOR.'fonts')){
+
+
             $this->srcPaths = array(
                 'font'  =>  $this->srcPath . '/fonts',
                 'tao'   =>  $this->srcPath . '/fonts/tao',
@@ -79,7 +83,6 @@ class FontsConversion extends  \tao_actions_CommonModule{
             );
 
             $this->srcFonts = scandir($this->srcPaths['font']);
-
             // load font configuration along with defaults
             $data  = json_decode(file_get_contents($this->srcPaths['style'] . '/selection.json', 'r'));
             $prefs  = json_decode(file_get_contents($this->taoMaticPath . '/selection.prefs.json', 'r'));
@@ -92,8 +95,11 @@ class FontsConversion extends  \tao_actions_CommonModule{
                 $dataName[] = $iconProperties->properties->name;
             }
 
-            if($errors = $this->isSelectionCorrect($dataName) != true){
-                throw new \Exception('Your selection.json file contains error, missing : ' . implode(", ",$errors));
+            $errors = $this->isSelectionCorrect($dataName);
+            if(is_array($errors)){
+                $this->setData('errorMessage', true);
+                $this->setData('message', __('Your selection.json file contains error, missing : ') . implode(", ",$errors));
+                return false;
             }
 
             // Write list of data name
@@ -116,7 +122,9 @@ class FontsConversion extends  \tao_actions_CommonModule{
 
             // read original stylesheet
             if(!$cssContent = file_get_contents($this->srcPaths['style'] . '/style.css')){
-                throw new \Exception('Unable to read the file : ' . $this->srcPaths['style'] . '/style.css');
+                $this->setData('errorMessage', true);
+                $this->setData('message', __('Unable to read the file : ') . $this->srcPaths['style'] . '/style.css');
+                return false;
             }
 
             // font-face
@@ -163,7 +171,9 @@ class FontsConversion extends  \tao_actions_CommonModule{
             $handler = fopen($this->distroPaths['style'] . '/_tao-icon-' . $key . '.scss', 'w');
 
             if(!$handler){
-                throw new \Exception('Unable to open file : ' . $this->srcPaths['style'] . '/selection.json');
+                $this->setData('errorMessage', true);
+                $this->setData('message', __('Unable to open the file : ') . $this->srcPaths['style'] . '/selection.json');
+                return false;
             }
             foreach ($this->iconCss as $key => $value){
                 fwrite($handler, $this->doNotEdit.$this->iconCss[$key]);
@@ -177,7 +187,9 @@ class FontsConversion extends  \tao_actions_CommonModule{
             $handler = fopen($this->distroPaths['helpers'] . '/class.Icon.php', 'w');
 
             if(!$handler){
-                throw new \Exception('Unable to open file : ' . $this->srcPaths['style'] . '/selection.json');
+                $this->setData('errorMessage', true);
+                $this->setData('message', __('Unable to open the file : ') . $this->distroPaths['helpers'] . '/class.Icon.php');
+                return false;
             }
             $phpContent = str_replace('{CONSTANTS}', $this->iconConstants, $phpContent);
             $phpContent = str_replace('{FUNCTIONS}', $this->iconFunctions, $phpContent);
@@ -209,7 +221,9 @@ class FontsConversion extends  \tao_actions_CommonModule{
             }
             $handler = fopen($this->distroPaths['ck'] . '/_ck-icons.scss', 'w');
             if(!$handler){
-                throw new \Exception('Unable to open file : ' . $this->srcPaths['style'] . '/selection.json');
+                $this->setData('errorMessage', true);
+                $this->setData('message', __('Unable to read the file : ') . $this->distroPaths['ck'] . '/_ck-icons.scss');
+                return false;
             }
             fwrite($handler,$cssContent);
             fclose($handler);
@@ -220,12 +234,13 @@ class FontsConversion extends  \tao_actions_CommonModule{
 
 
             $this->setData('message',$readmeContent);
+
         }
         else{
-            $this->setData('message', $this->srcPath .__(' is not a valid directory'));
+            $this->setData('errorMessage', true);
+            $this->setData('message', $this->srcPath . __(' is not a valid directory'));
         }
 
-        $this->setView('fontsConversion/view.tpl');
 
     }
 
