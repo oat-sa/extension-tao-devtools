@@ -56,7 +56,7 @@ class Extension
 		
 		//create action in toolbar
 		$createElt = \tao_helpers_form_FormFactory::getElement('create', 'Free');
-		$createElt->setValue('<button class="btn-info form-submiter" type="button" id="addButton">'.\tao_helpers_Icon::iconAdd().__('Create').'</button>');
+		$createElt->setValue('<button class="btn-info" type="submit" id="addButton">'.\tao_helpers_Icon::iconAdd().__('Create').'</button>');
 		$this->form->setActions(array(), 'top');
 		$this->form->setActions(array($createElt), 'bottom');
     }
