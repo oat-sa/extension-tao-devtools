@@ -7,6 +7,8 @@
 
 namespace oat\taoDevTools\actions;
 
+use ZipArchive;
+
 class FontsConversion extends  \tao_actions_CommonModule{
 
     private $dir;
@@ -14,12 +16,14 @@ class FontsConversion extends  \tao_actions_CommonModule{
     private $distroPaths;
     private $srcPath;
     private $srcPaths;
+    private $styleGuidePath;
     private $srcFonts;
     private $taoMaticPath;
     private $doNotEdit;
     private $iconConstants;
     private $iconFunctions;
     private $iconCss;
+    private $maxFileSize;
 
     public function __construct()
     {
@@ -31,6 +35,8 @@ class FontsConversion extends  \tao_actions_CommonModule{
             'ck'  =>  $this->distroPath . '/views/js/lib/ckeditor/skins/tao/scss/inc',
             'helpers'  =>  $this->distroPath . '/helpers'
         );
+
+        $this->styleGuidePath = $this->dir . '/styleguide/wp-content/themes/twentytwelve';
 
         $this->iconConstants = '';
         $this->iconFunctions = '';
@@ -47,6 +53,13 @@ class FontsConversion extends  \tao_actions_CommonModule{
             throw new \Exception('Unable to read the file : ' . $this->taoMaticPath . '/do-not-edit.tpl');
         }
 
+        $this->maxFileSize = 8388608;
+    }
+
+    public function index(){
+        $this->setData('file_upload', true);
+        $this->setData('upload_limit', $this->maxFileSize);
+        $this->setView('fontsConversion/view.tpl');
     }
 
     /**
@@ -57,6 +70,11 @@ class FontsConversion extends  \tao_actions_CommonModule{
         return preg_replace('/(^|_|-| )(.)/e', 'strtoupper("\\2")', $word);
     }
 
+    /**
+     * Verify that the new icon set contains the old icons
+     * @param $data the list of new icons
+     * @return array the list of missing icons or TRUE
+     */
     private function isSelectionCorrect($data){
         $remainingData  = json_decode(file_get_contents($this->taoMaticPath . '/selection.json'));
         $errors = array_diff($remainingData, $data);
@@ -64,18 +82,136 @@ class FontsConversion extends  \tao_actions_CommonModule{
 
     }
 
-    public function index(){
-        $this->setView('fontsConversion/view.tpl');
+    /**
+     * Function that catch the form submit and upload the file
+     */
+    public function fileUpload(){
+        $error = '';
+        if(is_array($_FILES['content'])){
+
+            $copy = true;
+            if($_FILES['content']['error'] !== UPLOAD_ERR_OK){
+
+                \common_Logger::w('fileUpload failed with Error '.$_FILES['content']['error']);
+
+                $copy = false;
+                switch($_FILES['content']['error']){
+                    case UPLOAD_ERR_INI_SIZE:
+                    case UPLOAD_ERR_FORM_SIZE:
+                        $error = __('media size must be less than : ').($this->maxFileSize / 1048576).__(' MB').'\.';
+                        break;
+                    case UPLOAD_ERR_PARTIAL:
+                        $error = __('file upload failed');
+                        break;
+                    case UPLOAD_ERR_NO_FILE:
+                        $error = __('no file uploaded');
+                        break;
+                }
+            }else{
+
+                if(!isset($_FILES['content']['type'])){
+                    $copy = false;
+                }elseif(empty($_FILES['content']['type'])){
+                    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                    $_FILES['content']['type'] = finfo_file($finfo, $_FILES['content']['tmp_name']);
+                }
+                if(!$_FILES['content']['type'] || $_FILES['content']['type'] != 'application/zip'){
+                    $copy = false;
+                    $error = __('incompatible media type : '.$_FILES['content']['type']);
+                }
+                if(!isset($_FILES['content']['size'])){
+                    $copy = false;
+                    $error = __('unknow media size');
+                }else if($_FILES['content']['size'] > $this->maxFileSize || !is_int($_FILES['content']['size'])){
+                    $copy = false;
+                    $error = __('media size must be less than : ').($this->maxFileSize / 1048576).__(' MB').'\.';
+                }
+            }
+
+            if($copy){
+                $fileName = $_FILES['content']['name'];
+                if(!move_uploaded_file($_FILES['content']['tmp_name'], $this->dir.DIRECTORY_SEPARATOR.$fileName)){
+                    $error = __('unable to move uploaded file');
+                }
+                else{
+                    if($this->extract($this->dir.DIRECTORY_SEPARATOR.$fileName)){
+                        unlink($this->dir.DIRECTORY_SEPARATOR.$fileName);
+                        $conversion = $this->runConversion(basename($fileName,'.zip'));
+                    }
+                }
+            }
+        }else{
+            \common_Logger::w('file upload information missing, probably file > upload limit in php.ini');
+
+            $error = __('media size must be less than : ').($this->maxFileSize / 1048576).__(' MB').'\.';
+        }
+        if($error != ''){
+            echo json_encode(array('error' => $error));
+        }
+        else{
+            echo json_encode($conversion);
+        }
+
     }
 
-    public function runConversion(){
-        $this->setView('fontsConversion/view.tpl');
-        //get the name of the src directory
-        $this->srcPath = $this->dir . DIRECTORY_SEPARATOR . $this->getRequestParameter('src_directory');
+    /**
+     * Allow the fileUpload method to unzip the file
+     * @param $zipFile
+     * @param string $subfolder
+     * @return bool
+     * @throws \common_exception_FileSystemError
+     */
+    private function extract($zipFile, $subfolder = '') {
+        $zip = new ZipArchive();
+        if ($zip->open($zipFile) === true) {
+            $destination = $this->dir.$subfolder;
+            if(!$zip->extractTo($destination)){
+                $zip->close();
+                throw new \common_exception_FileSystemError('Could not extract '.$zipFile.' to '.$destination);
+            }
+            $zip->close();
+            return true;
+        } else {
+            throw new \common_exception_FileSystemError('Could not open '.$zipFile);
+        }
+    }
 
+    /**
+     * Generate the demo file for the user style guide
+     * @param $dataName
+     * @return bool
+     */
+    private function generateDemo($dataName) {
+        $demoTpl = $this->taoMaticPath. DIRECTORY_SEPARATOR . 'demo.tpl';
+        $demoContent = file_get_contents($demoTpl);
+        asort($dataName);
+
+        $icomoonDemo = '<div class="clearfix mhl ptl">';
+        foreach($dataName as $data){
+            $icomoonDemo .= str_replace('{ICON}', $data, $demoContent);
+        }
+        $icomoonDemo .= '</div>';
+        if (!is_dir($this->styleGuidePath)){
+            mkdir($this->styleGuidePath, 0777, true);
+        }
+        if(file_put_contents($this->styleGuidePath.DIRECTORY_SEPARATOR.'icons.html',$icomoonDemo) == false){
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Function that convert the file in $filename to the right shape
+     * @param $filename
+     * @return array
+     */
+    public function runConversion($filename){
+        //get the name of the src directory
+        $this->srcPath = $this->dir . DIRECTORY_SEPARATOR . $filename;
         if(is_dir($this->srcPath.DIRECTORY_SEPARATOR.'fonts')){
 
-
+            // init remaining variables
             $this->srcPaths = array(
                 'font'  =>  $this->srcPath . '/fonts',
                 'tao'   =>  $this->srcPath . '/fonts/tao',
@@ -83,23 +219,32 @@ class FontsConversion extends  \tao_actions_CommonModule{
             );
 
             $this->srcFonts = scandir($this->srcPaths['font']);
+
             // load font configuration along with defaults
             $data  = json_decode(file_get_contents($this->srcPaths['style'] . '/selection.json', 'r'));
             $prefs  = json_decode(file_get_contents($this->taoMaticPath . '/selection.prefs.json', 'r'));
 
+            // if the preferences are different between old and new icons we throw an error
+            foreach($prefs->fontPref as $key => $value){
+                if($value != $data->preferences->fontPref->$key){
+                    return array('error' => __('Your font is not compatible with the preferences'));
+                }
+            }
 
+
+            // get all icons name
             $dataName = array();
-
-            // build code for PHP icon class and tao-*.scss files
             foreach($data->icons as $iconProperties){
                 $dataName[] = $iconProperties->properties->name;
             }
 
+            if(!$this->generateDemo($dataName)){
+                return array('error' => __('Unable to generate the demo file'));
+            }
+
             $errors = $this->isSelectionCorrect($dataName);
             if(is_array($errors)){
-                $this->setData('errorMessage', true);
-                $this->setData('message', __('Your selection.json file contains error, missing : ') . implode(", ",$errors));
-                return false;
+                return array('error' => __('Your selection.json file contains error, missing : ') . implode(", ",$errors));
             }
 
             // Write list of data name
@@ -120,11 +265,13 @@ class FontsConversion extends  \tao_actions_CommonModule{
                 }
             }
 
+            // copy selection.json and tao-main-style.css
+            copy(dirname($this->dir) . '/tao/views/css/tao-main-style.css', $this->distroPath.DIRECTORY_SEPARATOR.'tao-main-style.css');
+            copy($this->srcPaths['style'] . '/selection.json', $this->distroPath.DIRECTORY_SEPARATOR.'selection.json');
+
             // read original stylesheet
             if(!$cssContent = file_get_contents($this->srcPaths['style'] . '/style.css')){
-                $this->setData('errorMessage', true);
-                $this->setData('message', __('Unable to read the file : ') . $this->srcPaths['style'] . '/style.css');
-                return false;
+                return array('error' => __('Unable to read the file : ') . $this->srcPaths['style'] . '/style.css');
             }
 
             // font-face
@@ -137,12 +284,6 @@ class FontsConversion extends  \tao_actions_CommonModule{
             // the actual css code
             $this->iconCss['classes'] = '@import \'inc/tao-icon-vars.scss\';\n[class^="icon-"], [class*=" icon-"] { @extend %tao-icon-setup; }\n';
 
-            // icomoon config file, collect icons and re-configure
-            //$handler = fopen($this->srcPaths['style'] . '/selection.json', 'w');
-
-            //if(!$handler){
-            //    throw new \Exception('Unable to open file : ' . $this->srcPaths['style'] . '/selection.json');
-            //}
 
             // build code for PHP icon class and tao-*.scss files
             foreach($data->icons as $iconProperties){
@@ -168,18 +309,15 @@ class FontsConversion extends  \tao_actions_CommonModule{
             $data->preferences      = $prefs;
 
             // compose and write SCSS files
-            $handler = fopen($this->distroPaths['style'] . '/_tao-icon-' . $key . '.scss', 'w');
-
-            if(!$handler){
-                $this->setData('errorMessage', true);
-                $this->setData('message', __('Unable to open the file : ') . $this->srcPaths['style'] . '/selection.json');
-                return false;
-            }
             foreach ($this->iconCss as $key => $value){
-                fwrite($handler, $this->doNotEdit.$this->iconCss[$key]);
+                $handler = fopen($this->distroPaths['style'] . '/_tao-icon-' . $key . '.scss', 'w');
 
+                if(!$handler){
+                    return array('error' => __('Unable to open the file : ') . $this->srcPaths['style'] . '/selection.json');
+                }
+                fwrite($handler, $this->doNotEdit . $this->iconCss[$key]);
+                fclose($handler);
             }
-            fclose($handler);
 
             // write PHP icon class
             $phpContent = file_get_contents($this->taoMaticPath . '/class.Icon.tpl');
@@ -187,9 +325,7 @@ class FontsConversion extends  \tao_actions_CommonModule{
             $handler = fopen($this->distroPaths['helpers'] . '/class.Icon.php', 'w');
 
             if(!$handler){
-                $this->setData('errorMessage', true);
-                $this->setData('message', __('Unable to open the file : ') . $this->distroPaths['helpers'] . '/class.Icon.php');
-                return false;
+                return array('error' => __('Unable to open the file : ') . $this->distroPaths['helpers'] . '/class.Icon.php');
             }
             $phpContent = str_replace('{CONSTANTS}', $this->iconConstants, $phpContent);
             $phpContent = str_replace('{FUNCTIONS}', $this->iconFunctions, $phpContent);
@@ -221,9 +357,7 @@ class FontsConversion extends  \tao_actions_CommonModule{
             }
             $handler = fopen($this->distroPaths['ck'] . '/_ck-icons.scss', 'w');
             if(!$handler){
-                $this->setData('errorMessage', true);
-                $this->setData('message', __('Unable to read the file : ') . $this->distroPaths['ck'] . '/_ck-icons.scss');
-                return false;
+                return array('error' => __('Unable to read the file : ') . $this->distroPaths['ck'] . '/_ck-icons.scss');
             }
             fwrite($handler,$cssContent);
             fclose($handler);
@@ -233,17 +367,22 @@ class FontsConversion extends  \tao_actions_CommonModule{
             $readmeContent = str_replace('{LISTING}', $listing, $readmeContent);
 
 
-            $this->setData('message',$readmeContent);
+            return array('result' => $readmeContent);
 
         }
         else{
-            $this->setData('errorMessage', true);
-            $this->setData('message', $this->srcPath . __(' is not a valid directory'));
+            return array('error' => $this->srcPath . __(' is not a valid directory'));
         }
 
 
     }
 
+    /**
+     * List all file of a directory
+     * @param $dir
+     * @param string $prefix
+     * @return string
+     */
     private function ListIn($dir, $prefix = '') {
         $indent = sizeof(explode("/", $prefix)) - 1;
         $dir = rtrim($dir, '\\/');
