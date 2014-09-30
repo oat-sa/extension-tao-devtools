@@ -57,7 +57,6 @@
     "minimum-stability" : "dev",
     "require": {
         "oat-sa/oatbox-extension-installer": "dev-master",
-        "vakata/jstree": "*"
     },
     "autoload" : {
         "psr-4" : {

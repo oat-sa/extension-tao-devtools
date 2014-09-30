@@ -1,3 +1,4 @@
+/*
 define(['jquery', 'helpers', 'context','jsTree/jquery.tree'], function($, helpers, context){
 	$(document).ready(function () {
 	    // Create jqxTree
@@ -10,3 +11,4 @@ define(['jquery', 'helpers', 'context','jsTree/jquery.tree'], function($, helper
 	    });
 	});
 });
+*/
