@@ -24,6 +24,8 @@ class FontsConversion extends  \tao_actions_CommonModule{
     private $iconFunctions;
     private $iconCss;
     private $maxFileSize;
+    private $endMarker;
+    private $iconValue;
 
     public function __construct()
     {
@@ -54,6 +56,8 @@ class FontsConversion extends  \tao_actions_CommonModule{
         }
 
         $this->maxFileSize = 8388608;
+        $this->endMarker = '.generated_icons_end_marker{marker : end;}';
+        $this->iconValue = array();
     }
 
     public function index(){
@@ -276,13 +280,13 @@ class FontsConversion extends  \tao_actions_CommonModule{
 
             // font-face
             $cssContentArr = explode('[class^="icon-"]',$cssContent);
-            $this->iconCss['def'] = str_replace('fonts/tao.', 'fonts/tao/tao.',$cssContentArr[0]).'\n';
+            $this->iconCss['def'] = str_replace('fonts/tao.', 'fonts/tao/tao.',$cssContentArr[0])."\n";
             // font-family etc.
             $cssContentArr = explode('.icon',$cssContentArr[1]);
             $this->iconCss['vars'] = str_replace(', [class*=" icon-"]','%tao-icon-setup',$cssContentArr[0]);
 
             // the actual css code
-            $this->iconCss['classes'] = '@import \'inc/tao-icon-vars.scss\';\n[class^="icon-"], [class*=" icon-"] { @extend %tao-icon-setup; }\n';
+            $this->iconCss['classes'] = '@import \'inc/tao-icon-vars.scss\';'."\n".'[class^="icon-"], [class*=" icon-"] { @extend %tao-icon-setup; }'."\n";
 
 
             // build code for PHP icon class and tao-*.scss files
@@ -301,7 +305,9 @@ class FontsConversion extends  \tao_actions_CommonModule{
                 // tao-*.scss data
                 $this->iconCss['vars']    .= '%icon-' . $icon . ' { content: "' . $iconHex . '"; }'."\n";
                 $this->iconCss['classes'] .= '.icon-' . $icon . ':before { @extend %icon-' . $icon . '; }'."\n";
+                $this->iconValue[$icon] = $iconHex;
             }
+            $this->iconCss['classes'] .= $this->endMarker;
 
 
             // update configuration
@@ -318,6 +324,9 @@ class FontsConversion extends  \tao_actions_CommonModule{
                 fwrite($handler, $this->doNotEdit . $this->iconCss[$key]);
                 fclose($handler);
             }
+
+            // write the tao-main-style.css with iconCss
+            $this->parseCss($this->distroPath.DIRECTORY_SEPARATOR.'tao-main-style.css');
 
             // write PHP icon class
             $phpContent = file_get_contents($this->taoMaticPath . '/class.Icon.tpl');
@@ -367,12 +376,61 @@ class FontsConversion extends  \tao_actions_CommonModule{
             $readmeContent = str_replace('{LISTING}', $listing, $readmeContent);
 
 
-            return array('result' => $readmeContent);
+            return array('success' => $readmeContent);
 
         }
         else{
             return array('error' => $this->srcPath . __(' is not a valid directory'));
         }
+
+
+    }
+
+
+    /**
+     * Parse a css file (tao-main-style) and update classes
+     * @param $filename
+     */
+    private function parseCss($filename){
+        $cssContent = file_get_contents($filename);
+
+        $cssLines = explode("}\n", $cssContent);
+        $replacement = '';
+        $matches = array();
+        $allClasses = array();
+
+        // Parse css file line by line
+        foreach($cssLines as $line){
+            $line .= '}';
+            if(strpos($line, "\n") == 0){
+                $line = substr($line, 1);
+
+            }
+            // if the line is like .icon-email:before { content: "\141"; } we update the value
+            if(preg_match('#((\.icon-([\w-]+))\b([^{]+)){\s*content ?: ?(\'|")([^(\'|")]+)(\'|");([^}]+)}#', $line, $matches) !== 0){
+                $selector = trim(preg_replace('~\s+~', ' ', trim($matches[1])));
+                $classes = array();
+                $classes[] = $matches[3];
+
+                $allClasses = array_merge($allClasses, $classes);
+                // write the new classes
+                $replacement = $selector . '{content:"\\' . $this->iconValue[$matches[3]] .'";}';
+                $cssContent = str_replace($line, $replacement, $cssContent)."\n";
+
+            }
+            // write the new icons at the end
+            else if(strpos($line, $this->endMarker) !== FALSE){
+                $replacement = '';
+                $newClasses = array_diff(array_keys($this->iconValue), $allClasses);
+                foreach($newClasses as $icon){
+                    $replacement .= '.icon-'.$icon.':before{content:"\\'.$this->iconValue[$icon].'"; }'."\n\n";
+                }
+                $replacement .= $this->endMarker;
+                $cssContent = str_replace($line, $replacement, $cssContent);
+            }
+
+        }
+        file_put_contents($filename, $cssContent);
 
 
     }
