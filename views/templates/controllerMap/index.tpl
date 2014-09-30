@@ -1,5 +1,3 @@
-<?php
-?>
 <div id="jqxTree">
     <ul>
         <?php foreach (get_data('extensions') as $name => $controllers) :?>
