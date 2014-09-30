@@ -75,6 +75,8 @@ class ExtensionCreator {
             if (in_array('structure', $this->options)) {
                 $this->addSampleStructure();
             }
+            $this->addAutoloader();
+            
             return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, __('Extension %s created.', $this->label));
         } catch (Exception $e) {
             \common_Logger::w('Failed creating extension "'.$this->id.'": '.$e->getMessage());
@@ -132,12 +134,10 @@ class ExtensionCreator {
         $controllerName = ucfirst($this->id);
         $this->copyFile('controller'.DIRECTORY_SEPARATOR.'structures.xml', null, array('{classname}' => $controllerName));
         $this->copyFile('controller'.DIRECTORY_SEPARATOR.'extId.php', 'controller'.DIRECTORY_SEPARATOR.$controllerName.'.php', array('{classname}' => $controllerName));
+        $this->copyFile('views'.DIRECTORY_SEPARATOR.'js'.DIRECTORY_SEPARATOR.'controller'.DIRECTORY_SEPARATOR.'routes.js');
         $this->copyFile(
-            'views'.DIRECTORY_SEPARATOR.'js'.DIRECTORY_SEPARATOR.'extId'.DIRECTORY_SEPARATOR.'controller'.DIRECTORY_SEPARATOR.'routes.js',
-            'views'.DIRECTORY_SEPARATOR.'js'.DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR.'controller'.DIRECTORY_SEPARATOR.'routes.js'
-        );
-        $this->copyFile(
-            'views'.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'sample.tpl'
+            'views'.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'extId'.DIRECTORY_SEPARATOR.'templateExample.tpl',
+            'views'.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$controllerName.DIRECTORY_SEPARATOR.'templateExample.tpl'
         );
     }
 
@@ -152,6 +152,20 @@ class ExtensionCreator {
             'argv' => array('placeholder', '-action=compile','-extension='.$this->id, '-language=en-US')
         );
         new \tao_scripts_TaoTranslate(array(), $options);
+    }
+    
+    /**
+     * Add the autoloader manually to the composer,
+     * will break on next update
+     */
+    protected function addAutoloader() {
+        $autoloaderFile = VENDOR_PATH.'composer/autoload_psr4.php';
+        $content = file_get_contents($autoloaderFile);
+        
+        $lineToAdd = PHP_EOL.'    \''.$this->authorNamespace.'\\\\'.$this->id.'\\\\\' => array($baseDir . \'/'.$this->id.'\'),';
+        $content = str_replace('return array(', 'return array('.$lineToAdd, $content);
+        
+        $content = file_put_contents($autoloaderFile, $content);
     }
     
     // UTILS

@@ -8,7 +8,6 @@ namespace {authorNs}\{id}\controller;
  *
  * @author {author}
  * @package {id}
- * @subpackage actions
  * @license {license}
  *
  */
@@ -30,6 +29,6 @@ class {classname} extends \tao_actions_CommonModule {
 
     public function templateExample() {
         $this->setData('author', '{author}');
-        $this->setView('sample.tpl');
+        $this->setView('{classname}/templateExample.tpl');
     }
 }

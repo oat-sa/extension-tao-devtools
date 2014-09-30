@@ -18,6 +18,13 @@
  *               
  * 
  */
+namespace oat\taoDevTools\actions;
+
+use tao_actions_Main;
+use core_kernel_classes_Resource;
+use core_kernel_classes_Class;
+use common_ext_ExtensionsManager;
+use wfEngine_models_classes_ProcessExecutionService;
 
 /**
  * The Main Module of tao development tools
@@ -27,7 +34,7 @@
  * @license GPLv2  http://www.opensource.org/licenses/gpl-2.0.php
  * 
  */
-class taoDevTools_actions_WfEngineTool extends tao_actions_Main {
+class WfEngineTool extends tao_actions_Main {
     
     public function __construct() {
         parent::__construct();

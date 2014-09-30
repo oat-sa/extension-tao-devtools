@@ -18,7 +18,9 @@
  *               
  * 
  */
+namespace oat\taoDevTools\actions;
 
+use tao_actions_Main;
 /**
  * The Main Module of tao development tools
  * 
@@ -27,6 +29,6 @@
  * @license GPLv2  http://www.opensource.org/licenses/gpl-2.0.php
  * 
  */
-class taoDevTools_actions_Main extends tao_actions_Main {
+class Main extends tao_actions_Main {
 
 }
