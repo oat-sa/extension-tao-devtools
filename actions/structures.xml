@@ -5,7 +5,6 @@
 		<description />
 		<sections>
 			<section id="settings_ext_mng" name="Extensions manager" url="/taoDevTools/ExtensionsManager/index" policy="override" />
-			<section id="tool" name="Action Viewer" url="/taoDevTools/ControllerMap/index" />
 		</sections>
 	</structure>
 	<structure id="user_settings" name="User Settings" level="12" group="invisible">
