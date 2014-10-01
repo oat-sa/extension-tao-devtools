@@ -5,5 +5,10 @@ define(function(){
                 'index' : 'controller/settings/extensionManager'
             }
         },
+        'FontsConversion' : {
+            'actions' : {
+                'index' : 'controller/fontsConversion/fileUpload'
+            }
+        }
     };
 });

@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE structures SYSTEM "../doc/structures.dtd">
 <structures>
+        <structure id="fonts" name="Icon Font Conversion" level="8" group="main">
+            <description>Convert font</description>
+            <sections>
+                <section name="Convert" url="/taoDevTools/FontsConversion/index"></section>
+            </sections>
+        </structure>
 	<structure id="settings" name="Settings" level="8" group="invisible">
 		<description />
 		<sections>
