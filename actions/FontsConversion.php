@@ -61,7 +61,6 @@ class FontsConversion extends  \tao_actions_CommonModule{
     }
 
     public function index(){
-        $this->setData('file_upload', true);
         $this->setData('upload_limit', $this->maxFileSize);
         $this->setView('fontsConversion/view.tpl');
     }
@@ -407,7 +406,8 @@ class FontsConversion extends  \tao_actions_CommonModule{
 
             }
             // if the line is like .icon-email:before { content: "\141"; } we update the value
-            if(preg_match('#((\.icon-([\w-]+))\b([^{]+)){\s*content ?: ?(\'|")([^(\'|")]+)(\'|");([^}]+)}#', $line, $matches) !== 0){
+            $pattern = '#((\.icon-([\w-]+))\b([^{]+)){\s*content ?: ?(\'|")([^(\'|")]+)(\'|");([^}]+)}#';
+            if(preg_match($pattern, $line, $matches) !== 0){
                 $selector = trim(preg_replace('~\s+~', ' ', trim($matches[1])));
                 $classes = array();
                 $classes[] = $matches[3];
@@ -433,6 +433,12 @@ class FontsConversion extends  \tao_actions_CommonModule{
         file_put_contents($filename, $cssContent);
 
 
+    }
+
+    public function downloadCurrentSelection(){
+        header('Content-disposition: attachment; filename=selection.json');
+        header('Content-type: application/json');
+        echo(file_get_contents($this->distroPath.DIRECTORY_SEPARATOR.'selection.json'));
     }
 
     /**
