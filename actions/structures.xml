@@ -17,7 +17,8 @@
 		<description />
 		<icon id="icon-tools" src=""/>
 		<sections>
-			<section id="tool" name="Controller Viewer" url="/taoDevTools/ControllerMap/index" />
+			<section id="scripts" name="Scripts" url="/taoDevTools/ScriptRunner/index" />
+			<section id="controller_view" name="Controller Viewer" url="/taoDevTools/ControllerMap/index" />
 		</sections>
 	</structure>
 </structures>
