@@ -74,7 +74,7 @@ class UserDebug extends \tao_actions_CommonModule {
     	        $this->setData('formTitle'	, __("Restrict Roles"));
     	        $this->setData('myForm'		, $myForm->render());
     	        
-    	        $this->setView('form_container.tpl', 'tao');
+    	        $this->setView('form.tpl', 'tao');
 	        }
 	    }
 	}

@@ -82,7 +82,7 @@ class ExtensionsManager extends \tao_actions_ExtensionsManager {
 	    }
 
 	    $this->setData('formTitle', __('Create a new Extension'));
-	    $this->setView('form_container.tpl', 'tao');
+	    $this->setView('form.tpl', 'tao');
 	}
 
 }
