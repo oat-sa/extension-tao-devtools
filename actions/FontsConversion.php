@@ -31,11 +31,12 @@ class FontsConversion extends  \tao_actions_CommonModule{
     {
         $this->dir = dirname(dirname(__FILE__));
         $this->distroPath = $this->dir . '/tao-distro';
+        $this->taoPath = $this->dir . '/../tao';
         $this->distroPaths = array(
-            'font'  =>  $this->distroPath . '/views/css/font/tao',
-            'style'  =>  $this->distroPath . '/views/scss/inc',
-            'ck'  =>  $this->distroPath . '/views/js/lib/ckeditor/skins/tao/scss/inc',
-            'helpers'  =>  $this->distroPath . '/helpers'
+            'font'  =>  $this->taoPath . '/views/css/font/tao',
+            'style'  =>  $this->taoPath . '/views/scss/inc',
+            'ck'  =>  $this->taoPath . '/views/js/lib/ckeditor/skins/tao/scss/inc',
+            'helpers'  =>  $this->taoPath . '/helpers'
         );
 
         $this->styleGuidePath = $this->dir . '/styleguide/wp-content/themes/twentytwelve';
@@ -49,10 +50,15 @@ class FontsConversion extends  \tao_actions_CommonModule{
         );
 
         $this->taoMaticPath = $this->dir . '/config';
+        include($this->taoMaticPath . '/iconTest.php');
 
         // load 'do not edit' warning
         if(!$this->doNotEdit = file_get_contents($this->taoMaticPath . '/do-not-edit.tpl')){
             throw new \Exception('Unable to read the file : ' . $this->taoMaticPath . '/do-not-edit.tpl');
+        }
+
+        if (!is_dir($this->distroPath)){
+            mkdir($this->distroPath, 0777, true);
         }
 
         $this->maxFileSize = 8388608;
@@ -213,6 +219,7 @@ class FontsConversion extends  \tao_actions_CommonModule{
         //get the name of the src directory
         $this->srcPath = $this->dir . DIRECTORY_SEPARATOR . $filename;
         if(is_dir($this->srcPath.DIRECTORY_SEPARATOR.'fonts')){
+            $warning = "";
 
             // init remaining variables
             $this->srcPaths = array(
@@ -222,6 +229,15 @@ class FontsConversion extends  \tao_actions_CommonModule{
             );
 
             $this->srcFonts = scandir($this->srcPaths['font']);
+
+            $lastModified = filemtime($this->taoMaticPath . '/selection.json');
+            $timeSinceLastModified = time() - $lastModified;
+            if($timeSinceLastModified > 2 * 60){
+                $warning = __('You are about to change the TAO icon set.')."\n ";
+                $warning .= __('Before you do this please make sure that the directory');
+                $warning .= " ".$this->taoMaticPath . '/selection.json ';
+                $warning .= __('is in sync with the corresponding git repository.');
+            }
 
             // load font configuration along with defaults
             $data  = json_decode(file_get_contents($this->srcPaths['style'] . '/selection.json', 'r'));
@@ -343,7 +359,18 @@ class FontsConversion extends  \tao_actions_CommonModule{
             fclose($handler);
 
             // check validity of the PHP icon class
-            include($this->taoMaticPath . '/iconTest.php');
+
+            try {
+                $iconClass = new \icon($this->taoPath);
+                $iconClass->test();
+            }
+            catch (\Exception $e) {
+                print $e -> getMessage();
+                file_put_contents(__DIR__ . '/errors/' . date('Y-m-d') . '-error.log', date('Y-m-d H:i:s') . ' - ' . $e -> getMessage() . PHP_EOL, FILE_APPEND);
+                if($iconClass->classExists()) {
+                    rename($iconClass->getIconClass(), __DIR__ . '/errors/' . date('Y-m-d') . '-broken.class.Icon.php');
+                }
+            }
 
             // ck toolbar icons
             $cssContent  = '@import "inc/bootstrap";'."\n";
@@ -375,7 +402,7 @@ class FontsConversion extends  \tao_actions_CommonModule{
             $readmeContent = str_replace('{LISTING}', $listing, $readmeContent);
 
 
-            return array('success' => $readmeContent);
+            return array('success' => $readmeContent, 'warning' => $warning);
 
         }
         else{
@@ -438,7 +465,12 @@ class FontsConversion extends  \tao_actions_CommonModule{
     public function downloadCurrentSelection(){
         header('Content-disposition: attachment; filename=selection.json');
         header('Content-type: application/json');
-        echo(file_get_contents($this->distroPath.DIRECTORY_SEPARATOR.'selection.json'));
+        if(file_exists($this->distroPath.DIRECTORY_SEPARATOR.'selection.json')){
+            echo(file_get_contents($this->taoMaticPath.'/selection.json'));
+        }
+        else{
+            echo(file_get_contents($this->taoMaticPath . '/selection.prefs.json'));
+        }
     }
 
     /**

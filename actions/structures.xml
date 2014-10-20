@@ -4,7 +4,7 @@
         <structure id="fonts" name="Icon Font Conversion" level="8" group="main">
             <description>Convert font</description>
             <sections>
-                <section name="Convert" url="/taoDevTools/FontsConversion/index"></section>
+                <section id="convert_font" name="Convert" url="/taoDevTools/FontsConversion/index"/>
             </sections>
         </structure>
 	<structure id="settings" name="Settings" level="8" group="invisible">
