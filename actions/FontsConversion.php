@@ -67,6 +67,16 @@ class FontsConversion extends  \tao_actions_CommonModule{
     }
 
     public function index(){
+        $lastModified = filemtime($this->taoMaticPath . '/selection.json');
+        $timeSinceLastModified = time() - $lastModified;
+        if($timeSinceLastModified > 2 * 60){
+            $warning = __('You are about to change the TAO icon set.')." ";
+            $warning .= __('Before you do this please make sure that the directory');
+            $warning .= " ".$this->taoMaticPath . '/selection.json ';
+            $warning .= __('is in sync with the corresponding git repository.');
+            $this->setData('warning', $warning);
+        }
+
         $this->setData('upload_limit', $this->maxFileSize);
         $this->setView('fontsConversion/view.tpl');
     }
@@ -143,7 +153,7 @@ class FontsConversion extends  \tao_actions_CommonModule{
                     $error = __('unable to move uploaded file');
                 }
                 else{
-                    if($this->extract($this->dir.DIRECTORY_SEPARATOR.$fileName)){
+                    if($this->extract($this->dir.DIRECTORY_SEPARATOR.$fileName, basename($fileName,'.zip'))){
                         unlink($this->dir.DIRECTORY_SEPARATOR.$fileName);
                         $conversion = $this->runConversion(basename($fileName,'.zip'));
                     }
@@ -170,10 +180,10 @@ class FontsConversion extends  \tao_actions_CommonModule{
      * @return bool
      * @throws \common_exception_FileSystemError
      */
-    private function extract($zipFile, $subfolder = '') {
+    private function extract($zipFile, $filename, $subfolder = '') {
         $zip = new ZipArchive();
         if ($zip->open($zipFile) === true) {
-            $destination = $this->dir.$subfolder;
+            $destination = $this->dir.$subfolder.'/'.$filename;
             if(!$zip->extractTo($destination)){
                 $zip->close();
                 throw new \common_exception_FileSystemError('Could not extract '.$zipFile.' to '.$destination);
@@ -219,8 +229,6 @@ class FontsConversion extends  \tao_actions_CommonModule{
         //get the name of the src directory
         $this->srcPath = $this->dir . DIRECTORY_SEPARATOR . $filename;
         if(is_dir($this->srcPath.DIRECTORY_SEPARATOR.'fonts')){
-            $warning = "";
-
             // init remaining variables
             $this->srcPaths = array(
                 'font'  =>  $this->srcPath . '/fonts',
@@ -229,15 +237,6 @@ class FontsConversion extends  \tao_actions_CommonModule{
             );
 
             $this->srcFonts = scandir($this->srcPaths['font']);
-
-            $lastModified = filemtime($this->taoMaticPath . '/selection.json');
-            $timeSinceLastModified = time() - $lastModified;
-            if($timeSinceLastModified > 2 * 60){
-                $warning = __('You are about to change the TAO icon set.')."\n ";
-                $warning .= __('Before you do this please make sure that the directory');
-                $warning .= " ".$this->taoMaticPath . '/selection.json ';
-                $warning .= __('is in sync with the corresponding git repository.');
-            }
 
             // load font configuration along with defaults
             $data  = json_decode(file_get_contents($this->srcPaths['style'] . '/selection.json', 'r'));
@@ -401,11 +400,12 @@ class FontsConversion extends  \tao_actions_CommonModule{
             $readmeContent = file_get_contents($this->taoMaticPath . '/readme.md');
             $readmeContent = str_replace('{LISTING}', $listing, $readmeContent);
 
-
-            return array('success' => $readmeContent, 'warning' => $warning);
+            $this->delTree($this->srcPath);
+            return array('success' => $readmeContent);
 
         }
         else{
+            $this->delTree($this->srcPath);
             return array('error' => $this->srcPath . __(' is not a valid directory'));
         }
 
@@ -503,6 +503,14 @@ class FontsConversion extends  \tao_actions_CommonModule{
         closedir($h);
 
         return $result;
+    }
+
+    public function delTree($dir) {
+        $files = array_diff(scandir($dir), array('.','..'));
+        foreach ($files as $file) {
+            (is_dir("$dir/$file")) ? $this->delTree("$dir/$file") : unlink("$dir/$file");
+        }
+        return rmdir($dir);
     }
 
 

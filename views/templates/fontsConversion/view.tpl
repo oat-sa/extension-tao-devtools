@@ -9,3 +9,11 @@
 </div>
 
 <div class="data-container-wrapper"></div>
+
+<?php if(has_data('warning')): ?>
+    <script>
+        require(['ui/feedback'], function(feedback){
+            feedback().warning("<?= get_data('warning')?>");
+        });
+    </script>
+<?php endif;?>

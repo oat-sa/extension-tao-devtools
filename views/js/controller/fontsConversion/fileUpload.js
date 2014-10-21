@@ -7,9 +7,6 @@ define(['jquery', 'ui', 'ui/uploader', 'ui/feedback'], function($, ui, uploader,
     });
 
     container.on('upload.uploader', function(e, file, interactionHook){
-        if(interactionHook.warning != ''){
-            feedback().warning(interactionHook.warning);
-        }
         $('.data-container-wrapper').html('<pre>'+interactionHook.success+'</pre>');
     });
 
