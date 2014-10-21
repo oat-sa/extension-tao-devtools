@@ -1,4 +1,4 @@
-define(['jquery', 'i18n', 'context', 'helpers'], function($, __, context, helpers){
+define(['jquery', 'i18n', 'context', 'helpers', 'layout/section'], function($, __, context, helpers, section){
 
     var ext_installed = [];
     var toInstall = [];
@@ -111,10 +111,14 @@ define(['jquery', 'i18n', 'context', 'helpers'], function($, __, context, helper
 
             $('#installProgress').hide();
             
-            $('#addButton').click(function() {
-                var uri = helpers._url('create', 'ExtensionsManager', 'taoDevTools') + '?' + $.param({'uri': $('#openuri').val()});
-                helpers.openTab(__('Create new extension'), uri);
-                return false;
+            $('#addButton').click(function(e) {
+		e.preventDefault();
+		section.create({
+                    id : 'devtools-newextension',
+                    name : __('Create new extension'),
+                    url : helpers._url('create', 'ExtensionsManager', 'taoDevTools', {'uri': $('#openuri').val()})
+                })
+                .show();
             });
 
             //Detect wich extension is already installed
