@@ -1,14 +1,21 @@
 <div class="main-container">
-    <h2><?=__('File upload')?></h2>
+    <h2><?=__('Update Tao Icon Font')?></h2>
+    <ol>
+        <li><?= __('For instructions, please follow the tutorial at')?><a href="http://style.taotesting.com/icon-listing/" target="_blank">The Tao Style Guide</a></li>
+        <li><?= __('Download the latest version of')?>  <a href="<?=_url('downloadCurrentSelection','FontsConversion');?>" target="dwl">selection.json</a></li>
+
+    </ol>
     <div class="form-content">
         <div class="xhtml_form tao-scope">
-            <a href="<?=_url('downloadCurrentSelection','FontsConversion');?>" class="btn-success small" target="_blank"><span class="icon-download"></span>Download Selection.json</a>
             <div id="upload-container" data-url="<?=_url('fileUpload','FontsConversion');?>"></div>
         </div>
     </div>
 </div>
 
-<div class="data-container-wrapper"></div>
+
+<iframe id="dwl">
+
+</iframe>
 
 <?php if(has_data('warning')): ?>
     <script>

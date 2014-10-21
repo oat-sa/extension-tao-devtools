@@ -12,7 +12,6 @@ use ZipArchive;
 class FontsConversion extends  \tao_actions_CommonModule{
 
     private $dir;
-    private $distroPath;
     private $distroPaths;
     private $srcPath;
     private $srcPaths;
@@ -30,7 +29,6 @@ class FontsConversion extends  \tao_actions_CommonModule{
     public function __construct()
     {
         $this->dir = dirname(dirname(__FILE__));
-        $this->distroPath = $this->dir . '/tao-distro';
         $this->taoPath = $this->dir . '/../tao';
         $this->distroPaths = array(
             'font'  =>  $this->taoPath . '/views/css/font/tao',
@@ -57,10 +55,6 @@ class FontsConversion extends  \tao_actions_CommonModule{
             throw new \Exception('Unable to read the file : ' . $this->taoMaticPath . '/do-not-edit.tpl');
         }
 
-        if (!is_dir($this->distroPath)){
-            mkdir($this->distroPath, 0777, true);
-        }
-
         $this->maxFileSize = 8388608;
         $this->endMarker = '.generated_icons_end_marker{marker : end;}';
         $this->iconValue = array();
@@ -69,10 +63,10 @@ class FontsConversion extends  \tao_actions_CommonModule{
     public function index(){
         $lastModified = filemtime($this->taoMaticPath . '/selection.json');
         $timeSinceLastModified = time() - $lastModified;
-        if($timeSinceLastModified > 2 * 60){
-            $warning = __('You are about to change the TAO icon set.')." ";
+        if($timeSinceLastModified > 2 * 3600){
+            $warning = __('You are about to change the TAO icon set.')."<br>";
             $warning .= __('Before you do this please make sure that the directory');
-            $warning .= " ".$this->taoMaticPath . '/selection.json ';
+            $warning .= " <code>".$this->taoMaticPath . '/selection.json </code>';
             $warning .= __('is in sync with the corresponding git repository.');
             $this->setData('warning', $warning);
         }
@@ -95,7 +89,7 @@ class FontsConversion extends  \tao_actions_CommonModule{
      * @return array the list of missing icons or TRUE
      */
     private function isSelectionCorrect($data){
-        $remainingData  = json_decode(file_get_contents($this->taoMaticPath . '/selection.json'));
+        $remainingData  = json_decode(file_get_contents($this->taoMaticPath . '/dataName.json'));
         $errors = array_diff($remainingData, $data);
         return (empty($errors))?:$errors;
 
@@ -249,16 +243,15 @@ class FontsConversion extends  \tao_actions_CommonModule{
                 }
             }
 
-
             // get all icons name
             $dataName = array();
             foreach($data->icons as $iconProperties){
                 $dataName[] = $iconProperties->properties->name;
             }
 
-            if(!$this->generateDemo($dataName)){
-                return array('error' => __('Unable to generate the demo file'));
-            }
+//            if(!$this->generateDemo($dataName)){
+//                return array('error' => __('Unable to generate the demo file'));
+//            }
 
             $errors = $this->isSelectionCorrect($dataName);
             if(is_array($errors)){
@@ -266,7 +259,7 @@ class FontsConversion extends  \tao_actions_CommonModule{
             }
 
             // Write list of data name
-            file_put_contents($this->taoMaticPath.'/selection.json',json_encode($dataName));
+            file_put_contents($this->taoMaticPath.'/dataName.json',json_encode($dataName));
 
             // create directory structure
             foreach ($this->distroPaths as $key => $path){
@@ -283,9 +276,8 @@ class FontsConversion extends  \tao_actions_CommonModule{
                 }
             }
 
-            // copy selection.json and tao-main-style.css
-            copy(dirname($this->dir) . '/tao/views/css/tao-main-style.css', $this->distroPath.DIRECTORY_SEPARATOR.'tao-main-style.css');
-            copy($this->srcPaths['style'] . '/selection.json', $this->distroPath.DIRECTORY_SEPARATOR.'selection.json');
+            // copy selection.json
+            copy($this->srcPaths['style'] . '/selection.json', $this->taoMaticPath.DIRECTORY_SEPARATOR.'selection.json');
 
             // read original stylesheet
             if(!$cssContent = file_get_contents($this->srcPaths['style'] . '/style.css')){
@@ -340,7 +332,7 @@ class FontsConversion extends  \tao_actions_CommonModule{
             }
 
             // write the tao-main-style.css with iconCss
-            $this->parseCss($this->distroPath.DIRECTORY_SEPARATOR.'tao-main-style.css');
+            $this->parseCss($this->taoPath.DIRECTORY_SEPARATOR.'views/css/tao-main-style.css');
 
             // write PHP icon class
             $phpContent = file_get_contents($this->taoMaticPath . '/class.Icon.tpl');
@@ -396,12 +388,8 @@ class FontsConversion extends  \tao_actions_CommonModule{
             fwrite($handler,$cssContent);
             fclose($handler);
 
-            $listing = $this->ListIn($this->distroPath);
-            $readmeContent = file_get_contents($this->taoMaticPath . '/readme.md');
-            $readmeContent = str_replace('{LISTING}', $listing, $readmeContent);
-
             $this->delTree($this->srcPath);
-            return array('success' => $readmeContent);
+            return array('success' => __('Your font is now the new font of TAO'));
 
         }
         else{
@@ -465,7 +453,7 @@ class FontsConversion extends  \tao_actions_CommonModule{
     public function downloadCurrentSelection(){
         header('Content-disposition: attachment; filename=selection.json');
         header('Content-type: application/json');
-        if(file_exists($this->distroPath.DIRECTORY_SEPARATOR.'selection.json')){
+        if(file_exists($this->taoMaticPath.DIRECTORY_SEPARATOR.'selection.json')){
             echo(file_get_contents($this->taoMaticPath.'/selection.json'));
         }
         else{
