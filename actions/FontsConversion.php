@@ -28,8 +28,8 @@ class FontsConversion extends  \tao_actions_CommonModule{
 
     public function __construct()
     {
-        $this->dir = dirname(dirname(__FILE__));
-        $this->taoPath = $this->dir . '/../tao';
+        $this->dir = dirname(__DIR__);
+        $this->taoPath = dirname($this->dir) . '/tao';
         $this->distroPaths = array(
             'font'  =>  $this->taoPath . '/views/css/font/tao',
             'style'  =>  $this->taoPath . '/views/scss/inc',
@@ -47,7 +47,7 @@ class FontsConversion extends  \tao_actions_CommonModule{
             'vars'      =>  ''
         );
 
-        $this->taoMaticPath = $this->dir . '/config';
+        $this->taoMaticPath = str_replace(DIRECTORY_SEPARATOR, '/', $this->dir) . '/config';
         include($this->taoMaticPath . '/iconTest.php');
 
         // load 'do not edit' warning
