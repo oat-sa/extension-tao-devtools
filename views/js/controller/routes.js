@@ -10,9 +10,9 @@ define(function(){
                 'index' : 'controller/ScriptRunner/index'
             }
         },
-        'FontsConversion' : {
+        'FontConversion' : {
             'actions' : {
-                'index' : 'controller/fontsConversion/fileUpload'
+                'index' : 'controller/fontConversion/fileUpload'
             }
         }
     };

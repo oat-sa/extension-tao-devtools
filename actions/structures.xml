@@ -3,8 +3,9 @@
 <structures>
     <structure id="fonts" name="Tao Icon Font" level="8" group="main">
         <description>Convert font</description>
+        <icon id="icon-icon" src=""/>
         <sections>
-            <section id="convert_font" name="Convert" url="/taoDevTools/FontsConversion/index"/>
+            <section id="convert_font" name="Convert" url="/taoDevTools/FontConversion/index"/>
         </sections>
     </structure>
 	<structure id="settings" name="Settings" level="8" group="settings">
