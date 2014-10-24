@@ -79,73 +79,66 @@ class FontConversion extends \tao_actions_CommonModule
     }
 
     /**
-     * Function that catch the form submit and upload the file
+     * Catch the form submission and upload the file
      */
     public function fileUpload()
     {
         $error = '';
-        //\console::log($_FILES);
-        if (is_array($_FILES['content'])) {
+        $conversion = '';
 
-            $copy = true;
-            if ($_FILES['content']['error'] !== UPLOAD_ERR_OK) {
+        $copy = true;
+        if ($_FILES['content']['error'] !== UPLOAD_ERR_OK) {
 
-                \common_Logger::w('File upload failed with error ' . $_FILES['content']['error']);
+            \common_Logger::w('File upload failed with error ' . $_FILES['content']['error']);
 
-                $copy = false;
-                switch ($_FILES['content']['error']) {
-                    case UPLOAD_ERR_INI_SIZE:
-                    case UPLOAD_ERR_FORM_SIZE:
-                        $error = __('Media size must be less than : ') . ($this->maxFileSize / 1048576) . __(
-                                ' MB'
-                            ) . '\.';
-                        break;
-                    case UPLOAD_ERR_PARTIAL:
-                        $error = __('file upload failed');
-                        break;
-                    case UPLOAD_ERR_NO_FILE:
-                        $error = __('no file uploaded');
-                        break;
-                }
-            } else {
-
-                if (!isset($_FILES['content']['type'])) {
-                    $copy = false;
-                } elseif (empty($_FILES['content']['type'])) {
-                    $finfo                     = finfo_open(FILEINFO_MIME_TYPE);
-                    $_FILES['content']['type'] = finfo_file($finfo, $_FILES['content']['tmp_name']);
-                }
-                if (!$_FILES['content']['type'] || $_FILES['content']['type'] != 'application/zip') {
-                    $copy  = false;
-                    $error = __('Incompatible media type : ' . $_FILES['content']['type']);
-                }
-                if (!isset($_FILES['content']['size'])) {
-                    $copy  = false;
-                    $error = __('Unknown media size');
-                } else if ($_FILES['content']['size'] > $this->maxFileSize || !is_int($_FILES['content']['size'])) {
-                    $copy  = false;
-                    $error = __('Media size must be less than : ') . ($this->maxFileSize / 1048576) . __(' MB') . '\.';
-                }
-            }
-
-            if ($copy) {
-                $fileName = $_FILES['content']['name'];
-                $filePath = $this->dir . '/' . $fileName;
-                if (!move_uploaded_file($_FILES['content']['tmp_name'], $filePath)) {
-                    $error = __('Unable to move uploaded file');
-                } else {
-                    $nameWithoutExtension = basename($fileName, '.zip');
-                    if ($this->extract($filePath, $nameWithoutExtension)) {
-                        unlink($filePath);
-                        $conversion = $this->runConversion($nameWithoutExtension);
-                    }
-                }
+            $copy = false;
+            switch ($_FILES['content']['error']) {
+                case UPLOAD_ERR_INI_SIZE:
+                case UPLOAD_ERR_FORM_SIZE:
+                    $error = __('Media size must be lesser than : ') . ($this->maxFileSize / 1048576) . __(' MB');
+                    break;
+                case UPLOAD_ERR_PARTIAL:
+                    $error = __('File upload failed');
+                    break;
+                case UPLOAD_ERR_NO_FILE:
+                    $error = __('No file uploaded');
+                    break;
             }
         } else {
-            \common_Logger::w('File upload information missing, probably file > upload limit in php.ini');
 
-            $error = __('Media size must be less than : ') . ($this->maxFileSize / 1048576) . __(' MB') . '\.';
+            if (!isset($_FILES['content']['type'])) {
+                $copy = false;
+            } elseif (empty($_FILES['content']['type'])) {
+                $finfo                     = finfo_open(FILEINFO_MIME_TYPE);
+                $_FILES['content']['type'] = finfo_file($finfo, $_FILES['content']['tmp_name']);
+            }
+            if (!$_FILES['content']['type'] || $_FILES['content']['type'] != 'application/zip') {
+                $copy  = false;
+                $error = __('Incompatible media type : ' . $_FILES['content']['type']);
+            }
+            if (!isset($_FILES['content']['size'])) {
+                $copy  = false;
+                $error = __('Unknown media size');
+            } else if ($_FILES['content']['size'] > $this->maxFileSize || !is_int($_FILES['content']['size'])) {
+                $copy  = false;
+                $error = __('Media size must be lesser than : ') . ($this->maxFileSize / 1048576) . __(' MB');
+            }
         }
+
+        if ($copy) {
+            $fileName = $_FILES['content']['name'];
+            $filePath = $this->dir . '/' . $fileName;
+            if (!move_uploaded_file($_FILES['content']['tmp_name'], $filePath)) {
+                $error = __('Unable to move uploaded file');
+            } else {
+                $nameWithoutExtension = basename($fileName, '.zip');
+                if ($this->extract($filePath, $nameWithoutExtension)) {
+                    unlink($filePath);
+                    $conversion = $this->runConversion($nameWithoutExtension);
+                }
+            }
+        }
+
         if (!!$error) {
             echo json_encode(array('error' => $error));
         } else {
@@ -163,9 +156,9 @@ class FontConversion extends \tao_actions_CommonModule
      */
     private function extract($zipFile)
     {
-        $zipObj = new ZipArchive();
+        $zipObj    = new ZipArchive();
         $zipHandle = $zipObj->open($zipFile);
-        if(true !== $zipHandle) {
+        if (true !== $zipHandle) {
             throw new \common_exception_FileSystemError($zipHandle);
         }
 
@@ -278,7 +271,7 @@ class FontConversion extends \tao_actions_CommonModule
 
                 // icon function name
                 $iconFn = strtolower(trim($icon));
-                $iconFn = str_replace(' ' , '', ucwords(preg_replace('~[\W_-]+~', ' ', $iconFn)));
+                $iconFn = str_replace(' ', '', ucwords(preg_replace('~[\W_-]+~', ' ', $iconFn)));
                 $this->iconFunctions .= '    public static function icon' . $iconFn . '($options=array()){' . "\n"
                     . '        return self::buildIcon(self::' . $constName . ', $options);' . "\n" . '    }' . "\n\n";
 
