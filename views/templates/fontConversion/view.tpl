@@ -17,7 +17,7 @@ $icomoonLink = '<a href="https://icomoon.io/app/#/select" target="_blank">icomoo
     <div class="form-content">
         <div class="xhtml_form">
             <p><?= __('Upload the zip file created on %s below:', $icomoonLink)?></p>
-            <div id="upload-container" data-url="<?=_url('fileUpload','FontConversion');?>"></div>
+            <div id="upload-container" data-url="<?=_url('processFontArchive','FontConversion');?>"></div>
         </div>
     </div>
 </div>
