@@ -23,6 +23,7 @@ namespace oat\taoDevTools\actions;
 use tao_actions_CommonModule;
 use oat\tao\helpers\ControllerHelper;
 use oat\taoDevTools\helper\LocalesGenerator;
+use oat\taoDevTools\helper\DataGenerator;
 
 /**
  * The Main Module of tao development tools
@@ -38,7 +39,9 @@ class ScriptRunner extends tao_actions_CommonModule {
         $this->setData('actions', array(
         	'emptyCache' => __('Empty Cache'),
 //            'compileJs' => __('Compile Java-Scripts'),
-            'generatePo' => __('Regenerate locales files')
+            'generatePo' => __('Regenerate locales files'),
+            'createItems' => __('Create 100 qti Items'),
+            'createTesttakers' => __('Create 1000 test takers')
         ));
         $this->setView('ScriptRunner/index.tpl');
 	}
@@ -66,4 +69,21 @@ class ScriptRunner extends tao_actions_CommonModule {
 	        'message' => __('Translation files have been regenerated')
 	    ));
 	}
+	
+	public function createItems() {
+	    $class = DataGenerator::generateItems(100);
+	    return $this->returnJson(array(
+	        'success' => true,
+	        'message' => __('Items generated in class %s', $class->getLabel())
+	    ));
+	}
+
+	public function createTesttakers() {
+	    $class = DataGenerator::generateTesttakers(1000);
+	    return $this->returnJson(array(
+	        'success' => true,
+	        'message' => __('Testtakers generated in class %s', $class->getLabel())
+	    ));
+	}
+	
 }
