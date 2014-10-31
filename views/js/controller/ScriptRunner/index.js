@@ -1,4 +1,4 @@
-define(['jquery', 'helpers'], function($, helpers){
+define(['jquery', 'helpers', 'ui/feedback'], function($, helpers, feedback){
 	return {
         start : function(){
             
@@ -11,9 +11,9 @@ define(['jquery', 'helpers'], function($, helpers){
                     success: function(data) {
                         helpers.loaded();
                         if (data.success) {
-                            helpers.createInfoMessage(data.message);
+                            feedback().success(data.message);
                         } else {
-                        	helpers.createErrorMessage(data.message);
+                        	feedback().error(data.message);
                         }
                     }
             	});
