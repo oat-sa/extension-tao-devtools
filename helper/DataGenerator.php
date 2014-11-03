@@ -52,45 +52,59 @@ class DataGenerator
         helpers_TimeOutHelper::reset();
         
         return $class;
-    } 
+    }
     
-    public static function generateTesttakers($count = 100) {
+    public static function generateGlobalManager($count = 100) {
+        $topClass = new \core_kernel_classes_Class(CLASS_TAO_USER);
+        $role = new \core_kernel_classes_Resource(INSTANCE_ROLE_GLOBALMANAGER);
+        $class = self::generateUsers($count, $topClass, $role, 'Backoffice user', 'user');
+        
+        return $class;
+    }
+    
+    public static function generateTesttakers($count = 1000) {
         
         $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoGroups');
-        $topClass = new \core_kernel_classes_Class(TAO_SUBJECT_CLASS);
         
-        // ensure tts don't exist already
-        $tt0Exists = \tao_models_classes_UserService::singleton()->loginExists('tt0');
-        if ($tt0Exists) {
-            throw new \common_exception_Error('Testtaker 0 already exists, Generator already run?');
+        
+        $topClass = new \core_kernel_classes_Class(TAO_SUBJECT_CLASS);
+        $role = new \core_kernel_classes_Resource(INSTANCE_ROLE_DELIVERY);
+        $class = self::generateUsers($count, $topClass, $role, 'Test-Taker ', 'tt');
+        
+        $groupClass = new \core_kernel_classes_Class(TAO_GROUP_CLASS);
+        $group = $groupClass->createInstanceWithProperties(array(
+            RDFS_LABEL => $class->getLabel(),
+            TAO_GROUP_MEMBERS_PROP => $class->getInstances()
+        ));
+        
+        return $class;
+    }
+    
+    protected static function generateUsers($count, $class, $role, $label, $prefix) {
+        
+        $userExists = \tao_models_classes_UserService::singleton()->loginExists($prefix.'0');
+        if ($userExists) {
+            throw new \common_exception_Error($label.' 0 already exists, Generator already run?');
         }
         
         $generationId = NameGenerator::generateRandomString(4);
+        $subClass = $class->createSubClass('Generation '.$generationId);
         
         helpers_TimeOutHelper::setTimeOutLimit(helpers_TimeOutHelper::LONG);
-        
-        
-        $class = new \core_kernel_classes_Class(TAO_GROUP_CLASS);
-        $group = $class->createInstanceWithProperties(array(
-            RDFS_LABEL => 'Generation '.$generationId
-        ));
-        
-        $class = $topClass->createSubClass('Generation '.$generationId);
         for ($i = 0; $i < $count; $i++) {
-            $tt = $class->createInstanceWithProperties(array(
-                RDFS_LABEL => 'Test taker '.$i,
+            $tt = $subClass->createInstanceWithProperties(array(
+                RDFS_LABEL => $label.' '.$i,
                 PROPERTY_USER_UILG	=> 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
                 PROPERTY_USER_DEFLG => 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
-                PROPERTY_USER_LOGIN	=> 'tt'.$i,
+                PROPERTY_USER_LOGIN	=> $prefix.$i,
                 PROPERTY_USER_PASSWORD => \core_kernel_users_Service::getPasswordHash()->encrypt('pass'.$i),
-                PROPERTY_USER_ROLES => 'http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole',
-                PROPERTY_USER_FIRSTNAME => 'Testtaker '.$i,
+                PROPERTY_USER_ROLES => $role,
+                PROPERTY_USER_FIRSTNAME => $label.' '.$i,
                 PROPERTY_USER_LASTNAME => 'Family '.$generationId
             ));
-            $group->setPropertyValue(new \core_kernel_classes_Property(TAO_GROUP_MEMBERS_PROP), $tt);
         }
         
         helpers_TimeOutHelper::reset();
-        return $class;
+        return $subClass;
     }
 }
