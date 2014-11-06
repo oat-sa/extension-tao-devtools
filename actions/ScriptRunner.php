@@ -41,7 +41,8 @@ class ScriptRunner extends tao_actions_CommonModule {
 //            'compileJs' => __('Compile Java-Scripts'),
             'generatePo' => __('Regenerate locales files'),
             'createItems' => __('Create 100 qti Items'),
-            'createTesttakers' => __('Create 1000 test takers')
+            'createTesttakers' => __('Create 1000 test takers'),
+            'createGlobalManager' => __('Create 100 global managers'),
         ));
         $this->setView('ScriptRunner/index.tpl');
 	}
@@ -83,6 +84,14 @@ class ScriptRunner extends tao_actions_CommonModule {
 	    return $this->returnJson(array(
 	        'success' => true,
 	        'message' => __('Testtakers generated in class %s', $class->getLabel())
+	    ));
+	}
+	
+	public function createGlobalManager() {
+	    $class = DataGenerator::generateGlobalManager(100);
+	    return $this->returnJson(array(
+	        'success' => true,
+	        'message' => __('Global managers generated in class %s', $class->getLabel())
 	    ));
 	}
 	
