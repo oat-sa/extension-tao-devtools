@@ -14,6 +14,11 @@ define(function(){
             'actions' : {
                 'index' : 'controller/fontConversion/fileUpload'
             }
+        },
+        'StudentTollGenerator' : {
+            'actions' : {
+                'index' : 'controller/fontConversion/fileUpload'
+            }
         }
     };
 });

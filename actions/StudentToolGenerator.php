@@ -13,18 +13,6 @@ use Jig\Utils\StringUtils;
 
 class StudentToolGenerator extends \tao_actions_CommonModule {
 
-    /**
-     * @var array
-     */
-    private $requiredArgs = array(
-        'client'       => 'Client Name (PARCC or OAT)',
-        'title'        => 'Tool Name',
-        'transparent'  => '(1 or 0)',
-        'rotatable'    => '(1 or 0)',
-        'movable'      => '(1 or 0)',
-        'adjustx'      => '(1 or 0)',
-        'adjusty'      => '(1 or 0)',
-    );
 
     /**
      * @var array
@@ -35,19 +23,21 @@ class StudentToolGenerator extends \tao_actions_CommonModule {
     public function index()
     {
         $this->setView('studentToolGenerator/view.tpl');
+        if($_POST){
+            try {
+                $targetPath = $this -> generateTool();
+                $this->setData('message', 'Created skeleton in ' . $targetPath);
+                if ($this->getRequestParameter('errorMessage')) {
+                    $this->setData('errorMessage', $this->getRequestParameter('errorMessage'));
+                }
+                return false;
+            }
+            catch(\Exception $e) {
+                $this->setData('errorMessage', $e -> getMessage());
+            }
+        }
     }
 
-    /**
-     * Start generator
-     */
-    public function run() {
-        try {
-            $this -> generateTool();
-        }
-        catch(\Exception $e) {
-            return $this -> returnJson(array('error' => $e -> getMessage()));
-        }
-    }
 
     /**
      * Take template and create the tool
@@ -61,6 +51,7 @@ class StudentToolGenerator extends \tao_actions_CommonModule {
         $targetPath    = $generatorPath . '/generated-code/' . $this->data['client'] . '/' . $this->data['tool-id'];
         $templatePath  = $generatorPath . '/template';
         if(is_dir($targetPath)) {
+            \console::log($targetPath, $_POST);
             throw new \Exception (sprintf('Tool %s already exists', $this->data['tool-id']));
         }
 
@@ -85,6 +76,7 @@ class StudentToolGenerator extends \tao_actions_CommonModule {
                 file_put_contents($toolFile, $toolContent);
             }
         }
+        return $targetPath;
     }
 
 
@@ -96,52 +88,56 @@ class StudentToolGenerator extends \tao_actions_CommonModule {
      */
     protected function getMappedArguments()
     {
-        $argHelp = "Required arguments are:\n";
-        foreach ($this->requiredArgs as $key => $value) {
-            $argHelp .= $key . ': ' . $value . "\n";
+        $requiredArgs = array(
+            'client'       => 'Client Name',
+            'tool-title'   => 'Tool title',
+            'transparent'  => '(1 or 0)',
+            'rotatable'    => '(1 or 0)',
+            'movable'      => '(1 or 0)',
+            'adjustable-x' => '(1 or 0)',
+            'adjustable-y' => '(1 or 0)',
+        );
+        $argHelp = "<p>Required arguments are:</p><ul>";
+        foreach ($requiredArgs as $key => $value) {
+            $argHelp .= '<li>' . $key . ': ' . $value . '</li>';
         }
+        $argHelp .= '</ul>';
 
-        foreach ($this->requiredArgs as $key => $value) {
-            if (!isset($_POST[$key])) {
+        foreach ($requiredArgs as $key => &$value) {
+            // !string '0' is a valid entry!
+            if (!isset($_POST[$key]) || $_POST[$key] === '') {
                 throw new \Exception($argHelp);
                 break;
             }
-        }
-        $data = $_POST;
-
-        // trim all, cast 0|1 too bool
-        foreach ($data as &$value) {
+            // trim all, cast 0|1 to bool
             $value = trim($value);
             if (in_array($value, array('0', '1'))) {
                 $value = (bool)$value;
             }
         }
-        $data['client']           = strtoupper($data['client']);
-        $data['tool-title']       = StringUtils::removeSpecChars($data['title']);
-        $data['tool-base']        = StringUtils::removeSpecChars($data['tool-title']);
-        $data['tool-fn']          = StringUtils::camelize($data['tool-base']);
-        $data['tool-obj']         = ucfirst($data['tool-fn']);
-        $data['tool-id']          = strtolower($data['client']) . $data['tool-obj'];
-        $data['tool-date']        = date('Y-m-d H:i:s');
-        $data['is-transparent']   = $this->boolToString($data['transparent']);
-        $data['is-rotatable-tl']  = $this->boolToString($data['rotatable']); // default position of rotator
-        $data['is-rotatable-tr']  = $this->boolToString(!$data['adjustx'] && !$data['adjusty']); // only visible when not adjustable
-        $data['is-rotatable-br']  = $this->boolToString(!$data['adjustx'] && !$data['adjusty']); // only visible when not adjustable
-        $data['is-rotatable-bl']  = $this->boolToString($data['rotatable']); // also default position of rotator
-        $data['is-movable']       = $this->boolToString($data['movable']);
-        $data['is-adjustable-x']  = $this->boolToString($data['adjustx']);
-        $data['is-adjustable-y']  = $this->boolToString($data['adjusty']);
-        $data['is-adjustable-xy'] = $this->boolToString($data['adjustx'] && $data['adjusty']);
 
-        unset($data['title']);
-        unset($data['transparent']);
-        unset($data['rotatable']);
-        unset($data['movable']);
-        unset($data['adjustx']);
-        unset($data['adjusty']);
+        $_POST['client']           = strtoupper($_POST['client']);
+        $_POST['tool-base']        = StringUtils::removeSpecChars($_POST['tool-title']);
+        $_POST['tool-fn']          = StringUtils::camelize($_POST['tool-base']);
+        $_POST['tool-obj']         = ucfirst($_POST['tool-fn']);
+        $_POST['tool-id']          = strtolower($_POST['client']) . $_POST['tool-obj'];
+        $_POST['is-transparent']   = $this->boolToString($_POST['transparent']);
+        $_POST['is-rotatable-tl']  = $this->boolToString($_POST['rotatable']); // default position of rotator
+        $_POST['is-rotatable-tr']  = $this->boolToString(!$_POST['adjustable-x'] && !$_POST['adjustable-y']); // only visible when not adjustable
+        $_POST['is-rotatable-br']  = $this->boolToString(!$_POST['adjustable-x'] && !$_POST['adjustable-y']); // only visible when not adjustable
+        $_POST['is-rotatable-bl']  = $this->boolToString($_POST['rotatable']); // also default position of rotator
+        $_POST['is-movable']       = $this->boolToString($_POST['movable']);
+        $_POST['is-adjustable-x']  = $this->boolToString($_POST['adjustable-x']);
+        $_POST['is-adjustable-y']  = $this->boolToString($_POST['adjustable-y']);
+        $_POST['is-adjustable-xy'] = $this->boolToString($_POST['adjustable-x'] && $_POST['adjustable-y']);
 
+        unset($_POST['transparent']);
+        unset($_POST['rotatable']);
+        unset($_POST['movable']);
+        unset($_POST['adjustable-x']);
+        unset($_POST['adjustable-y']);
 
-        return $data;
+        return $_POST;
     }
 
     /**
