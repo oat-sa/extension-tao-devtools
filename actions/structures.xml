@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE structures SYSTEM "../doc/structures.dtd">
 <structures>
-    <structure id="fonts" name="Tao Icon Font" level="8" group="main">
-        <description>Convert font</description>
-        <icon id="icon-icon" src=""/>
+    <structure id="dev_tools" name="Dev Tools" level="8" group="main">
+        <description>Dev Tools</description>
+        <icon id="icon-tools" src=""/>
         <sections>
-            <section id="convert_font" name="Convert" url="/taoDevTools/FontConversion/index"/>
+            <section id="convert_font" name="TAO Icon Font" url="/taoDevTools/FontConversion/index"/>
+            <section id="student_tools" name="Student Tool Generator" url="/taoDevTools/StudentToolGenerator/index"/>
         </sections>
     </structure>
 	<structure id="settings" name="Settings" level="8" group="settings">
