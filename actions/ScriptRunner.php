@@ -24,6 +24,7 @@ use tao_actions_CommonModule;
 use oat\tao\helpers\ControllerHelper;
 use oat\taoDevTools\helper\LocalesGenerator;
 use oat\taoDevTools\helper\DataGenerator;
+use oat\tao\model\search\SearchService;
 
 /**
  * The Main Module of tao development tools
@@ -40,6 +41,7 @@ class ScriptRunner extends tao_actions_CommonModule {
         	'emptyCache' => __('Empty Cache'),
 //            'compileJs' => __('Compile Java-Scripts'),
             'generatePo' => __('Regenerate locales files'),
+            'reindexItems' => __('Reindex the items'),
             'createItems' => __('Create 100 qti Items'),
             'createTesttakers' => __('Create 1000 test takers'),
             'createGlobalManager' => __('Create 100 global managers'),
@@ -68,6 +70,20 @@ class ScriptRunner extends tao_actions_CommonModule {
 	    return $this->returnJson(array(
 	        'success' => true,
 	        'message' => __('Translation files have been regenerated')
+	    ));
+	}
+	
+	public function reindexItems() {
+	    $ids = array();
+	    \common_ext_ExtensionsManager::singleton()->getExtensionById('taoItems');
+	    $class = \taoItems_models_classes_ItemsService::singleton()->getItemClass();
+	    foreach ($class->getInstances(true) as $item) {
+	        $ids[] = $item->getUri();
+	    }
+	    SearchService::getSearchImplementation()->index($ids);
+	    return $this->returnJson(array(
+	        'success' => true,
+	        'message' => __('Reindexed %s items', count($ids))
 	    ));
 	}
 	
