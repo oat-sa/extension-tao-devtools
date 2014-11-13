@@ -104,7 +104,7 @@ class StudentToolGenerator extends \tao_actions_CommonModule {
         $argHelp .= '</ul>';
 
         foreach ($requiredArgs as $key => &$value) {
-            // !string '0' is a valid entry!
+            // string '0' is a valid entry!
             if (!isset($_POST[$key]) || $_POST[$key] === '') {
                 throw new \Exception($argHelp);
                 break;
@@ -121,15 +121,15 @@ class StudentToolGenerator extends \tao_actions_CommonModule {
         $_POST['tool-fn']          = StringUtils::camelize($_POST['tool-base']);
         $_POST['tool-obj']         = ucfirst($_POST['tool-fn']);
         $_POST['tool-id']          = strtolower($_POST['client']) . $_POST['tool-obj'];
-        $_POST['is-transparent']   = $this->boolToString($_POST['transparent']);
-        $_POST['is-rotatable-tl']  = $this->boolToString($_POST['rotatable']); // default position of rotator
-        $_POST['is-rotatable-tr']  = $this->boolToString(!$_POST['adjustable-x'] && !$_POST['adjustable-y']); // only visible when not adjustable
-        $_POST['is-rotatable-br']  = $this->boolToString(!$_POST['adjustable-x'] && !$_POST['adjustable-y']); // only visible when not adjustable
-        $_POST['is-rotatable-bl']  = $this->boolToString($_POST['rotatable']); // also default position of rotator
-        $_POST['is-movable']       = $this->boolToString($_POST['movable']);
-        $_POST['is-adjustable-x']  = $this->boolToString($_POST['adjustable-x']);
-        $_POST['is-adjustable-y']  = $this->boolToString($_POST['adjustable-y']);
-        $_POST['is-adjustable-xy'] = $this->boolToString($_POST['adjustable-x'] && $_POST['adjustable-y']);
+        $_POST['is-transparent']   = json_encode($_POST['transparent']);
+        $_POST['is-rotatable-tl']  = json_encode($_POST['rotatable']); // default position of rotator
+        $_POST['is-rotatable-tr']  = json_encode(!$_POST['adjustable-x'] && !$_POST['adjustable-y']); // only visible when not adjustable
+        $_POST['is-rotatable-br']  = json_encode(!$_POST['adjustable-x'] && !$_POST['adjustable-y']); // only visible when not adjustable
+        $_POST['is-rotatable-bl']  = json_encode($_POST['rotatable']); // also default position of rotator
+        $_POST['is-movable']       = json_encode($_POST['movable']);
+        $_POST['is-adjustable-x']  = json_encode($_POST['adjustable-x']);
+        $_POST['is-adjustable-y']  = json_encode($_POST['adjustable-y']);
+        $_POST['is-adjustable-xy'] = json_encode($_POST['adjustable-x'] && $_POST['adjustable-y']);
 
         unset($_POST['transparent']);
         unset($_POST['rotatable']);
@@ -160,17 +160,5 @@ class StudentToolGenerator extends \tao_actions_CommonModule {
      */
     protected function getReplacements() {
         return array_values($this -> data);
-    }
-
-    /**
-     * This looks a bit dodgy at first glance but it's not. These 'Bool strings' are used to replace placeholders
-     * in the generated JavaScript.
-     *
-     * @param $arg
-     * @return string
-     */
-    protected function boolToString($arg)
-    {
-        return false !== $arg ? "true" : "false";
     }
 } 
