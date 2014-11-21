@@ -41,7 +41,7 @@ class ScriptRunner extends tao_actions_CommonModule {
         	'emptyCache' => __('Empty Cache'),
 //            'compileJs' => __('Compile Java-Scripts'),
             'generatePo' => __('Regenerate locales files'),
-            'reindexItems' => __('Reindex the items'),
+            'reindex' => __('Reindex all resources'),
             'createItems' => __('Create 100 qti Items'),
             'createTesttakers' => __('Create 1000 test takers'),
             'createGlobalManager' => __('Create 100 global managers'),
@@ -73,17 +73,11 @@ class ScriptRunner extends tao_actions_CommonModule {
 	    ));
 	}
 	
-	public function reindexItems() {
-	    $ids = array();
-	    \common_ext_ExtensionsManager::singleton()->getExtensionById('taoItems');
-	    $class = \taoItems_models_classes_ItemsService::singleton()->getItemClass();
-	    foreach ($class->getInstances(true) as $item) {
-	        $ids[] = $item->getUri();
-	    }
-	    SearchService::getSearchImplementation()->index($ids);
+	public function reindex() {
+	    $indexed = SearchService::runIndexing();
 	    return $this->returnJson(array(
 	        'success' => true,
-	        'message' => __('Reindexed %s items', count($ids))
+	        'message' => __('Reindexed %s resources', $indexed)
 	    ));
 	}
 	
