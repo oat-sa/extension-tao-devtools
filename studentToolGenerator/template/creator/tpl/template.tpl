@@ -1,25 +1,30 @@
-<div{{#if id}} id="{{id}}"{{/if}} class="sts-container sts-{{typeIdentifier}}-container{{#if is.movable}} sts-movable-container{{/if}}{{#if is.transparent}} sts-transparent-container{{/if}}">
-    <div class="sts-title-bar">
-        <div class="sts-title">{{title}}</div>
-        <ul class="sts-header-controls">
-            <li class="sts-close sts-button"></li>
-        </ul>
-    </div>
-    <div class="sts-content">
-    <!-- The template for {client}/{tool-title} goes here -->
-    </div>
-    {{#if is.transmutable}}
-    <div class="sts-container-controls">
-        {{#each is.rotatable}}
+<html5:span class="sts-button" data-typeIdentifier="{{typeIdentifier}}" title="{{title}}">
+    <html5:img src="{{icon}}" alt="{{alt}}" />
+</html5:span>
+<html5:div{{#if id}} id="{{id}}"{{/if}} class="sts-container sts-hidden-container sts-{{typeIdentifier}}-container{{#if is.movable}} sts-movable-container{{/if}}{{#if is.transparent}} sts-transparent-container{{/if}}">
+    <html5:div class="sts-title-bar">
+        <html5:div class="sts-title">{{title}}</html5:div>
+        <html5:ul class="sts-header-controls">
+            <html5:li class="sts-close sts-button"></html5:li>
+        </html5:ul>
+    </html5:div>
+    <html5:div class="sts-workspace">
+        <html5:div class="sts-content">
+            <!-- The template for {client}/{tool-title} goes here -->
+        </html5:div>
+        {{#if is.transmutable}}
+        <html5:div class="sts-container-controls">
+            {{#each is.rotatable}}
             {{#if this}}
-                <div class="sts-handle-rotate-{{@key}}"></div>
+            <html5:div class="sts-handle-rotate-{{@key}}"></html5:div>
             {{/if}}
-        {{/each}}
-        {{#each is.adjustable}}
+            {{/each}}
+            {{#each is.adjustable}}
             {{#if this}}
-                <div class="sts-handle-adjustable-{{@key}}"></div>
+            <html5:div class="sts-handle-adjustable-{{@key}}"></html5:div>
             {{/if}}
-        {{/each}}
-    </div>
-    {{/if}}
-</div>
+            {{/each}}
+        </html5:div>
+        {{/if}}
+    </html5:div>
+</html5:div>

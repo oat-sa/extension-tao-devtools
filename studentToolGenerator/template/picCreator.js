@@ -4,7 +4,7 @@ define([
     '{tool-id}/creator/widget/Widget',
     'tpl!{tool-id}/creator/tpl/{tool-base}'
 ], 
-function(_, registry, Widget, commonTpl, markupTpl){
+function(_, registry, Widget, markupTpl){
 
 
     /**
@@ -14,6 +14,9 @@ function(_, registry, Widget, commonTpl, markupTpl){
 
     /**
      * Configuration of the container
+     *
+     * t/r/b/l is meant to be an alternative to the tl/tr/br/bl syntax.
+     * Using them together might look rather weird.
      */
     var is = {
         transparent: {is-transparent}, 
@@ -21,8 +24,12 @@ function(_, registry, Widget, commonTpl, markupTpl){
         rotatable: {
             tl: {is-rotatable-tl},
             tr: {is-rotatable-tr},
+            bl: {is-rotatable-bl},
             br: {is-rotatable-br},
-            bl: {is-rotatable-bl}
+            t:  {is-rotatable-t},
+            r:  {is-rotatable-r},
+            b:  {is-rotatable-b},
+            l:  {is-rotatable-l}
         },
         adjustable: {
             x:  {is-adjustable-x}, 
@@ -91,7 +98,7 @@ function(_, registry, Widget, commonTpl, markupTpl){
                 title : manifest.label,
                 is: is,
                 //referenced as a required file in manifest.media[]
-                icon : manifest.typeIdentifier + '/runtime/media/{tool-base}.svg',
+                icon : manifest.typeIdentifier + '/' + manifest.icon,
                 alt : manifest.short || manifest.label
             });
             
