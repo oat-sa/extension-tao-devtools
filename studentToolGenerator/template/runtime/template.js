@@ -1,8 +1,9 @@
 define([
     'IMSGlobal/jquery_2_1_1',
+    'OAT/sts/common',
     'qtiInfoControlContext'
 ],
-    function($, qtiInfoControlContext){
+    function($, common, qtiInfoControlContext){
 
         var {tool-id} = {
         id : -1,
@@ -22,15 +23,21 @@ define([
             this.dom = dom;
             this.config = config || {};
 
-            var $container = $(dom);
+            var $container = $(dom),
+                $launcher = $container.find('.sts-launch-button'),
+                $tool = $container.find('.sts-container');
 
-            console.log('init', this.getTypeIdentifier(), $container);
+            $launcher.off().on('click.sts', function() {
+                $tool.toggleClass('sts-hidden-container');
+            });
 
             //hook it into the toolbar:
             var toolbarId = 'studentToolbar1';
 
             this.$toolbar = $('#'+toolbarId);
             this.$toolbar.find('.sts-content').append($container);
+
+            common.init($container);
 
         },
         /**

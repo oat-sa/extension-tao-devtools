@@ -98,7 +98,7 @@ function(_, registry, Widget, markupTpl){
                 title : manifest.label,
                 is: is,
                 //referenced as a required file in manifest.media[]
-                icon : manifest.typeIdentifier + '/' + manifest.icon,
+                icon : manifest.typeIdentifier + '/runtime/media/{tool-base}-icon.svg',
                 alt : manifest.short || manifest.label
             });
             
