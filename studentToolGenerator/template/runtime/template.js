@@ -23,13 +23,7 @@ define([
             this.dom = dom;
             this.config = config || {};
 
-            var $container = $(dom),
-                $launcher = $container.find('.sts-launch-button'),
-                $tool = $container.find('.sts-container');
-
-            $launcher.off().on('click.sts', function() {
-                $tool.toggleClass('sts-hidden-container');
-            });
+            var $container = $(dom);
 
             //hook it into the toolbar:
             var toolbarId = 'studentToolbar1';
