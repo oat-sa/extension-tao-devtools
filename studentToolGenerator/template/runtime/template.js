@@ -31,7 +31,7 @@ define([
             this.$toolbar = $('#'+toolbarId);
             this.$toolbar.find('.sts-content').append($container);
 
-            common.init($container);
+            common.init($container, this.config);
 
         },
         /**
@@ -53,7 +53,7 @@ define([
          */
         setSerializedState : function(state){
 
-            console.log('state set to', state);
+            //console.log('state set to', state);
         },
         /**
          * Get the current state of the interaction as a string.
