@@ -64,7 +64,9 @@ function(_, registry, Widget, markupTpl){
          * @returns {Object}
          */
         getDefaultProperties : function(pic){
-            return {};
+            return {
+                is: is
+            };
         },
 
         /**
