@@ -20,18 +20,46 @@
 namespace oat\taoDevTools\actions;
 
 use oat\taoItems\model\pack\Packer;
+use oat\taoItems\model\asset\Loader;
 /**
  * Package visualisation
  */
 class ItemTools extends \tao_actions_CommonModule {
     
-    public function viewPackage() {
+    public function __construct() {
+        // load item constants
         \common_ext_ExtensionsManager::singleton()->getExtensionById('taoItems');
+    }
+    
+    public function viewPackage() {
         $item = new \core_kernel_classes_Resource($this->getRequestParameter('id'));
-        $packer = new Packer($item);
+        $package = (new Packer($item))->pack();
         
-        $json = json_encode($packer->pack(), JSON_PRETTY_PRINT);
-        $this->setData('jsonPackage', $json);
+        $json = json_encode($package, JSON_PRETTY_PRINT);
+        
+        // private so copy/paste
+        $data = $package->JsonSerialize();
+        $assets = array();
+        foreach ($data['assets'] as $type => $typeAssets) {
+            $assets = array_merge($assets, $typeAssets);
+        }
+        
+        $package->getAssets($type);
+        $this->setData('id', $item->getUri());
+        $this->setData('assets', $assets);
+        $this->setData('jsonPackage', htmlentities($json));
         $this->setView('ItemTools/viewPackage.tpl');
+    }
+    
+    public function getAsset() {
+        $item = new \core_kernel_classes_Resource($this->getRequestParameter('id'));
+        $assetPath = $this->getRequestParameter('asset');
+        
+        $mimeType = \tao_helpers_File::getMimeType($assetPath, true);
+        header('Content-Type: ' . $mimeType);
+        
+        $loader = new Loader($item);
+        $content = $loader->getAssetContent($assetPath);
+        echo $content;
     }
 }
