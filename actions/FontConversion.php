@@ -309,7 +309,7 @@ class FontConversion extends \tao_actions_CommonModule
      */
     protected function generatePhpClass($iconSet)
     {
-        $phpClass     = file_get_contents($this->assetDir . '/class.icon.tpl');
+        $phpClass     = file_get_contents($this->assetDir . '/class.Icon.tpl');
         $phpClassPath = $this->tmpDir . '/class.Icon.php';
         $constants    = '';
         $functions    = '';
