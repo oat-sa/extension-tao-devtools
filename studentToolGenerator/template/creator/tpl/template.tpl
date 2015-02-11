@@ -1,4 +1,4 @@
-<html5:div style="display:none" id="sts-{{typeIdentifier}}">
+<html5:div id="sts-{{typeIdentifier}}">
     <html5:span class="sts-button sts-launch-button" data-typeIdentifier="{{typeIdentifier}}" title="{{title}}">
         <html5:img src="{{icon}}" alt="{{alt}}" />
     </html5:span>
