@@ -153,7 +153,7 @@ class FontConversion extends \tao_actions_CommonModule
             $_FILES['content']['type'] = finfo_file($finfo, $_FILES['content']['tmp_name']);
         }
 
-        if (!$_FILES['content']['type'] || preg_match('#application\/(x-g?)?zip(-compressed)?#', $_FILES['content']['type']) !== 1) {
+        if (!$_FILES['content']['type'] || preg_match('#application\/(x-?)?zip(-compressed)?#', $_FILES['content']['type']) !== 1) {
             return array('error' => __('Media must be a zip archive, got ' . $_FILES['content']['type']));
         }
 
