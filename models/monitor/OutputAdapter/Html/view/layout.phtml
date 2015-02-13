@@ -1,0 +1,64 @@
+<?php
+/**
+ * @var $this    common_monitor_Adapter_Html
+ * @var $request common_monitor_Chunk_Request
+ */
+?>
+<!doctype html>
+<html>
+    <head>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css">
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/prettify/r298/run_prettify.js" type="text/javascript"></script>
+        <link href="http://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.css" type="text/css">
+
+        <style>
+                     .prettyprint ol.linenums > li { list-style-type: decimal; }
+        </style>
+
+    </head>
+    <body onload="prettyPrint()">
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <a type="button" class="btn btn-info" href="index.html">Back</a>
+                    Statistics : <a href="<?= $request->getUrl() ?>" target="_blank"><?= $request->getUrl() ?></a>
+                </h3>
+            </div>
+            <div class="panel-body">
+                <div class="panel panel-default">
+                    <?php foreach($this->getRequest()->getClasses() as $className => $class) : ?>
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><?= $className ?></h3>
+                        </div>
+                        <div class="panel-body">
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#instances" role="tab" data-toggle="tab">By instances :</a></li>
+                                <li role="presentation"><a href="#methods" role="tab" data-toggle="tab">By Methods :</a></li>
+                            </ul>
+                        </div>
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane active" id="instances">
+                                <?= $this->partial('class', ['class' => $class]); ?>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="methods">
+                                <?= $this->partial('method', ['methods' => $class->getMethods()]); ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    </body>
+</html>

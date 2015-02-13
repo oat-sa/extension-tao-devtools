@@ -1,0 +1,17 @@
+<?php
+/**
+ * @var $class common_monitor_Chunk_Class
+ */
+?>
+
+<?php foreach($class->getInstances() as $objectId => $instance) : ?>
+
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <h3 class="panel-title">Instance : <?= $objectId ?> (<?= $instance->getRdfUri() ?>)</h3>
+    </div>
+    <div class="panel-body">
+        <?= $this->partial('method', ['methods' => $instance->getMethods()]) ?>
+    </div>
+</div>
+<?php endforeach;?>

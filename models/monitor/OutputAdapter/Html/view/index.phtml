@@ -1,0 +1,45 @@
+<?php
+/**
+ * @var $this    common_monitor_Adapter_Html
+ * @var $request common_monitor_Chunk_Request
+ */
+?>
+<!doctype html>
+<html>
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+<div class="container">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Statistics</h3>
+        </div>
+        <div class="panel-body">
+            <div class="panel panel-default">
+                <ul>
+                    <?php foreach($files as $file) :
+                        $explodedFile = explode('.', $file);
+                        $totalCalls = $explodedFile[0];
+                        $totalDuplicatedCalls = $explodedFile[1];
+                    ?>
+                    <li>
+                        <a class="btn btn-<?= $totalDuplicatedCalls ? 'danger' : 'success' ?>" href="<?= $file ?>"><?= $totalCalls ?>/<?= $totalDuplicatedCalls ?> : <?= $explodedFile[2] ?></a>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

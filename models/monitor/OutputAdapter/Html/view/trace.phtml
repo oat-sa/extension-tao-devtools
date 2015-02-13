@@ -1,0 +1,107 @@
+<?php
+/**
+ * @var $this common_monitor_Adapter_Html
+ * @var $calls common_monitor_Chunk_Call[]
+ */
+?>
+<ul>
+    <?php
+
+    $mergedTraces = $this->getMergedTrace($calls);
+
+    $commonStartingParts = $this->getCommonTracePart($mergedTraces);
+    $commonEndingParts = $this->getCommonTracePart($mergedTraces, false);
+
+    /**
+     * Avoid erroneous common traces detection in reverse way:
+     *
+     *    t1   t2
+     * ------------------
+     *  0 A     A
+     *  1 B     B
+     *  2 C     C
+     *  3 B     D
+     *  4 C     E
+     *  5 D     F
+     *  6 E     G
+     *  7 F
+     *  8 G
+
+     *  In this sequence the starting parts is easy to detect (A-B-C) but
+     * the ending one is more difficult due to the repetition of B-C in
+     * t1. If you compare this two traces from the end you will find that
+     * the ending parts will override the starting one so we cut it.
+     */
+
+    $minSize = $this->getTraceMinSize($mergedTraces);
+    $nbrStartingParts   = count($commonStartingParts);
+    $nbrEndingParts     = count($commonEndingParts);
+    $commonStartingTrace = ($nbrStartingParts) ? $commonStartingParts[$nbrStartingParts-1] : null;
+    $commonEndingTrace = ($nbrEndingParts) ? $commonEndingParts[0]: null;
+    if($minSize < ($nbrEndingParts + $nbrStartingParts) ) {
+        $offset = ($nbrEndingParts + $nbrStartingParts) - $minSize;
+        $nbrEndingParts -= $offset;
+        $commonEndingParts = array_slice($commonEndingParts, $offset);
+    }
+
+    ?>
+    <li>
+        <img src="<?= $this->getUmlImgUrl($mergedTraces, $nbrStartingParts, $nbrEndingParts,$commonStartingTrace, $commonEndingTrace) ?>">
+    </li>
+    <li>
+    <span>Common starting trace :</span>
+        <ul>
+    <?
+        $count = 1;
+        foreach($commonStartingParts as $trace ) :?>
+            <li><?= str_repeat('&nbsp;', $count++) ?> => <?= $trace['function']?> [<?= $trace['file'] ?> (<?= $trace['line'] ?>)]</li>
+    <?php endforeach; ?>
+        </ul>
+    </li>
+
+
+    <?php foreach($mergedTraces as $mergedTrace) :?>
+    <li>
+        <span>Nbr call for this trace : <?= $mergedTrace['count'] ?></span>
+        <ul>
+        <?php
+            $count = 1;
+
+            $diffTrace = array_slice($mergedTrace['trace'], $nbrStartingParts , - $nbrEndingParts );
+
+            if(!count($diffTrace))
+            {
+                //Here we found a trace that is completely represented by the starting and ending parts so
+                //there is no difference to show
+                echo 'This trace is completely contained in starting and ending parts.';
+            }
+            foreach($diffTrace as $trace ) : $traceId = 'trace-id-' . uniqid(); ?>
+                <li>
+                    <a data-toggle="collapse"  href="#<?= $traceId ?>" aria-expanded="false" aria-controls="<?= $traceId ?>">
+                        <?= $trace['function']?> [<?= $trace['file'] ?> (<?= $trace['line'] ?>)]
+                    </a>
+                    <?php $methodSrc = $this->getMethodCodeFromTrace($trace, '</pre><span style="color:red;">', '</span><pre>'); ?>
+                    <div id="<?= $traceId ?>" class="collapse">
+                        <style>
+                            .class<?= $traceId ?> li:nth-child(<?= $trace['line'] - $methodSrc['startOffset']?> ) { background: rgb(255,200,200) }
+                        </style>
+                        <pre class="class<?= $traceId ?> prettyprint linenums:<?= $methodSrc['startOffset'] +1 ?> linenums"><?= $methodSrc['src'] ?></pre>
+                    </div>
+                </li>
+
+        <?php endforeach; ?>
+        </ul>
+    <?php endforeach; ?>
+    </li>
+    <li>
+
+        <span>Common ending trace :</span>
+        <ul>
+    <?php
+        $count = 1;
+        foreach($commonEndingParts as $trace ) :?>
+            <li><?= str_repeat('&nbsp;', $count++) ?> => <?= $trace['function']?> [<?= $trace['file'] ?> (<?= $trace['line'] ?>)]</li>
+    <?php endforeach; ?>
+        </ul>
+    </li>
+</ul>

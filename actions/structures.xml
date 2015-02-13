@@ -1,26 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE structures SYSTEM "../doc/structures.dtd">
 <structures>
-	<structure id="settings" name="Settings" level="8" group="settings">
-		<description />
-		<sections>
-			<section id="settings_ext_mng" name="Extensions manager" url="/taoDevTools/ExtensionsManager/index" policy="override" />
-		</sections>
-	</structure>
-	<structure id="user_settings" name="User Settings" level="12" group="invisible">
-		<description />
-		<sections>
-			<section id="settings_debug_roles" name="Restrict Roles" url="/taoDevTools/UserDebug/roles" />
-		</sections>
-	</structure>
-	<structure id="tools" name="Tools" level="18" group="settings">
-		<description />
-		<icon id="icon-tools" src=""/>
-		<sections>
-			<section id="scripts" name="Scripts" url="/taoDevTools/ScriptRunner/index" />
-			<section id="controller_view" name="Controller Viewer" url="/taoDevTools/ControllerMap/index" />
+    <structure id="settings" name="Settings" level="8" group="settings">
+        <description/>
+        <sections>
+            <section id="settings_ext_mng" name="Extensions manager" url="/taoDevTools/ExtensionsManager/index"
+                     policy="override"/>
+        </sections>
+    </structure>
+    <structure id="user_settings" name="User Settings" level="12" group="invisible">
+        <description/>
+        <sections>
+            <section id="settings_debug_roles" name="Restrict Roles" url="/taoDevTools/UserDebug/roles"/>
+        </sections>
+    </structure>
+    <structure id="tools" name="Tools" level="18" group="settings">
+        <description/>
+        <icon id="icon-tools" src=""/>
+        <sections>
+            <section id="scripts" name="Scripts" url="/taoDevTools/ScriptRunner/index"/>
+            <section id="controller_view" name="Controller Viewer" url="/taoDevTools/ControllerMap/index"/>
             <section id="convert_font" name="TAO Icon Font" url="/taoDevTools/FontConversion/index"/>
             <section id="student_tools" name="Student Tool Generator" url="/taoDevTools/StudentToolGenerator/index"/>
-		</sections>
-	</structure>
+            <section id="monitor_tools" name="Monitor Tool" url="/taoDevTools/MonitorTool/index" >
+                <trees>
+                    <tree name="methods"
+                          dataUrl="/taoDevTools/MonitorTool/getTreeData"
+                          selectClass="item-class-properties"
+                          selectInstance="item-properties"
+                    />
+                </trees>
+                <actions>
+                    <action id="item-properties" name="Status" url="/taoDevTools/MonitorTool/showProperty" group="none" context="class">
+                        <icon id="icon-edit"/>
+                    </action>
+                    <action id="item-class-properties" name="Properties" url="/taoDevTools/MonitorTool/showClassProperty" group="none" context="instance">
+                        <icon id="icon-edit"/>
+                    </action>
+                    <!--
+                    <action id="monitor-start" name="Start" url="/taoDevTools/MonitorTool/installProxy" context="class" group="content">
+                        <icon id="icon-play"/>
+                    </action>
+                    <action id="monitor-stop" name="Stop" url="/taoDevTools/MonitorTool/uninstallProxy" context="class" group="content">
+                        <icon id="icon-stop"/>
+                    </action>
+                    -->
+                </actions>
+            </section>
+        </sections>
+    </structure>
 </structures>

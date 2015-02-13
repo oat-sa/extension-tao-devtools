@@ -19,6 +19,12 @@ define(function(){
             'actions' : {
                 'index' : 'controller/fontConversion/fileUpload'
             }
+        },
+        'MonitorTool' : {
+            'actions' : {
+                'index' : 'controller/monitorTool/monitor'
+
+            }
         }
     };
 });
