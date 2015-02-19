@@ -62,9 +62,13 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
     public function query($statement, $params) {
 
         $call = Monitor::getInstance()->append($this, __METHOD__, func_get_args());
-        $call->startTiming();
+        if($call) {
+            $call->startTiming();
+        }
         $result = $this->persistence->query($statement, $params);
-        $call->stopTiming();
+        if($call) {
+            $call->stopTiming();
+        }
         return $result;
 
     }
@@ -78,9 +82,13 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      */
     public function exec($statement, $params) {
         $call = Monitor::getInstance()->append($this, __METHOD__, func_get_args());
-        $call->startTiming();
+        if($call) {
+            $call->startTiming();
+        }
         $result = $this->persistence->exec($statement, $params);
-        $call->stopTiming();
+        if($call) {
+            $call->stopTiming();
+        }
         return $result;
     }
 
@@ -93,9 +101,13 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      */
     public function insert($tableName, array $data) {
         $call = Monitor::getInstance()->append($this, __METHOD__, func_get_args());
-        $call->startTiming();
+        if($call) {
+            $call->startTiming();
+        }
         $result = $this->persistence->insert($tableName, $data);
-        $call->stopTiming();
+        if($call) {
+            $call->stopTiming();
+        }
         return $result;
     }
 

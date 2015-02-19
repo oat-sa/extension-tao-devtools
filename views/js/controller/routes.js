@@ -22,7 +22,8 @@ define(function(){
         },
         'MonitorTool' : {
             'actions' : {
-                'index' : 'controller/monitorTool/monitor'
+                'index' : 'controller/monitorTool/monitor',
+                'showCallGroupChunk' : 'controller/monitorTool/trace'
 
             }
         }

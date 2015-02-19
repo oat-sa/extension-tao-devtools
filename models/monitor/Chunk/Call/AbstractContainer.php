@@ -12,10 +12,14 @@ use oat\taoDevTools\models\Monitor\Chunk\CallChunk;
 
 abstract class AbstractContainer
 {
-
-
+    /**
+     * @var CallChunk[]
+     */
     protected $calls = [];
 
+    /**
+     * @var CallChunk[]
+     */
     protected $duplicatedCalls = [];
 
     /**
@@ -32,12 +36,8 @@ abstract class AbstractContainer
     }
 
     /**
-     * @param $call
-     */
-
-    /**
      * Propagate a call in the tree
-     * @param common_monitor_Chunk_Call $call
+     * @param CallChunk $call
      * @param bool                   $recursive
      */
     public function addCall(CallChunk $call, $recursive = true) {
@@ -90,6 +90,14 @@ abstract class AbstractContainer
         return $this->duplicatedCalls;
     }
 
-
+    /**
+     * Return score as Calls / DuplicatedCalls
+     * @return int|string
+     */
+    public function getScore() {
+        $nbrCalls           = (float) count($this->getCalls());
+        $nbrDuplicatedCalls = (float) count($this->getDuplicatedCalls());
+        return ($nbrDuplicatedCalls ? sprintf('%.2f', ((100 / $nbrCalls) * $nbrDuplicatedCalls)) : 0);
+    }
 
 }

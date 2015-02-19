@@ -4,14 +4,37 @@
     </div>
 </div>
 
-<dic class="grid-row">
-    <button class="btn-success monitor-tool-bar monitor-start" type="button" disabled="disabled" data-action="startMonitor">
-        <span class="icon-play"></span>Start</button>
-    <button class="btn-error monitor-tool-bar monitor-stop" type="button" disabled="disabled" data-action="stopMonitor">
-        <span class="icon-stop"></span>Stop
-    </button>
-</dic>
-
 <div class="grid-row">
+    <div class="col-12">
+        <ul>
 
+            <li>Monitored Persistence:
+                <ul>
+                    <?php foreach(get_data('proxyPersistenceMap') as $persistenceName => $config): ?>
+                    <li><?php echo $persistenceName; ?>
+                        <ul>
+                            <?php foreach($config as $key => $value) : ?>
+                            <li><?php echo $key . ' = ' . $value; ?></li>
+                            <? endforeach; ?>
+                        </ul>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+            </li>
+            <li>Output adapter:
+                <ul>
+                    <?php foreach(get_data('adapters') as $adapterName => $config): ?>
+                    <li><?php echo $adapterName; ?>
+                        <ul>
+                            <?php foreach($config as $key => $value) : ?>
+                            <li><?php echo $key . ' = ' . $value; ?></li>
+                            <? endforeach; ?>
+                        </ul>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+            </li>
+        </ul>
+
+    </div>
 </div>

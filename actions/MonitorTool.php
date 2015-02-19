@@ -20,6 +20,8 @@
 namespace oat\taoDevTools\actions;
 
 use oat\controllerMap\parser\Factory;
+use oat\taoDevTools\models\Monitor\Exception\AdapterNotFound;
+use oat\taoDevTools\models\Monitor\Exception\ChunkNotFoundException;
 use oat\taoDevTools\models\Monitor\Monitor;
 use oat\taoDevTools\models\Monitor\OutputAdapter\KeyValueAdapter;
 
@@ -40,14 +42,168 @@ class MonitorTool extends \tao_actions_CommonModule {
 
     }
 
+
+    /**
+     * @example method used to populate the tree widget
+     * render json data of the documents in the DOCS_PATH
+     * @return void
+     */
+    public function getTreeData(){
+        return Monitor::getInstance()->getAdapter('tao')
+            ->getTreeData($this->getRequestParameter('classUri'));
+    }
+
     public function index() {
         $config = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDevTools')->getConfig('monitor');
 
         $this->setData('proxyPersistenceMap', isset($config['proxyPersistenceMap']) ? $config['proxyPersistenceMap'] : array() );
-
-        $this->setData('enabled', Monitor::getInstance()->isEnabled());
+        $this->setData('adapters', isset($config['adapters']) ? $config['adapters'] : array() );
 
         $this->setView('monitorTool/index.tpl');
+    }
+
+    /**
+     * Dispatch action in regard of the selected node item
+     * (Called by the tree)
+     * @throws \oat\taoDevTools\models\Monitor\Exception\ChunkNotFoundException
+     * @throws AdapterNotFoundException
+     */
+    public function dispatch() {
+        if(!$storageKey = $this->getRequestParameter('uri')) {
+            $storageKey = $this->getRequestParameter('classUri');
+        }
+
+        if($storageKey == 'root') {
+            $this->forward('index');
+        } else {
+            $taoAdapter = Monitor::getInstance()->getAdapter('tao');
+            if(!$taoAdapter) {
+                throw new AdapterNotFoundException('You must activate the tao adapter to enable reporting in the tao interface.');
+            }
+            $chunk = $taoAdapter->getChunk($storageKey);
+            if($chunk === false) {
+                throw new ChunkNotFoundException('Chunk not found with key :' . $storageKey);
+            }
+            $className = get_class($chunk);
+            $explodedClassName = explode('\\', $className);
+            $className = array_pop($explodedClassName);
+            $this->forward('show' . $className, null, null, array('classUri' => $storageKey));
+
+        }
+    }
+
+    /**
+     * Root tree item property page
+     */
+    public function showRoot() {
+        echo 'root';
+    }
+
+    /**
+     * Request tree item property page
+     */
+    public function showRequestChunk() {
+
+        $classUri = $this->getRequestParameter('classUri');
+        $request = Monitor::getInstance()->getAdapter('tao')->getChunk($classUri);
+        $this->setData('adapter', Monitor::getInstance()->getAdapter('tao'));
+        $this->setData('request', $request);
+        $this->setView('monitorTool/request.tpl');
+
+
+    }
+
+    /**
+     * Class tree item property page
+     */
+    public function showClassChunk() {
+
+        $classUri = $this->getRequestParameter('classUri');
+        $class = Monitor::getInstance()->getAdapter('tao')->getChunk($classUri);
+        $this->setData('class', $class);
+        $this->setData('adapter', Monitor::getInstance()->getAdapter('tao'));
+        $this->setView('monitorTool/class.tpl');
+
+    }
+
+    /**
+     * Method tree item property page
+     */
+    public function showMethodChunk() {
+
+        $classUri = $this->getRequestParameter('classUri');
+        $class = Monitor::getInstance()->getAdapter('tao')->getChunk($classUri);
+        $this->setData('method', $class);
+        $this->setData('adapter', Monitor::getInstance()->getAdapter('tao'));
+        $this->setView('monitorTool/method.tpl');
+
+    }
+
+    /**
+     * Method tree item property page
+     */
+    public function showCallGroupChunk() {
+
+        $classUri = $this->getRequestParameter('uri');
+        $adapter = Monitor::getInstance()->getAdapter('tao');
+        $callGroup = $adapter->getChunk($classUri);
+        $this->setView('monitorTool/call-group.tpl');
+        $this->setData('adapter', Monitor::getInstance()->getAdapter('tao'));
+
+        $calls = $callGroup->getCalls();
+
+        $this->setData('mergedTraceInfo', $adapter->getMergedTraceInfo($calls));
+        $this->setData('adapter', $adapter);
+
+    }
+
+    //XHR
+
+    /**
+     * Start the monitor
+     */
+    public function startMonitor() {
+        if($config = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDevTools')->getConfig('monitor')) {
+            $config['enabled'] = true;
+            \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDevTools')->setConfig('monitor', $config);
+        }
+
+        $status = Monitor::getInstance()->isEnabled();
+        $this->returnJson(array(
+                'success' => $status,
+                'status' => $status
+            )
+        );
+    }
+
+    /**
+     * Stop the monitor
+     */
+    public function stopMonitor() {
+        if($config = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDevTools')->getConfig('monitor')) {
+            $config['enabled'] = false;
+            \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDevTools')->setConfig('monitor', $config);
+        }
+        $status = Monitor::getInstance()->isEnabled();
+        $this->returnJson(array(
+                'success' => !$status,
+                'status' => $status
+            )
+        );
+    }
+
+    /**
+     * Clear monitor data
+     */
+    public function clearMonitor() {
+
+        Monitor::getInstance()->getAdapter('tao')->clearData();
+        $this->returnJson(array(
+                'success' => true,
+                'status' => $status = Monitor::getInstance()->isEnabled(),
+                'refresh' => true
+            )
+        );
     }
 
     /**
@@ -65,106 +221,5 @@ class MonitorTool extends \tao_actions_CommonModule {
         );
     }
 
-    public function showClassProperty() {
-        //echo(print_r($this->getRequestParameters(), true));
 
-        $classUri = $this->getRequestParameter('classUri');
-
-        if($classUri == 'root') {
-            $this->forward('index');
-        } else {
-            $class = Monitor::getInstance()->getAdapter('tao')->getObject($classUri);
-            switch(get_class($class)) {
-                case 'oat\taoDevTools\models\Monitor\Chunk\RequestChunk':
-
-                case 'oat\taoDevTools\models\Monitor\Chunk\ClassChunk':
-
-                case 'oat\taoDevTools\models\Monitor\Chunk\MethodChunk':
-            }
-
-        }
-    }
-
-    public function startMonitor() {
-        if($config = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDevTools')->getConfig('monitor')) {
-            $config['enabled'] = true;
-            \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDevTools')->setConfig('monitor', $config);
-        }
-
-        $status = Monitor::getInstance()->isEnabled();
-        $this->returnJson(array(
-                'success' => $status,
-                'status' => $status
-            )
-        );
-    }
-
-    public function stopMonitor() {
-        if($config = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDevTools')->getConfig('monitor')) {
-            $config['enabled'] = false;
-            \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDevTools')->setConfig('monitor', $config);
-        }
-        $status = Monitor::getInstance()->isEnabled();
-        $this->returnJson(array(
-                'success' => !$status,
-                'status' => $status
-            )
-        );
-    }
-
-    public function showProperty() {
-        echo(print_r($this->getRequestParameters(), true));
-    }
-
-
-    /**
-     * @example method used to populate the tree widget
-     * render json data of the documents in the DOCS_PATH
-     * @return void
-     */
-    public function getTreeData(){
-
-        return Monitor::getInstance()->getAdapter('tao')
-            ->getTreeData();
-
-
-    }
-
-    /**
-     * Change the default generis configuration
-     * to use the proxy and start monitoring calls
-     */
-    public function installProxy() {
-        Monitor::getInstance()->installProxy();
-    }
-
-    /**
-     * Revert the configuration to it's previous state
-     * and stop monitoring calls
-     */
-    public function uninstallProxy() {
-        Monitor::getInstance()->uninstallProxy();
-    }
-
-    /**
-     * this function must contain the word edit
-     */
-    public function editDocument(){
-        $filepath = $this->getRequestParameter('uri');
-
-        // send data to the template
-        $this->setData('filename', substr($filepath, strrpos($filepath, '/')+1));
-        $this->setData('downloadpath', DOCS_URL.$filepath);
-
-        // select the template
-        $this->setView('editDocument.tpl');
-    }
-
-    /**
-     * @see TaoModule::getRootClass
-     * @abstract implement the abstract method
-     */
-    public function getRootClass(){
-        return null;
-    }
 }

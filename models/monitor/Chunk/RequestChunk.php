@@ -105,8 +105,6 @@ class RequestChunk extends AbstractContainer
         return $this->id;
     }
 
-
-
     /**
      * @param array $params
      */

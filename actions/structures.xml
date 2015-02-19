@@ -26,17 +26,31 @@
                 <trees>
                     <tree name="methods"
                           dataUrl="/taoDevTools/MonitorTool/getTreeData"
-                          selectClass="item-class-properties"
-                          selectInstance="item-properties"
+                          selectClass="monitor-dispatch"
+                          selectInstance="monitor-dispatch"
                     />
                 </trees>
                 <actions>
-                    <action id="item-properties" name="Status" url="/taoDevTools/MonitorTool/showProperty" group="none" context="class">
+                    <action id="monitor-dispatch" name="Status" url="/taoDevTools/MonitorTool/dispatch" group="none" context="class">
                         <icon id="icon-edit"/>
                     </action>
-                    <action id="item-class-properties" name="Properties" url="/taoDevTools/MonitorTool/showClassProperty" group="none" context="instance">
-                        <icon id="icon-edit"/>
+
+                    <action id="monitor-start" name="Start" binding="monitorStart" context="*" group="content">
+                        <icon id="icon-play"></icon>
                     </action>
+                    <action id="monitor-stop" name="Stop" binding="monitorStop" context="*" group="content">
+                        <icon id="icon-stop"></icon>
+                    </action>
+                    <action id="monitor-clear" name="Clear" binding="monitorClear" context="*" group="content">
+                        <icon id="icon-backward"></icon>
+                    </action>
+
+                    <action id="monitor-refresh" name="Refresh" binding="monitorRefreshTree" context="*" group="content">
+                        <icon id="icon-reset"/>
+                    </action>
+
+
+
                     <!--
                     <action id="monitor-start" name="Start" url="/taoDevTools/MonitorTool/installProxy" context="class" group="content">
                         <icon id="icon-play"/>

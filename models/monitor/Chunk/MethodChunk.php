@@ -46,9 +46,12 @@ class MethodChunk extends AbstractContainer
         $hash = $call->getHash();
         if(isset($this->callHashes[$hash])) {
 
-           $originalCall = $this->callHashes[$hash];
-           $originalCall->setDuplicated();
-           $this->addDuplicatedCall($originalCall);
+            $originalCall = $this->callHashes[$hash];
+            if(!$originalCall->isDuplicated()) {
+                $originalCall->setDuplicated();
+                $this->addDuplicatedCall($originalCall);
+            }
+
            $call->setDuplicated();
         } else {
             $this->callHashes[$hash] = $call;

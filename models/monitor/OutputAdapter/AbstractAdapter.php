@@ -212,6 +212,78 @@ abstract class AbstractAdapter
         return $hashes;
     }
 
+    /**
+     * Return merged traces information
+     *
+     *
+     * Avoid erroneous common traces detection in reverse way:
+     *
+     *    t1   t2
+     * ------------------
+     *  0 A     A
+     *  1 B     B
+     *  2 C     C
+     *  3 B     D
+     *  4 C     E
+     *  5 D     F
+     *  6 E     G
+     *  7 F
+     *  8 G
+     *
+     *  In this sequence the starting parts is easy to detect (A-B-C) but
+     * the ending one is more difficult due to the repetition of B-C in
+     * t1. If you compare this two traces from the end you will find that
+     * the ending parts will override the starting one so we cut it.
+     *
+     * @param $calls
+     *
+     * @return array
+     */
+    public function getMergedTraceInfo($calls) {
+
+
+        $mergedTraces = $this->getMergedTrace($calls);
+        $commonStartingParts = $this->getCommonTracePart($mergedTraces);
+        $commonEndingParts = $this->getCommonTracePart($mergedTraces, false);
+
+        $minSize = $this->getTraceMinSize($mergedTraces);
+        $nbrStartingParts   = count($commonStartingParts);
+        $nbrEndingParts     = count($commonEndingParts);
+        $commonStartingTrace = ($nbrStartingParts) ? $commonStartingParts[$nbrStartingParts-1] : null;
+        $commonEndingTrace = ($nbrEndingParts) ? $commonEndingParts[0]: null;
+        if($minSize < ($nbrEndingParts + $nbrStartingParts) ) {
+            $offset = ($nbrEndingParts + $nbrStartingParts) - $minSize;
+            $nbrEndingParts -= $offset;
+            $commonEndingParts = array_slice($commonEndingParts, $offset);
+        }
+        $umlSrc = $this->getUmlImgUrl($mergedTraces, $nbrStartingParts, $nbrEndingParts,$commonStartingTrace, $commonEndingTrace);
+        $count = count($calls);
+
+        foreach($mergedTraces as &$mergedTrace) {
+            $mergedTrace['diffTrace'] = array_slice($mergedTrace['trace'], $nbrStartingParts , - $nbrEndingParts );
+            foreach($mergedTrace['diffTrace'] as &$trace) {
+                $trace['methodSrc'] = $this->getMethodCodeFromTrace($trace, '</pre><span style="color:red;">', '</span><pre>');
+            }
+        }
+
+        return array(
+            'count'                     => $count,
+            'params'                    => $count ? $calls[0]->getParams() : array(),
+            'mergedTraces'              => $mergedTraces,
+            'commonEndingParts'         => $commonEndingParts,
+            'commonStartingParts'       => $commonStartingParts,
+            'umlSrc'                    => $umlSrc,
+        );
+    }
+
+    /**
+     * Return the source code of a method
+     * @param        $trace
+     * @param string $methodPrefix
+     * @param string $methodSuffix
+     *
+     * @return array
+     */
     public function getMethodCodeFromTrace($trace, $methodPrefix = '', $methodSuffix = '') {
 
         $lines = file($trace['file']);
@@ -254,6 +326,16 @@ abstract class AbstractAdapter
 
     }
 
+    /**
+     * Return the Yuml formated string of a merged traces
+     * @param $mergedTraces
+     * @param $nbrStartingParts
+     * @param $nbrEndingParts
+     * @param $startCommonTrace
+     * @param $endCommonTrace
+     *
+     * @return string
+     */
     public function getUmlImgUrl($mergedTraces, $nbrStartingParts, $nbrEndingParts, $startCommonTrace, $endCommonTrace) {
 
         //(start)-label><a>[kettle empty]->(Fill Kettle)->(Boil Kettle),<a>[kettle full]->(Boil Kettle)->(end)
