@@ -6,8 +6,8 @@ namespace oat\taoDevTools\models\Monitor;
 
 use oat\taoDevTools\models\Monitor\Chunk\CallChunk;
 use oat\taoDevTools\models\Monitor\Chunk\RequestChunk;
-use oat\taoDevTools\models\Monitor\Exception\BadAdapterConfig;
 use oat\taoDevTools\models\Monitor\OutputAdapter\AbstractAdapter;
+use oat\taoDevTools\models\Monitor\Exception\BadAdapterConfigException;
 
 class Monitor
 {
@@ -259,7 +259,7 @@ class Monitor
         if(!class_exists($className)) {
             $className = $name;
             if(!class_exists($className)) {
-                throw new BadAdapterConfig('Could not find any monitor adapter with name :' . $name);
+                throw new BadAdapterConfigException('Could not find any monitor adapter with name :' . $name);
             }
         }
         return new $className($config);

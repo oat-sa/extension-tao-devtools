@@ -57,6 +57,8 @@ class CallChunk
 
         if(function_exists('xdebug_get_function_stack')) {
             $this->trace = xdebug_get_function_stack();
+        } else {
+            $this->trace = array();
         }
 
         $this->method = $method;
@@ -115,9 +117,11 @@ class CallChunk
      */
     public function getCallerTrace() {
 
-        if(!$this->callerTrace && (count($this->trace) > 3)) {
+        if (!$this->callerTrace && (count($this->trace) > 3)) {
             $this->callerTrace = array_reverse($this->trace);
             $this->callerTrace = array_slice($this->callerTrace, 4);
+        } else {
+            $this->callerTrace = array();
         }
 
         return $this->callerTrace;

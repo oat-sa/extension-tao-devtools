@@ -36,6 +36,11 @@ return array(
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#SysAdminRole', array('ext'=>'taoDevTools')),
     ),
+    'install' => array(
+    	'php' => array(
+    	    __DIR__.DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'registerMonitorPersitence.php'
+        )
+    ),
     'uninstall' => array(
     ),
     'routes' => array(
