@@ -39,6 +39,9 @@ function(_, registry, Widget, markupTpl){
     };
     is.transmutable = _.some(is.rotatable, Boolean) || _.some(is.adjustable, Boolean);
 
+    // the position in which the checkbox should appear
+    var position = 100;
+
     return {
         /**
          * (required) Get the typeIdentifier of the custom interaction
@@ -65,7 +68,8 @@ function(_, registry, Widget, markupTpl){
          */
         getDefaultProperties : function(pic){
             return {
-                is: is
+                is: is,
+                position: position
             };
         },
 
@@ -99,6 +103,7 @@ function(_, registry, Widget, markupTpl){
                 typeIdentifier : manifest.typeIdentifier,
                 title : manifest.label,
                 is: is,
+                position: position,
                 //referenced as a required file in manifest.media[]
                 icon : manifest.typeIdentifier + '/runtime/media/{tool-base}-icon.svg',
                 alt : manifest.short || manifest.label
