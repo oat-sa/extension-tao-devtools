@@ -6,10 +6,7 @@
         <div class="xhtml_form">
             <form method="post" id="sts-form" name="sts-form" action="<?= _url('index')?>">
                 <div>
-                    <label class="form_desc" for="sts-client"><?=__('Client')?></label><select name="client" id="sts-client">
-                        <option value="PARCC"><?=__('PARCC')?></option>
-                        <option value="OAT"><?=__('OAT')?></option>
-                    </select>
+                    <label class="form_desc" for="sts-client"><?=__('Prefix')?></label><input name="client" id="sts-client" type="text">
                 </div>
                 <div>
                     <label class="form_desc" for="sts-tool-title"><?=__('Tool name')?></label><input type="text" name="tool-title" id="sts-tool-title">
