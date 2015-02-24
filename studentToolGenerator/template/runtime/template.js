@@ -25,12 +25,6 @@ define([
 
             var $container = $(dom);
 
-            //hook it into the toolbar:
-            var toolbarId = 'studentToolbar1';
-
-            this.$toolbar = $('#'+toolbarId);
-            this.$toolbar.find('.sts-content').append($container);
-
             common.init($container, this.config);
 
         },

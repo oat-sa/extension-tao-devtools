@@ -1,8 +1,8 @@
-<html5:div style="display:none">
+<html5:div id="sts-{{typeIdentifier}}" class="sts-toolcontainer" data-position="{{position}}">
     <html5:span class="sts-button sts-launch-button" data-typeIdentifier="{{typeIdentifier}}" title="{{title}}">
         <html5:img src="{{icon}}" alt="{{alt}}" />
     </html5:span>
-    <html5:div{{#if id}} id="{{id}}"{{/if}} class="sts-container sts-hidden-container sts-{{typeIdentifier}}-container{{#if is.movable}} sts-movable-container{{/if}}{{#if is.transparent}} sts-transparent-container{{/if}}">
+    <html5:div class="sts-container sts-hidden-container sts-{{typeIdentifier}}-container{{#if is.movable}} sts-movable-container{{/if}}{{#if is.transparent}} sts-transparent-container{{/if}}">
         <html5:div class="sts-title-bar">
             <html5:div class="sts-title">{{title}}</html5:div>
             <html5:ul class="sts-header-controls">
