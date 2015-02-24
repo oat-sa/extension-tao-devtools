@@ -85,7 +85,7 @@ class StudentToolGenerator extends \tao_actions_CommonModule {
     protected function getMappedArguments()
     {
         $requiredArgs = array(
-            'client'       => 'Client Name',
+            'client'       => 'Prefix',
             'tool-title'   => 'Tool title',
             'transparent'  => '(1 or 0)',
             'rotatable'    => '(1 or 0)',
