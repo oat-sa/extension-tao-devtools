@@ -19,6 +19,22 @@
 		<sections>
 			<section id="scripts" name="Scripts" url="/taoDevTools/ScriptRunner/index" />
 			<section id="controller_view" name="Controller Viewer" url="/taoDevTools/ControllerMap/index" />
+			<section id="settings_view" name="System Settings" url="/taoDevTools/SystemSettings/index">
+				<trees>
+				    <tree name="System Settings"
+				    	className="Item"
+				        dataUrl="/taoDevTools/SystemSettings/data"
+				        selectInstance="view-config"
+				    >
+				    <icon id="icon-settings"/>
+				    </tree>
+				</trees>
+				<actions>
+					<action id="view-config" name="View" url="/taoDevTools/SystemSettings/viewSetting" group="content" context="instance">
+					    <icon id="icon-settings"/>
+					</action>
+				</actions>
+			</section>
             <section id="convert_font" name="TAO Icon Font" url="/taoDevTools/FontConversion/index"/>
             <section id="student_tools" name="Student Tool Generator" url="/taoDevTools/StudentToolGenerator/index"/>
             <section id="item_package" name="Item Packages" url="/taoItems/Items/index">

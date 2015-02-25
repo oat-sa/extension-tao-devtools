@@ -1,6 +1,6 @@
-`define([
+define([
     'taoQtiItem/qtiCreator/widgets/static/Widget',
-    '{tool-base}/creator/widget/states/states'
+    '{tool-id}/creator/widget/states/states'
 ], function(Widget, states){
 
     var {tool-obj}Widget = Widget.clone();
