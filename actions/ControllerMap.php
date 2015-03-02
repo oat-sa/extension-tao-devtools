@@ -19,7 +19,7 @@
  */
 namespace oat\taoDevTools\actions;
 
-use oat\controllerMap\parser\Factory;
+use oat\tao\model\controllerMap\Factory;
 
 /**
  * Extensions management controller
