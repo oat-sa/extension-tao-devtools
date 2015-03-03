@@ -1,12 +1,17 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO v2.6-beta2\n"
-"PO-Revision-Date: 2014-05-30T15:54:41\n"
+"Project-Id-Version: TAO v2.7\n"
+"PO-Revision-Date: 2014-10-14T10:43:30\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: en-US\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: en-US\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ../../\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-SearchPath-0: .\n"
 
 msgid "%s extension(s) to install."
 msgstr ""
@@ -24,6 +29,16 @@ msgid "Actions"
 msgstr ""
 
 msgid "Apply"
+msgstr ""
+
+msgid "Cache has been emptied"
+msgstr ""
+
+msgid "Compile Java-Scripts"
+msgstr ""
+
+#, tao-public
+msgid "Controller Viewer"
 msgstr ""
 
 msgid "Create a new Extension"
@@ -45,6 +60,9 @@ msgid "Do you wish to install the following extension(s):\n"
 "%s?"
 msgstr ""
 
+msgid "Empty Cache"
+msgstr ""
+
 msgid "Enable"
 msgstr ""
 
@@ -52,9 +70,6 @@ msgid "Extension can be created"
 msgstr ""
 
 msgid "Extension created"
-msgstr ""
-
-msgid "Extensions"
 msgstr ""
 
 #, tao-public
@@ -79,6 +94,9 @@ msgstr ""
 msgid "Installing extension %s..."
 msgstr ""
 
+msgid "Javascripts have been compiled"
+msgstr ""
+
 msgid "License"
 msgstr ""
 
@@ -92,6 +110,9 @@ msgid "Nothing to install !"
 msgstr ""
 
 msgid "Preparing installation..."
+msgstr ""
+
+msgid "Regenerate locales files"
 msgstr ""
 
 msgid "Requires"
@@ -108,7 +129,18 @@ msgid "Restricted session"
 msgstr ""
 
 #, tao-public
+msgid "Scripts"
+msgstr ""
+
+#, tao-public
 msgid "Settings"
+msgstr ""
+
+#, tao-public
+msgid "Tools"
+msgstr ""
+
+msgid "Translation files have been regenerated"
 msgstr ""
 
 msgid "Uninstall"

@@ -21,6 +21,10 @@
 
 namespace oat\taoDevTools\actions;
 
+use oat\taoQtiItem\model\qti\ImportService;
+use oat\taoDevTools\helper\NameGenerator;
+use oat\taoDevTools\helper\DataGenerator;
+
 /**
  * The Main Module of tao development tools
  *
@@ -37,44 +41,24 @@ class DataCreation extends \tao_actions_Main
         parent::__construct();
     }
 
+    /**
+     * Work in progress
+     */
+    public function createItems()
+    {
+        $count = $this->hasRequestParameter('count') ? $this->getRequestParameter('count') : 100;
+        
+        DataGenerator::generateItems($count);
+
+        echo 'created '.$count.' items';
+    }
+    
     public function createTesttakers()
     {
-        $generationId = $this->generateRandomString(4);
         $count = $this->hasRequestParameter('count') ? $this->getRequestParameter('count') : 1000;
         
-        set_time_limit($count);
-        
-        $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoGroups');
-        
-        $class = new \core_kernel_classes_Class(TAO_GROUP_CLASS);
-        $group = $class->createInstanceWithProperties(array(
-            RDFS_LABEL => 'Generation '.$generationId
-        ));
-        
-        $topClass = new \core_kernel_classes_Class(TAO_SUBJECT_CLASS);
-        $class = $topClass->createSubClass('Generation '.$generationId);
-        for ($i = 0; $i < $count; $i++) {
-            $tt = $class->createInstanceWithProperties(array(
-            	RDFS_LABEL => 'Test taker '.$i,
-                PROPERTY_USER_UILG	=> 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
-                PROPERTY_USER_DEFLG => 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
-                PROPERTY_USER_LOGIN	=> 'tt'.$i,
-                PROPERTY_USER_PASSWORD => \core_kernel_users_Service::getPasswordHash()->encrypt('pass'.$i),
-                PROPERTY_USER_ROLES => 'http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole',
-                PROPERTY_USER_FIRSTNAME => 'Testtaker '.$i,
-                PROPERTY_USER_LASTNAME => 'Family '.$generationId
-            ));
-            $group->setPropertyValue(new \core_kernel_classes_Property(TAO_GROUP_MEMBERS_PROP), $tt);
-        }
+        DataGenerator::generateTesttakers($count);
         echo 'created '.$count.' testakers';
     }
     
-    private function generateRandomString($length = 10) {
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $randomString = '';
-        for ($i = 0; $i < $length; $i++) {
-            $randomString .= $characters[rand(0, strlen($characters) - 1)];
-        }
-        return $randomString;
-    }
 }

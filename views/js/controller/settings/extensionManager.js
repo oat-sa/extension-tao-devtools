@@ -1,4 +1,4 @@
-define(['jquery', 'i18n', 'context', 'helpers'], function($, __, context, helpers){
+define(['jquery', 'i18n',  'helpers', 'layout/section', 'ui/feedback'], function($, __, helpers, section, feedback){
 
     var ext_installed = [];
     var toInstall = [];
@@ -21,7 +21,9 @@ define(['jquery', 'i18n', 'context', 'helpers'], function($, __, context, helper
     function getUnique(orig){
             var a = [];
             for (var i = 0; i < orig.length; i++) {
-                    if ($.inArray(orig[i], a) < 0) a.push(orig[i]);
+                if ($.inArray(orig[i], a) < 0){
+                     a.push(orig[i]);
+                }
             }
             return a;
     }
@@ -37,7 +39,7 @@ define(['jquery', 'i18n', 'context', 'helpers'], function($, __, context, helper
             progressConsole(__('Installing extension %s...').replace('%s', ext));
             $.ajax({
                     type: "POST",
-                    url: context.root_url + "tao/ExtensionsManager/install",
+                    url: helpers._url('install', 'ExtensionsManager', 'tao'),
                     data: 'id='+ext,
                     dataType: 'json',
                     success: function(data) {
@@ -54,7 +56,7 @@ define(['jquery', 'i18n', 'context', 'helpers'], function($, __, context, helper
                                     installError = 1;
                                     progressConsole('Installation of ' + ext + ' failed');
                             }
-                            helpers.createInfoMessage(data.message);
+                            feedback().info(data.message);
                     }
             });
 
@@ -111,10 +113,14 @@ define(['jquery', 'i18n', 'context', 'helpers'], function($, __, context, helper
 
             $('#installProgress').hide();
             
-            $('#addButton').click(function() {
-                var uri = helpers._url('create', 'ExtensionsManager', 'taoDevTools') + '?' + $.param({'uri': $('#openuri').val()});
-                helpers.openTab(__('Create new extension'), uri);
-                return false;
+            $('#addButton').click(function(e) {
+		e.preventDefault();
+		section.create({
+                    id : 'devtools-newextension',
+                    name : __('Create new extension'),
+                    url : helpers._url('create', 'ExtensionsManager', 'taoDevTools', {'uri': $('#openuri').val()})
+                })
+                .show();
             });
 
             //Detect wich extension is already installed
@@ -191,14 +197,17 @@ define(['jquery', 'i18n', 'context', 'helpers'], function($, __, context, helper
             	var id = $(event.target).data('extid');
             	$.ajax({
                     type: "POST",
-                    url: context.root_url + "taoDevTools/ExtensionsManager/disable",
+                    url: helpers._url('disable', 'ExtensionsManager', 'taoDevTools'),
                     data: 'id='+id,
                     dataType: 'json',
                     success: function(data) {
-                        helpers.loaded();
-                        helpers.createInfoMessage(data.message);
                         if (data.success) {
-                            window.location.reload();
+                            feedback().success(data.message);
+                            setTimeout(function(){
+                                window.location.reload();   
+                            }, 1000);
+                        } else {
+                            feedback().info(data.message);
                         }
                     }
             	});
@@ -208,14 +217,17 @@ define(['jquery', 'i18n', 'context', 'helpers'], function($, __, context, helper
             	var id = $(event.target).data('extid');
             	$.ajax({
                     type: "POST",
-                    url: context.root_url + "taoDevTools/ExtensionsManager/enable",
+                    url: helpers._url('enable', 'ExtensionsManager', 'taoDevTools'),
                     data: 'id='+id,
                     dataType: 'json',
                     success: function(data) {
-                        helpers.loaded();
-                        helpers.createInfoMessage(data.message);
                         if (data.success) {
-                            window.location.reload();
+                            feedback().success(data.message);
+                            setTimeout(function(){
+                                window.location.reload();   
+                            }, 1000);
+                        } else {
+                            feedback().info(data.message);
                         }
                     }
             	});
@@ -225,14 +237,17 @@ define(['jquery', 'i18n', 'context', 'helpers'], function($, __, context, helper
             	var id = $(event.target).data('extid');
             	$.ajax({
                     type: "POST",
-                    url: context.root_url + "taoDevTools/ExtensionsManager/uninstall",
+                    url: helpers._url('uninstall', 'ExtensionsManager', 'taoDevTools'),
                     data: 'id='+id,
                     dataType: 'json',
                     success: function(data) {
-                        helpers.loaded();
-                        helpers.createInfoMessage(data.message);
                         if (data.success) {
-                            window.location.reload();
+                            feedback().success(data.message);
+                            setTimeout(function(){
+                                window.location.reload();   
+                            }, 1000);
+                        } else {
+                            feedback().info(data.message);
                         }
                     }
             	});

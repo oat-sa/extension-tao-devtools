@@ -3,3 +3,6 @@
 /.buildpath
 composer.lock
 /vendor/
+/tao/
+/tao-distro/
+generated-code

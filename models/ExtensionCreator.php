@@ -71,11 +71,11 @@ class ExtensionCreator {
         try {
             $this->createDirectoryStructure();
             $this->writebaseFiles();
-            $this->prepareLanguages();
             if (in_array('structure', $this->options)) {
                 $this->addSampleStructure();
             }
             $this->addAutoloader();
+            $this->prepareLanguages();
             
             return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, __('Extension %s created.', $this->label));
         } catch (Exception $e) {
