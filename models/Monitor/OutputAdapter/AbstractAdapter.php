@@ -16,6 +16,12 @@ abstract class AbstractAdapter
 {
 
     /**
+     * If true do not manage call where there is no duplicated call
+     * @var bool
+     */
+    protected $writeOnlyDuplicated = true;
+
+    /**
      * @param array $config
      */
     public function __construct(array $config = null) {
@@ -380,4 +386,24 @@ abstract class AbstractAdapter
         return '(' .  $path . '\r' . $file . '::' .  $trace['line'] . '\r' . $trace['function'] . ')';
 
     }
+
+    /**
+     * @param boolean $writeOnlyDuplicated
+     *
+     * @return AbstractAdapter
+     */
+    public function setWriteOnlyDuplicated($writeOnlyDuplicated) {
+        $this->writeOnlyDuplicated = $writeOnlyDuplicated;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getWriteOnlyDuplicated() {
+        return $this->writeOnlyDuplicated;
+    }
+
+
 }

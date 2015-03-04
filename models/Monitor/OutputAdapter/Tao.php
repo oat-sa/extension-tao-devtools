@@ -96,24 +96,4 @@ class Tao extends AbstractAdapter {
         return $this->storage->getTaoTreeData($key);
     }
 
-    /**
-     * If true, write only requests that own at least one duplicated call
-     * @param boolean $writeOnlyDuplicated
-     *
-     * @return Tao
-     */
-    public function setWriteOnlyDuplicated($writeOnlyDuplicated) {
-        $this->writeOnlyDuplicated = $writeOnlyDuplicated;
-
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getWriteOnlyDuplicated() {
-        return $this->writeOnlyDuplicated;
-    }
-
-
 } 

@@ -43,6 +43,10 @@ class Logger extends  AbstractAdapter
      */
     public function endMonitoring(RequestChunk $request) {
 
+        if($this->writeOnlyDuplicated && !count($request->getDuplicatedCalls())) {
+            return;
+        }
+
         $this->renderStatistics($request);
         $this->flush();
         $this->log('End Monitoring : ' . $this->color($request->getUri(), 92) . PHP_EOL);

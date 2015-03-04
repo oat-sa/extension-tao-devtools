@@ -14,8 +14,6 @@ class Html extends AbstractAdapter
 
     protected $request;
 
-    protected $writeOnlyDuplicated = false;
-
     /**
      * Delegate constructor
      */
@@ -161,24 +159,6 @@ class Html extends AbstractAdapter
         $this->filePath = $filePath;
 
         return $this;
-    }
-
-    /**
-     * @param boolean $writeOnlyDuplicated
-     *
-     * @return Html
-     */
-    public function setWriteOnlyDuplicated($writeOnlyDuplicated) {
-        $this->writeOnlyDuplicated = $writeOnlyDuplicated;
-
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getWriteOnlyDuplicated() {
-        return $this->writeOnlyDuplicated;
     }
 
 
