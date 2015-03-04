@@ -262,7 +262,7 @@ abstract class AbstractAdapter
         foreach($mergedTraces as &$mergedTrace) {
             $mergedTrace['diffTrace'] = array_slice($mergedTrace['trace'], $nbrStartingParts , - $nbrEndingParts );
             foreach($mergedTrace['diffTrace'] as &$trace) {
-                $trace['methodSrc'] = $this->getMethodCodeFromTrace($trace, '</pre><span style="color:red;">', '</span><pre>');
+                $trace['methodSrc'] = $this->getMethodCodeFromTrace($trace);
             }
         }
 
@@ -284,7 +284,7 @@ abstract class AbstractAdapter
      *
      * @return array
      */
-    public function getMethodCodeFromTrace($trace, $methodPrefix = '', $methodSuffix = '') {
+    public function getMethodCodeFromTrace($trace) {
 
         $lines = file($trace['file']);
         $count = 0;

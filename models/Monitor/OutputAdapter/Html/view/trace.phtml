@@ -81,7 +81,7 @@ use oat\taoDevTools\models\Monitor\OutputAdapter\Html;
                     <a data-toggle="collapse"  href="#<?= $traceId ?>" aria-expanded="false" aria-controls="<?= $traceId ?>">
                         <?= $trace['function']?> [<?= $trace['file'] ?> (<?= $trace['line'] ?>)]
                     </a>
-                    <?php $methodSrc = $this->getMethodCodeFromTrace($trace, '</pre><span style="color:red;">', '</span><pre>'); ?>
+                    <?php $methodSrc = $this->getMethodCodeFromTrace($trace); ?>
                     <div id="<?= $traceId ?>" class="collapse">
                         <style>
                             .class<?= $traceId ?> li:nth-child(<?= $trace['line'] - $methodSrc['startOffset']?> ) { background: rgb(255,200,200) }
