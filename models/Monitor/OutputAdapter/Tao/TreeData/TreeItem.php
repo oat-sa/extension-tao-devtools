@@ -21,6 +21,7 @@ class TreeItem {
 
     public function __construct($id, $data, $score = 0) {
         $this->attributes['id'] = $id;
+        $this->attributes['data-uri'] = $id;
         $this->data = $data;
     }
 
