@@ -29,7 +29,7 @@ class FontConversion extends \tao_actions_CommonModule
 
         $writables = array(
             $this->taoDir . '/views/css/font/tao/',
-            $this->taoDir . '/views/scss/inc/',
+            $this->taoDir . '/views/scss/inc/fonts/',
             $this->taoDir . '/views/js/lib/ckeditor/skins/tao/scss/inc/',
             $this->taoDir . '/helpers/',
             $this->assetDir
@@ -248,11 +248,10 @@ class FontConversion extends \tao_actions_CommonModule
 
         // font-family etc.
         $cssContentArr   = explode('.icon', $cssContentArr[1]);
-        $iconCss['vars'] = str_replace(', [class*=" icon-"]', '%tao-icon-setup', $cssContentArr[0]);
+        $iconCss['vars'] = str_replace(', [class*=" icon-"]', '@mixin tao-icon-setup', $cssContentArr[0]);
 
         // the actual css code
-        $iconCss['classes'] = '@import "inc/tao-icon-vars.scss";' . "\n"
-            . '[class^="icon-"], [class*=" icon-"] { @extend %tao-icon-setup; }' . "\n";
+        $iconCss['classes'] = '[class^="icon-"], [class*=" icon-"] { @include tao-icon-setup; }' . "\n";
 
         // build code for PHP icon class and tao-*.scss files
         foreach ($icons as $iconProperties) {
@@ -262,8 +261,8 @@ class FontConversion extends \tao_actions_CommonModule
             $iconHex    = dechex($properties->code);
 
             // tao-*.scss data
-            $iconCss['vars'] .= '%icon-' . $icon . ' { content: "\\' . $iconHex . '"; }' . "\n";
-            $iconCss['classes'] .= '.icon-' . $icon . ':before { @extend %icon-' . $icon . '; }' . "\n";
+            $iconCss['vars'] .= '@mixin icon-' . $icon . ' { content: "\\' . $iconHex . '"; }' . "\n";
+            $iconCss['classes'] .= '.icon-' . $icon . ':before { @include icon-' . $icon . '; }' . "\n";
         }
 
         // compose and write SCSS files
@@ -287,13 +286,13 @@ class FontConversion extends \tao_actions_CommonModule
 
         // ck toolbar icons
         $cssContent = '@import "inc/bootstrap";' . "\n";
-        $cssContent .= '.cke_button_icon, .cke_button { @extend %tao-icon-setup;}' . "\n";
+        $cssContent .= '.cke_button_icon, .cke_button { @include tao-icon-setup;}' . "\n";
 
         foreach ($ckIni as $ckIcon => $taoIcon) {
             if (!$taoIcon) {
                 continue;
             }
-            $cssContent .= '.' . $ckIcon . ':before { @extend %' . $taoIcon . ';}' . "\n";
+            $cssContent .= '.' . $ckIcon . ':before { @include ' . $taoIcon . ';}' . "\n";
         }
 
         file_put_contents($this->tmpDir . '/_ck-icons.scss', $this->doNotEdit . $cssContent);
@@ -357,7 +356,7 @@ class FontConversion extends \tao_actions_CommonModule
     protected function distribute($tmpDir)
     {
         // copy fonts
-        foreach(glob($tmpDir . '/fonts/tao.*') as $font) {
+        foreach(glob($tmpDir . '/font/tao.*') as $font) {
             if(!copy($font, $this->taoDir . '/views/css/font/tao/' . basename($font))) {
                 return array('error' => 'Failed to copy ' . $font);
             }
@@ -365,7 +364,7 @@ class FontConversion extends \tao_actions_CommonModule
 
         // copy icon scss
         foreach(glob($tmpDir . '/_tao-icon-*.scss') as $scss) {
-            if(!copy($scss, $this->taoDir . '/views/scss/inc/' . basename($scss))) {
+            if(!copy($scss, $this->taoDir . '/views/scss/inc/fonts/' . basename($scss))) {
                 return array('error' => 'Failed to copy ' . $scss);
             }
         };
@@ -374,12 +373,12 @@ class FontConversion extends \tao_actions_CommonModule
         if(!copy($tmpDir . '/_ck-icons.scss', $this->taoDir . '/views/js/lib/ckeditor/skins/tao/scss/inc/_ck-icons.scss')) {
             return array('error' => 'Failed to copy ' . $tmpDir . '/_ck-icons.scss');
         }
-        
+
         // copy helper class
         if(!copy($tmpDir . '/class.Icon.php', $this->taoDir . '/helpers/class.Icon.php')) {
             return array('error' => 'Failed to copy ' . $tmpDir . '/class.Icon.php');
         }
-        
+
         // copy selection to assets
         if(!copy($tmpDir . '/selection.json', $this->assetDir . '/selection.json')) {
             return array('error' => 'Failed to copy ' . $tmpDir . '/selection.json');
