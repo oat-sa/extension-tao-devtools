@@ -11,6 +11,6 @@ define(['jquery', 'ui', 'ui/uploader', 'ui/feedback'], function($, ui, uploader,
     });
 
     container.on('fail.uploader', function(e, file, interactionHook){
-        feedback().error(interactionHook.error);
+        feedback().error(interactionHook.message);
     });
 });
