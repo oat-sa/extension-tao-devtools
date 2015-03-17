@@ -44,7 +44,6 @@ class ItemTools extends \tao_actions_CommonModule {
             $assets = array_merge($assets, $typeAssets);
         }
         
-        $package->getAssets($type);
         $this->setData('id', $item->getUri());
         $this->setData('assets', $assets);
         $this->setData('jsonPackage', htmlentities($json));

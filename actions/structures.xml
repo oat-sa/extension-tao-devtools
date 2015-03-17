@@ -47,7 +47,7 @@
                     />
                 </trees>
                 <actions>
-                    <action id="item-package" name="Package" url="/taoDevTools/ItemTools/viewPackage" group="content" context="class">
+                    <action id="item-package" name="Package" url="/taoDevTools/ItemTools/viewPackage" group="content" context="instance">
                         <icon id="icon-edit"/>
                     </action>
                 </actions>
