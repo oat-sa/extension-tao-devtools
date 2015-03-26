@@ -63,14 +63,15 @@ class SystemSettings extends \tao_actions_CommonModule {
         			    ),
             		    'attributes' => array(
             		        'id' => $ext->getId(),
-            		        'class' => 'node-class'
+            		        'class' => 'node-class',
+            		        'data-uri' => $ext->getId()
             		    ),
         			    'state'	=> 'closed'
         		    );
     		    }
     		}
         }
-		echo json_encode($data);
+		$this->returnJson($data);
     }
     
     public function getKeys(\common_ext_Extension $ext) {
@@ -83,10 +84,6 @@ class SystemSettings extends \tao_actions_CommonModule {
                     $key = substr($fileinfo->getFilename(), 0, -strlen('.conf.php'));
                     $data[] =  array(
                         'data' 	=> $key,
-                        'type' => 'class',
-                        '_data' => array(
-                            'id' => $key
-                        ),
                         'attributes' => array(
                             'id' => $key,
                             'class' => 'node-instance'
