@@ -39,6 +39,8 @@ class SettingsRenderer
         if (is_array($settingValue)) {
             return self::renderArray($settingValue);
         } elseif (is_string($settingValue)) {
+            return '"'.$settingValue.'"';
+        } elseif (is_numeric($settingValue)) {
             return $settingValue;
         } elseif (is_object($settingValue) && $settingValue instanceof Configurable) {
             return get_class($settingValue).' : '.self::renderArray($settingValue->getOptions());
