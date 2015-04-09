@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.0-RC04\n"
-"PO-Revision-Date: 2015-03-06T15:54:26\n"
+"Project-Id-Version: TAO 3.0-RC05\n"
+"PO-Revision-Date: 2015-04-09T09:18:56\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: en-US\n"
@@ -174,6 +174,12 @@ msgstr ""
 msgid "Scripts"
 msgstr ""
 
+msgid "Send a message"
+msgstr ""
+
+msgid "Send a message to yourself"
+msgstr ""
+
 #, tao-public
 msgid "Settings"
 msgstr ""
@@ -182,6 +188,7 @@ msgstr ""
 msgid "Student Tool Generator"
 msgstr ""
 
+#, tao-public
 msgid "System Settings"
 msgstr ""
 
@@ -221,6 +228,7 @@ msgstr ""
 msgid "Version"
 msgstr ""
 
+#, tao-public
 msgid "View"
 msgstr ""
 
