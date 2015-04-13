@@ -24,6 +24,9 @@ use tao_actions_CommonModule;
 use oat\tao\helpers\ControllerHelper;
 use oat\taoDevTools\helper\LocalesGenerator;
 use oat\taoDevTools\helper\DataGenerator;
+use oat\tao\model\messaging\Message;
+use oat\tao\model\messaging\MessagingService;
+use oat\tao\model\messaging\transportStrategy\FileSink;
 
 /**
  * The Main Module of tao development tools
@@ -39,10 +42,11 @@ class ScriptRunner extends tao_actions_CommonModule {
         $this->setData('actions', array(
         	'emptyCache' => __('Empty Cache'),
 //            'compileJs' => __('Compile Java-Scripts'),
-            'generatePo' => __('Regenerate locales files'),
+//            'generatePo' => __('Regenerate locales files'),
             'createItems' => __('Create 100 qti Items'),
             'createTesttakers' => __('Create 1000 test takers'),
             'createGlobalManager' => __('Create 100 global managers'),
+            'sendSelfMsg' => __('Send a message to yourself')
         ));
         $this->setView('ScriptRunner/index.tpl');
 	}
@@ -94,5 +98,17 @@ class ScriptRunner extends tao_actions_CommonModule {
 	        'message' => __('Global managers generated in class %s', $class->getLabel())
 	    ));
 	}
+	
+	public function sendSelfMsg() {
+	    $message = new Message();
+	    $message->setTo(\common_session_SessionManager::getSession()->getUser());
+	    $message->setBody('<h1>Tao Dev Message send on the '.\tao_helpers_Date::displayeDate(time()).'</h1>');
+	    $success = MessagingService::singleton()->send($message);
+	    return $this->returnJson(array(
+	        'success' => $success,
+	        'message' => __('Send a message')
+	    ));
+	}
+	
 	
 }
