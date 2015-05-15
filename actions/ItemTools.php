@@ -33,7 +33,8 @@ class ItemTools extends \tao_actions_CommonModule {
     
     public function viewPackage() {
         $item = new \core_kernel_classes_Resource($this->getRequestParameter('id'));
-        $package = (new Packer($item))->pack();
+        $packer = new Packer($item);
+        $package = $packer->pack();
         
         $json = json_encode($package, JSON_PRETTY_PRINT);
         
