@@ -27,6 +27,7 @@ use oat\taoDevTools\helper\DataGenerator;
 use oat\tao\model\messaging\Message;
 use oat\tao\model\messaging\MessagingService;
 use oat\tao\model\messaging\transportStrategy\FileSink;
+use oat\tao\model\search\SearchService;
 
 /**
  * The Main Module of tao development tools
@@ -41,8 +42,9 @@ class ScriptRunner extends tao_actions_CommonModule {
     public function index() {
         $this->setData('actions', array(
         	'emptyCache' => __('Empty Cache'),
+            'reindex' => __('Reindex all resources'),
 //            'compileJs' => __('Compile Java-Scripts'),
-//            'generatePo' => __('Regenerate locales files'),
+            'generatePo' => __('Regenerate locales files'),
             'createItems' => __('Create 100 qti Items'),
             'createTesttakers' => __('Create 1000 test takers'),
             'createGlobalManager' => __('Create 100 global managers'),
@@ -72,6 +74,14 @@ class ScriptRunner extends tao_actions_CommonModule {
 	    return $this->returnJson(array(
 	        'success' => true,
 	        'message' => __('Translation files have been regenerated')
+	    ));
+	}
+	
+	public function reindex() {
+	    $indexed = SearchService::runIndexing();
+	    return $this->returnJson(array(
+	        'success' => true,
+	        'message' => __('Reindexed %s resources', $indexed)
 	    ));
 	}
 	

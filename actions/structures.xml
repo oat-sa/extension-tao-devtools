@@ -37,6 +37,21 @@
 			</section>
             <section id="convert_font" name="TAO Icon Font" url="/taoDevTools/FontConversion/index"/>
             <section id="student_tools" name="Student Tool Generator" url="/taoDevTools/StudentToolGenerator/index"/>
+            <section id="item_package" name="Item Packages" url="/taoDevTools/ItemTools/viewPackage">
+                <trees>
+                    <tree name="Items library"
+                        className="Item"
+                        dataUrl="/taoItems/Items/getOntologyData"
+                        rootNode="http://www.tao.lu/Ontologies/TAOItem.rdf#Item"
+                        selectInstance="item-package"
+                    />
+                </trees>
+                <actions>
+                    <action id="item-package" name="Package" url="/taoDevTools/ItemTools/viewPackage" group="content" context="instance">
+                        <icon id="icon-edit"/>
+                    </action>
+                </actions>
+            </section>
 		</sections>
 	</structure>
 </structures>
