@@ -12,6 +12,9 @@
                     <label class="form_desc" for="sts-tool-title"><?=__('Tool name')?></label><input type="text" name="tool-title" id="sts-tool-title">
                 </div>
                 <div>
+                    <label class="form_desc" for="sts-tool-description"><?=__('Tool description')?></label><input type="text" name="tool-description" id="sts-tool-description">
+                </div>
+                <div>
                     <label class="form_desc" for="sts-transparent"><?=__('Transparent canvas')?></label><select name="transparent" id="sts-transparent">
                         <option value="0"><?=__('No')?></option>
                         <option value="1"><?=__('Yes')?></option>
