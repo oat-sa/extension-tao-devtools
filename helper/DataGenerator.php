@@ -25,6 +25,7 @@ namespace oat\taoDevTools\helper;
 use oat\taoQtiItem\model\qti\ImportService;
 use helpers_TimeOutHelper;
 use oat\taoTestTaker\models\TestTakerService;
+use oat\taoGroups\models\GroupsService;
 
 class DataGenerator
 {
@@ -73,9 +74,12 @@ class DataGenerator
         
         $groupClass = new \core_kernel_classes_Class(TAO_GROUP_CLASS);
         $group = $groupClass->createInstanceWithProperties(array(
-            RDFS_LABEL => $class->getLabel(),
-            TAO_GROUP_MEMBERS_PROP => $class->getInstances()
+            RDFS_LABEL => $class->getLabel()
         ));
+        
+        foreach ($class->getInstances() as $user) {
+            GroupsService::singleton()->addUser($user->getUri(), $group);
+        }
         
         return $class;
     }
