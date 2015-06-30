@@ -244,7 +244,7 @@ class FontConversion extends \tao_actions_CommonModule
 
         // font-face
         $cssContentArr  = explode('[class^="icon-"]', $cssContent);
-        $iconCss['def'] = str_replace('fonts/tao.', 'font/tao/tao.', $cssContentArr[0]) . "\n";
+        $iconCss['def'] = str_replace('fonts/tao.', '#{$fontPath}tao/tao.', $cssContentArr[0]) . "\n";
 
         // font-family etc.
         $cssContentArr   = explode('.icon', $cssContentArr[1]);
