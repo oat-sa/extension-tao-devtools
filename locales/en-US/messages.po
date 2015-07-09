@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO v3.1-dev\n"
-"PO-Revision-Date: 2015-06-18T18:36:14\n"
+"Project-Id-Version: TAO v3.1.0-sprint02\n"
+"PO-Revision-Date: 2015-07-08T17:24:00\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: en-US\n"
@@ -38,6 +38,9 @@ msgid "Apply"
 msgstr ""
 
 msgid "Archive size must be lesser than : "
+msgstr ""
+
+msgid "Before you start working with the TAO icon font make sure that this extension is in sync with the %s."
 msgstr ""
 
 msgid "Cache has been emptied"
@@ -87,6 +90,9 @@ msgstr ""
 msgid "Existing Icons"
 msgstr ""
 
+msgid "Extension %s created."
+msgstr ""
+
 msgid "Extension can be created"
 msgstr ""
 
@@ -109,7 +115,13 @@ msgstr ""
 msgid "Generating cache..."
 msgstr ""
 
+msgid "Global managers generated in class %s"
+msgstr ""
+
 msgid "Hello World"
+msgstr ""
+
+msgid "If you need instructions please follow the tutorial in the %s."
 msgstr ""
 
 msgid "Installation done."
@@ -128,6 +140,9 @@ msgstr ""
 msgid "Item Packages"
 msgstr ""
 
+msgid "Items generated in class %s"
+msgstr ""
+
 #, tao-public
 msgid "Items library"
 msgstr ""
@@ -136,6 +151,9 @@ msgid "Javascripts have been compiled"
 msgstr ""
 
 msgid "License"
+msgstr ""
+
+msgid "Media must be a zip archive, got "
 msgstr ""
 
 msgid "Movable"
@@ -167,6 +185,9 @@ msgid "Regenerate locales files"
 msgstr ""
 
 msgid "Reindex all resources"
+msgstr ""
+
+msgid "Reindexed %s resources"
 msgstr ""
 
 msgid "Requires"
@@ -211,6 +232,9 @@ msgstr ""
 msgid "TAO Icon Font"
 msgstr ""
 
+msgid "Testtakers generated in class %s"
+msgstr ""
+
 msgid "Tool description"
 msgstr ""
 
@@ -227,6 +251,9 @@ msgstr ""
 msgid "Transparent canvas"
 msgstr ""
 
+msgid "Unable to create extension %s, please consult log."
+msgstr ""
+
 msgid "Unable to move uploaded file"
 msgstr ""
 
@@ -237,6 +264,9 @@ msgid "Uninstall"
 msgstr ""
 
 msgid "Update Tao Icon Font"
+msgstr ""
+
+msgid "Upload the zip file created on %s below:"
 msgstr ""
 
 #, tao-public
@@ -254,5 +284,8 @@ msgid "Yes"
 msgstr ""
 
 msgid "You are currently restricted to the following roles"
+msgstr ""
+
+msgid "You will need a copy of %s to get started."
 msgstr ""
 
