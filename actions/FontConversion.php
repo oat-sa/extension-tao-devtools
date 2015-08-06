@@ -147,16 +147,6 @@ class FontConversion extends \tao_actions_CommonModule
             return array('error' => $error);
         }
 
-        // upload ok but problem with data
-        if (empty($_FILES['content']['type'])) {
-            $finfo                     = finfo_open(FILEINFO_MIME_TYPE);
-            $_FILES['content']['type'] = finfo_file($finfo, $_FILES['content']['tmp_name']);
-        }
-
-        if (!$_FILES['content']['type'] || preg_match('#application\/(x-?)?zip(-compressed)?#', $_FILES['content']['type']) !== 1) {
-            return array('error' => __('Media must be a zip archive, got ' . $_FILES['content']['type']));
-        }
-
         $filePath = $this->tmpDir . '/' . $_FILES['content']['name'];
         if (!move_uploaded_file($_FILES['content']['tmp_name'], $filePath)) {
             return array('error' => __('Unable to move uploaded file'));
@@ -177,12 +167,12 @@ class FontConversion extends \tao_actions_CommonModule
         $archiveObj    = new ZipArchive();
         $archiveHandle = $archiveObj->open($archiveFile);
         if (true !== $archiveHandle) {
-            return array('error' => 'Could not open archive');
+            return array('error' => __('Could not open archive'));
         }
 
         if (!$archiveObj->extractTo($archiveDir)) {
             $archiveObj->close();
-            return array('error' => 'Could not extract archive');
+            return array('error' => __('Could not extract archive'));
         }
         $archiveObj->close();
         return $archiveDir;
@@ -197,14 +187,22 @@ class FontConversion extends \tao_actions_CommonModule
      */
     protected function checkIntegrity($currentSelection, $oldSelection)
     {
-        if($currentSelection->metadata->name !== 'tao'
-          || $currentSelection->preferences->fontPref->metadata->fontFamily !== 'tao') {
-            return array('error' => 'You need to change the font name to "tao" in the icomoon preferences');
+        $metadataExists = property_exists($currentSelection, 'metadata') && property_exists($currentSelection->metadata, 'name');
+
+        $prefExists = property_exists($currentSelection, 'preferences') && property_exists($currentSelection->preferences, 'fontPref')
+            && property_exists($currentSelection->preferences->fontPref, 'metadata') && property_exists($currentSelection->preferences->fontPref->metadata, 'fontFamily') ;
+
+        if (($metadataExists && $currentSelection->metadata->name !== 'tao')
+            || ($prefExists && $currentSelection->preferences->fontPref->metadata->fontFamily !== 'tao')
+            || (!$prefExists && !$metadataExists)
+        ) {
+            return array('error' => __('You need to change the font name to "tao" in the icomoon preferences'));
         }
         $newSet = $this->dataToGlyphSet($currentSelection);
         $oldSet = $this->dataToGlyphSet($oldSelection);
+
         return !!count(array_diff($oldSet, $newSet))
-            ? array('error', '<p>Font incomplete!</p><ul><li>Is the extension in sync width git?</li><li>Have you removed any glyphs?</li></ul>')
+            ? array('error' => __('Font incomplete!  Is the extension in sync width git?  Have you removed any glyphs?'))
             : true;
     }
 
@@ -356,7 +354,7 @@ class FontConversion extends \tao_actions_CommonModule
     protected function distribute($tmpDir)
     {
         // copy fonts
-        foreach(glob($tmpDir . '/font/tao.*') as $font) {
+        foreach(glob($tmpDir . '/fonts/tao.*') as $font) {
             if(!copy($font, $this->taoDir . '/views/css/font/tao/' . basename($font))) {
                 return array('error' => 'Failed to copy ' . $font);
             }
