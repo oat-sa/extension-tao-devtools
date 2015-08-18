@@ -48,9 +48,9 @@ class SystemSettings extends \tao_actions_CommonModule {
     		$data = array(
     			'data' 	=> __("Settings"),
     			'attributes' => array(
-    					'id' => 1,
-    					'class' => 'node-class'
-    				),
+					'id' => 1,
+					'class' => 'node-class'
+				),
     			'children' => array()
     			);
     		foreach (\common_ext_ExtensionsManager::singleton()->getInstalledExtensions() as $ext) {
@@ -58,9 +58,6 @@ class SystemSettings extends \tao_actions_CommonModule {
         			$data['children'][] =  array(
             		    'data' 	=> $ext->getManifest()->getLabel(),
         			    'type' => 'class',
-        			    '_data' => array(
-        			        'id' => $ext->getId()
-        			    ),
             		    'attributes' => array(
             		        'id' => $ext->getId(),
             		        'class' => 'node-class',
