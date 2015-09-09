@@ -106,12 +106,13 @@ class taoDevTools_models_RdfDiff
         foreach ($this->toRemove as $line) {
             $sql .= 'DELETE FROM statements WHERE subject = ' . $this->escape($line['s']) . ' AND predicate = ' . $this->escape($line['p']) . ' AND object = ' . $this->escape($line['o']) . ' AND l_language = ' . $this->escape($line['l']) . ";\n";
         }
-        $junk = ",DEFAULT,'updateScript','yyy[admin,administrators,authors]','yyy[admin,administrators,authors]','yyy[admin,administrators,authors]','" . date("m/d/y g:i A", time()) . "'";
         $namespaces = common_ext_NamespaceManager::singleton()->getAllNamespaces();
         foreach ($this->toAdd as $line) {
             $nsPrefix = substr($line['s'], 0, strpos($line['s'], '#') + 1);
             $ns = isset($namespaces[$nsPrefix]) ? $namespaces[$nsPrefix]->getModelId() : common_ext_NamespaceManager::singleton()->getLocalNamespace()->getModelId();
-            $sql .= 'INSERT INTO statements VALUES (' . $ns . ',' . $this->escape($line['s']) . ',' . $this->escape($line['p']) . ',' . $this->escape($line['o']) . ',' . $this->escape($line['l']) . $junk . ");\n";
+            $sql .= 'INSERT INTO statements (modelid,subject,predicate,object,l_language,author,epoch) VALUES '
+                .'(' . $ns . ',' . $this->escape($line['s']) . ',' . $this->escape($line['p']) . ',' . $this->escape($line['o']) . ',' . $this->escape($line['l']) . ','
+                ."'updateScript','" . date("m/d/y g:i A", time()) . "');\n";
         }
         return $sql;
     }
