@@ -118,7 +118,8 @@ define(['jquery', 'i18n',  'helpers', 'layout/section', 'ui/feedback'], function
 		section.create({
                     id : 'devtools-newextension',
                     name : __('Create new extension'),
-                    url : helpers._url('create', 'ExtensionsManager', 'taoDevTools', {'uri': $('#openuri').val()})
+                    url : helpers._url('create', 'ExtensionsManager', 'taoDevTools'),
+                    contentBlock : true
                 })
                 .show();
             });
