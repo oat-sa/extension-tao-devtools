@@ -9,18 +9,11 @@ return array(
     'version' => '{version}',
 	'author' => '{author}',
 	'requires' => {requires},
-	// for compatibility
-	'dependencies' => {dependencies},
 	'managementRole' => '{managementRole}',
     'acl' => array(
         array('grant', '{managementRole}', array('ext'=>'{id}')),
     ),
     'uninstall' => array(
-    ),
-    'autoload' => array (
-        'psr-4' => array(
-            '{authorNs}\\{id}\\' => dirname(__FILE__).DIRECTORY_SEPARATOR
-        )
     ),
     'routes' => array(
         '/{id}' => '{authorNs}\\{id}\\controller'

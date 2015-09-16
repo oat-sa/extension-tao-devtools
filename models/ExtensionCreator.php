@@ -114,7 +114,7 @@ class ExtensionCreator {
             '{description}' => self::escape($this->description),
             '{authorNs}' => $this->authorNamespace,
             '{dependencies}' => 'array(\''.implode('\',\'', array_keys($this->requires)).'\')',
-            '{requires}' => \common_Utils::toPHPVariableString($this->requires),
+            '{requires}' => \common_Utils::toHumanReadablePhpString($this->requires, 1),
             '{managementRole}' => GENERIS_NS.'#'.$this->id.'Manager',
             '{licenseBlock}' => $this->getLicense() 
         );
