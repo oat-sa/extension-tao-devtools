@@ -100,7 +100,7 @@ class ExtensionCreator {
     }
     
     protected function copyFile($file, $destination = null, $extra = array()) {
-        $sample = file_get_contents(dirname(__FILE__).DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$file);
+        $sample = file_get_contents(dirname(__FILE__).DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$file.'.sample');
         $destination = $this->getDestinationDirectory().(is_null($destination) ? $file : $destination);
         if (!file_exists(dirname($destination))) {
             mkdir(dirname($destination), 0770, true);
