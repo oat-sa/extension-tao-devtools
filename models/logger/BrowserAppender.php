@@ -40,19 +40,21 @@ class BrowserAppender
      */
     public function dolog( common_log_Item $item)
     {
-        switch($item->getSeverity()){
-        case common_Logger::ERROR_LEVEL :
-            ChromePhp::error($item->getDescription() . ' at ' . $item->getCallerFile . ':' . $item->getCallerLine());
-            break;
-        case common_Logger::WARNING_LEVEL :
-            ChromePhp::warn($item->getDescription());
-            break;
-        case common_Logger::INFO_LEVEL :
-            ChromePhp::info($item->getDescription());
-            break;
-        default :
-            ChromePhp::log($item->getDescription());
-            break;
+        if(php_sapi_name() != 'cli'){
+            switch($item->getSeverity()){
+            case common_Logger::ERROR_LEVEL :
+                ChromePhp::error($item->getDescription() . ' at ' . $item->getCallerFile . ':' . $item->getCallerLine());
+                break;
+            case common_Logger::WARNING_LEVEL :
+                ChromePhp::warn($item->getDescription());
+                break;
+            case common_Logger::INFO_LEVEL :
+                ChromePhp::info($item->getDescription());
+                break;
+            default :
+                ChromePhp::log($item->getDescription());
+                break;
+            }
         }
     }
 }
