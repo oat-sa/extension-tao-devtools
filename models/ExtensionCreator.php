@@ -100,7 +100,7 @@ class ExtensionCreator {
     }
     
     protected function copyFile($file, $destination = null, $extra = array()) {
-        $sample = file_get_contents(dirname(__FILE__).DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$file);
+        $sample = file_get_contents(dirname(__FILE__).DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$file.'.sample');
         $destination = $this->getDestinationDirectory().(is_null($destination) ? $file : $destination);
         if (!file_exists(dirname($destination))) {
             mkdir(dirname($destination), 0770, true);
@@ -114,7 +114,7 @@ class ExtensionCreator {
             '{description}' => self::escape($this->description),
             '{authorNs}' => $this->authorNamespace,
             '{dependencies}' => 'array(\''.implode('\',\'', array_keys($this->requires)).'\')',
-            '{requires}' => \common_Utils::toPHPVariableString($this->requires),
+            '{requires}' => \common_Utils::toHumanReadablePhpString($this->requires, 1),
             '{managementRole}' => GENERIS_NS.'#'.$this->id.'Manager',
             '{licenseBlock}' => $this->getLicense() 
         );
@@ -126,8 +126,6 @@ class ExtensionCreator {
     protected function writeBaseFiles() {
         $this->copyFile('manifest.php');
         $this->copyFile('composer.json');
-        $this->copyFile('.htaccess');
-        $this->copyFile('index.php');
     }
     
     protected function addSampleStructure() {
