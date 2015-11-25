@@ -43,7 +43,7 @@ class BrowserAppender
         if(php_sapi_name() != 'cli'){
             switch($item->getSeverity()){
             case common_Logger::ERROR_LEVEL :
-                ChromePhp::error($item->getDescription() . ' at ' . $item->getCallerFile . ':' . $item->getCallerLine());
+                ChromePhp::error($item->getDescription() . ' at ' . $item->getCallerFile() . ':' . $item->getCallerLine());
                 break;
             case common_Logger::WARNING_LEVEL :
                 ChromePhp::warn($item->getDescription());
