@@ -36,7 +36,7 @@ class Updater extends \common_ext_ExtensionUpdater
         
         $currentVersion = $initialVersion;
         
-        if ($this->isLessThan('2.8')) {
+        if ($this->isBetween('0','2.8')) {
             $this->setVersion('2.8');
         }
         
