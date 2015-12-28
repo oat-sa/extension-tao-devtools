@@ -44,6 +44,10 @@ class SettingsRenderer
             return $settingValue;
         } elseif (is_object($settingValue) && $settingValue instanceof Configurable) {
             return get_class($settingValue).' : '.self::renderArray($settingValue->getOptions());
+        } elseif (is_bool($settingValue)) {
+            return $settingValue ? 'true' : 'false';
+        } elseif (is_null($settingValue)) {
+            return 'null';
         } else {
             return 'other';
         }

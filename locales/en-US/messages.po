@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO v3.1.0-sprint02\n"
-"PO-Revision-Date: 2015-07-08T17:24:00\n"
+"Project-Id-Version: TAO 3.1.0-sprint15\n"
+"PO-Revision-Date: 2015-12-23T13:12:12\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: en-US\n"
@@ -51,6 +51,12 @@ msgstr ""
 
 #, tao-public
 msgid "Controller Viewer"
+msgstr ""
+
+msgid "Could not extract archive"
+msgstr ""
+
+msgid "Could not open archive"
 msgstr ""
 
 msgid "Create 100 global managers"
@@ -106,6 +112,9 @@ msgstr ""
 msgid "File upload failed"
 msgstr ""
 
+msgid "Font incomplete!  Is the extension in sync width git?  Have you removed any glyphs?"
+msgstr ""
+
 msgid "Generate"
 msgstr ""
 
@@ -116,9 +125,6 @@ msgid "Generating cache..."
 msgstr ""
 
 msgid "Global managers generated in class %s"
-msgstr ""
-
-msgid "Hello World"
 msgstr ""
 
 msgid "If you need instructions please follow the tutorial in the %s."
@@ -151,9 +157,6 @@ msgid "Javascripts have been compiled"
 msgstr ""
 
 msgid "License"
-msgstr ""
-
-msgid "Media must be a zip archive, got "
 msgstr ""
 
 msgid "Movable"
@@ -284,6 +287,9 @@ msgid "Yes"
 msgstr ""
 
 msgid "You are currently restricted to the following roles"
+msgstr ""
+
+msgid "You need to change the font name to \"tao\" in the icomoon preferences"
 msgstr ""
 
 msgid "You will need a copy of %s to get started."

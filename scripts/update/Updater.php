@@ -24,26 +24,22 @@ namespace oat\taoDevTools\scripts\update;
  * 
  * @author Joel Bout <joel@taotesting.com>
  */
-class Updater extends \common_ext_ExtensionUpdater {
-
-	/**
+class Updater extends \common_ext_ExtensionUpdater
+{
+    /**
      * 
      * @param string $currentVersion
      * @return string $versionUpdatedTo
      */
-    public function update($initialVersion) {
+    public function update($initialVersion)
+    {
         
         $currentVersion = $initialVersion;
         
-        if ($currentVersion == '2.6') {
-        	$currentVersion = '2.6.1';
+        if ($this->isBetween('0','2.8')) {
+            $this->setVersion('2.8');
         }
-        if ($currentVersion == '2.6.1') {
-            $currentVersion = '2.7.0';
-        }
-        if ($currentVersion == '2.7.0') {
-            $currentVersion = '2.7.1';
-        }
-        return $currentVersion;
+        
+        return null;
     }
 }
