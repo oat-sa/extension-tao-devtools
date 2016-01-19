@@ -1,0 +1,114 @@
+<?php
+{licenseBlock}
+
+namespace {authorNs}\{id}\model\theme;
+
+use oat\tao\helpers\Template;
+use oat\tao\model\theme\DefaultTheme;
+use oat\tao\model\theme\Theme;
+use Jig\Utils\StringUtils;
+
+/**
+ * Class {platformTheme}
+ *
+ * @package {authorNs}\{id}\model\theme
+ */
+class {platformTheme} extends DefaultTheme
+{
+
+    /**
+     * Id of this extension
+     */
+    const EXTENSION_ID = '{id}';
+
+
+    /**
+     * Theme's label
+     */
+    const THEME_LABEL = '{themeLabel}';
+
+
+    /**
+     * Theme's id, by default label without spec chars
+     */
+    const THEME_ID = '{themeId}';
+
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getId()
+    {
+        return self::THEME_ID;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getLabel()
+    {
+        return __(self::THEME_LABEL);
+    }
+
+
+    /**
+     * @param string $id
+     * @param string $context
+     * @return string
+     */
+    public function getTemplate($id, $context = Theme::CONTEXT_BACKOFFICE)
+    {
+        switch ($id) {
+            case 'header' :
+                $template = Template::getTemplate(
+                    'themes/platform/' . self::THEME_ID . '/header.tpl',
+                    self::EXTENSION_ID
+                );
+                break;
+
+            case 'header-logo' :
+                $template = Template::getTemplate(
+                    'themes/platform/' . self::THEME_ID . '/header-logo.tpl',
+                    self::EXTENSION_ID
+                );
+                break;
+
+            case 'footer' :
+                $template = Template::getTemplate(
+                    'themes/platform/' . self::THEME_ID . '/footer.tpl',
+                    self::EXTENSION_ID
+                );
+                break;
+
+            case 'login-message' :
+                $template = Template::getTemplate(
+                    'themes/platform/' . self::THEME_ID . '/login-message.tpl',
+                    self::EXTENSION_ID
+                );
+                break;
+                
+            default:
+                $template = parent::getTemplate($id);
+        }
+        return $template;
+    }
+
+
+    /**
+     * @param string $context
+     * @return string
+     */
+    public function getStylesheet($context = Theme::CONTEXT_BACKOFFICE)
+    {
+        return Template::css('themes/platform/' . self::THEME_ID . '/theme.css', self::EXTENSION_ID);
+    }
+}

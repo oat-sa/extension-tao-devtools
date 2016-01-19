@@ -20,6 +20,8 @@
 
 namespace oat\taoDevTools\models;
 
+use Jig\Utils\StringUtils;
+
 /**
  * Creates a new extension
  * 
@@ -70,10 +72,15 @@ class ExtensionCreator {
     public function run() {
         try {
             $this->createDirectoryStructure();
-            $this->writebaseFiles();
             if (in_array('structure', $this->options)) {
                 $this->addSampleStructure();
             }
+            if (in_array('theme', $this->options)) {
+                $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoThemingPlatform');
+                $this->requires['taoThemingPlatform'] = '>='.$ext->getVersion();
+                $this->addSampleTheme();
+            }
+            $this->writebaseFiles();
             $this->addAutoloader();
             $this->prepareLanguages();
             
@@ -137,6 +144,44 @@ class ExtensionCreator {
             'views'.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'extId'.DIRECTORY_SEPARATOR.'templateExample.tpl',
             'views'.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$controllerName.DIRECTORY_SEPARATOR.'templateExample.tpl'
         );
+    }
+
+    /**
+     * Adds sample code for theme support
+     */
+    protected function addSampleTheme() {
+        // replacements
+        $values = array(
+            '{themeLabel}' => $this->label . ' default theme',
+            '{themeId}' => StringUtils::camelize($this->label . ' default theme'),
+            '{platformTheme}' => StringUtils::camelize($this->label . ' default theme', true)
+        );
+        $pathValues = array();
+        foreach($values as $key => $value) {
+            $pathValues[trim($key, '{}')] = $value;
+        }
+
+        // copy templates
+        $templates = array();
+        $paths = array(
+            array('model','theme','*.sample'),
+            array('scripts','install','*.sample'),
+            array('views','templates','themes','platform','themeId','*.sample'),
+            array('views','scss','themes','items','*.sample'),
+            array('views','scss','themes','platform','themeId','*.sample')
+        );
+
+        $originalPath = getcwd();
+        chdir('./models/templates');
+        foreach($paths as $path) {
+            $templates = array_merge($templates, glob(implode(DIRECTORY_SEPARATOR, $path)));
+        }
+        chdir($originalPath);
+
+        foreach($templates as $template) {
+            $template = substr($template, 0, strrpos($template, '.'));
+            $this->copyFile($template, str_replace(array_keys($pathValues), $pathValues, $template), $values);
+        }
     }
 
     protected function prepareLanguages() {
