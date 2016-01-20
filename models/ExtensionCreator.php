@@ -87,7 +87,7 @@ class ExtensionCreator {
             $this->addAutoloader();
             $this->prepareLanguages();
             
-            return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, __('Extension %s created.', $this->label));
+            return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, __('Extension %s created. Before you install the extension make sure you add it to /vendor/composer/autoload_psr4.php', $this->label));
         } catch (Exception $e) {
             \common_Logger::w('Failed creating extension "'.$this->id.'": '.$e->getMessage());
             return new \common_report_Report(\common_report_Report::TYPE_ERROR, __('Unable to create extension %s, please consult log.', $this->label));
