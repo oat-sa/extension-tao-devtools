@@ -6,7 +6,6 @@ namespace {authorNs}\{id}\model\theme;
 use oat\tao\helpers\Template;
 use oat\tao\model\theme\DefaultTheme;
 use oat\tao\model\theme\Theme;
-use Jig\Utils\StringUtils;
 
 /**
  * Class {platformTheme}

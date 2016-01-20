@@ -47,6 +47,8 @@ class ExtensionCreator {
     
     private $options;
 
+    private $installScripts = array();
+
     public function __construct($id, $name, $version, $author, $namespace, $license, $description, $dependencies, $options) {
         $this->id = $id;
         $this->label = $name;
@@ -78,6 +80,7 @@ class ExtensionCreator {
             if (in_array('theme', $this->options)) {
                 $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoThemingPlatform');
                 $this->requires['taoThemingPlatform'] = '>='.$ext->getVersion();
+                $this->addInstallScript('php', '{__DIR__}/scripts/install/setThemeConfig.php');
                 $this->addSampleTheme();
             }
             $this->writebaseFiles();
@@ -123,7 +126,8 @@ class ExtensionCreator {
             '{dependencies}' => 'array(\''.implode('\',\'', array_keys($this->requires)).'\')',
             '{requires}' => \common_Utils::toHumanReadablePhpString($this->requires, 1),
             '{managementRole}' => GENERIS_NS.'#'.$this->id.'Manager',
-            '{licenseBlock}' => $this->getLicense() 
+            '{licenseBlock}' => $this->getLicense(),
+            '{installScripts}' => $this->substituteConstantTemplates(\common_Utils::toHumanReadablePhpString($this->installScripts, 1))
         );
         $map = array_merge($map, $extra);
         $content = str_replace(array_keys($map), array_values($map), $sample);
@@ -184,6 +188,7 @@ class ExtensionCreator {
         }
     }
 
+
     protected function prepareLanguages() {
         $options = array(
             'output_mode' => 'log_only',
@@ -234,5 +239,39 @@ class ExtensionCreator {
     
     protected static function escape($value) {
         return str_replace('\'', '\\\'', str_replace('\\', '\\\\', $value));
+    }
+
+
+    /**
+     * Add install scripts to the manifest
+     *
+     * @param string $section
+     * @param string $scriptPath without __DIR__
+     */
+    protected function addInstallScript($section, $scriptPath) {
+        $this->installScripts[$section][] = $scriptPath;
+    }
+
+    /**
+     * Formats 'foo/{CONSTANT_BAR}/quux' as 'foo/'.CONSTANT_BAR.'/quux'
+     *
+     * @param $value
+     * @return string
+     */
+    protected function substituteConstantTemplates($value) {
+        $returnValue = '';
+        foreach(explode("\n", $value) as $line) {
+            $quote = substr(trim($line), 0, 1);
+            $line = preg_replace_callback(
+                '~{([\w]+)}~',
+                function($matches) use ($quote) {
+                    $matches[1] = $quote . '.' . $matches[1] . '.' . $quote;
+                    return $matches[1];
+                },
+                $line
+            );
+            $returnValue .= str_replace(array($quote.$quote . '.', '.' . $quote.$quote), '', $line);
+        }
+        return  $returnValue;
     }
 }

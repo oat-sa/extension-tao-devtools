@@ -13,12 +13,7 @@ return array(
     'acl' => array(
         array('grant', '{managementRole}', array('ext'=>'{id}')),
     ),
-    'install' => array(
-        'php' => array(
-            // set this one to enable theme support
-            //__DIR__ . '/scripts/install/setThemeConfig.php'
-        )
-    ),
+    'install' => {installScripts},
     'uninstall' => array(
     ),
     'routes' => array(
