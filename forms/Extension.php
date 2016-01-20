@@ -118,6 +118,7 @@ class Extension
 		$chainingElt->setDescription(__('Samples'));
 		$chainingElt->setOptions(array(
 		    'structure' =>  __('sample structure')
+			,'theme' => __('custom theme')
 		    ,'model' => __('sample model (todo)')
 		    ,'rdf' => __('sample rdf install (todo)')
 		    ,'install' => __('sample post install script (todo)')
