@@ -78,8 +78,6 @@ class ExtensionCreator {
                 $this->addSampleStructure();
             }
             if (in_array('theme', $this->options)) {
-                $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoThemingPlatform');
-                $this->requires['taoThemingPlatform'] = '>='.$ext->getVersion();
                 $this->addInstallScript('php', '{__DIR__}/scripts/install/setThemeConfig.php');
                 $this->addSampleTheme();
             }
