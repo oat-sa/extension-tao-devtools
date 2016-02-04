@@ -164,7 +164,8 @@ class ExtensionCreator {
         }
 
         // copy templates
-        $templates = array();
+        $samplePath = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDevTools')->getDir()
+            .'models'.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR;
         $paths = array(
             array('model','theme','*.sample'),
             array('scripts','install','*.sample'),
@@ -173,14 +174,13 @@ class ExtensionCreator {
             array('views','scss','themes','platform','themeId','*.sample')
         );
 
-        $originalPath = getcwd();
-        chdir('./models/templates');
+        $templates = array();
         foreach($paths as $path) {
-            $templates = array_merge($templates, glob(implode(DIRECTORY_SEPARATOR, $path)));
+            $templates = array_merge($templates, glob($samplePath.implode(DIRECTORY_SEPARATOR, $path)));
         }
-        chdir($originalPath);
-
+        
         foreach($templates as $template) {
+            $template = \tao_helpers_File::getRelPath($samplePath, $template);
             $template = substr($template, 0, strrpos($template, '.'));
             $this->copyFile($template, str_replace(array_keys($pathValues), $pathValues, $template), $values);
         }
@@ -257,8 +257,8 @@ class ExtensionCreator {
      * @return string
      */
     protected function substituteConstantTemplates($value) {
-        $returnValue = '';
-        foreach(explode("\n", $value) as $line) {
+        $lines = array();
+        foreach(explode(PHP_EOL, $value) as $line) {
             $quote = substr(trim($line), 0, 1);
             $line = preg_replace_callback(
                 '~{([\w]+)}~',
@@ -268,8 +268,8 @@ class ExtensionCreator {
                 },
                 $line
             );
-            $returnValue .= str_replace(array($quote.$quote . '.', '.' . $quote.$quote), '', $line);
+            $lines[] = str_replace(array($quote.$quote . '.', '.' . $quote.$quote), '', $line);
         }
-        return  $returnValue;
+        return implode(PHP_EOL, $lines);
     }
 }
