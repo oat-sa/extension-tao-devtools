@@ -1,0 +1,59 @@
+<?php
+{licenseBlock}
+
+namespace oat\{id}\scripts\update;
+
+use \common_ext_ExtensionUpdater;
+use oat\tao\model\ThemeRegistry;
+use Jig\Utils\StringUtils;
+use oat\tao\model\ThemeNotFoundException;
+
+class Updater extends common_ext_ExtensionUpdater
+{
+    /**
+     * @param string $initialVersion
+     * @return string $versionUpdatedTo
+     */
+    public function update($initialVersion)
+    {
+
+        $currentVersion = $initialVersion;
+        
+        if ($currentVersion === '1.0') {
+
+            // Item themes
+            // 'Name of the theme'
+            $itemThemes = array(
+                '{itemThemeId}'
+            );
+
+            // override if required
+            $defaultTheme = '{itemThemeId}';
+
+            foreach($itemThemes as $themeName){
+                $pathFragment = StringUtils::removeSpecChars($themeName);
+                $themeId = StringUtils::camelize($pathFragment);
+                ThemeRegistry::getRegistry()->registerTheme(
+                    $themeId,
+                    $themeName,
+                    implode(DIRECTORY_SEPARATOR, array('{id}', 'views', 'css', 'themes', 'items', $pathFragment, 'theme.css')), array('items')
+                );
+            }
+
+            ThemeRegistry::getRegistry()->setDefaultTheme('items', $defaultTheme);
+
+            // TAO theme would usually be removed from the stack if custom themes are used
+            // Make sure another theme has been set to default in this case.
+            if($defaultTheme !== 'tao') {
+                try {
+                    ThemeRegistry::getRegistry()->unregisterTheme('tao');
+                }
+                catch (ThemeNotFoundException $e) {
+                }
+            }
+
+            $currentVersion = '1.0.1';
+        }
+        return $currentVersion;
+    }
+}

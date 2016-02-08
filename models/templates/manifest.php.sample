@@ -2,7 +2,7 @@
 {licenseBlock}               
 
 return array(
-    'name' => '{id}',
+    'name' => 'oat-sa/extension-{gitId}',
 	'label' => '{name}',
 	'description' => '{description}',
     'license' => '{license}',
@@ -14,6 +14,7 @@ return array(
         array('grant', '{managementRole}', array('ext'=>'{id}')),
     ),
     'install' => {installScripts},
+    'update' => 'oat\\{id}\\scripts\\update\\Updater',
     'uninstall' => array(
     ),
     'routes' => array(

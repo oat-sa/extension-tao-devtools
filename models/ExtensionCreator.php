@@ -79,7 +79,7 @@ class ExtensionCreator {
             }
             if (in_array('theme', $this->options)) {
                 $this->addInstallScript('php', '{__DIR__}/scripts/install/setThemeConfig.php');
-                $this->addSampleTheme();
+                $this->setupThemes();
             }
             $this->writebaseFiles();
             $this->addAutoloader();
@@ -115,6 +115,7 @@ class ExtensionCreator {
         }
         $map = array(
         	'{id}' => $this->id,
+            '{gitId}' => str_replace('_', '-', StringUtils::underscorize($this->id)),
             '{name}' => self::escape($this->label),
             '{version}' => self::escape($this->version),
             '{author}' => self::escape($this->author),
@@ -151,12 +152,14 @@ class ExtensionCreator {
     /**
      * Adds sample code for theme support
      */
-    protected function addSampleTheme() {
+    protected function setupThemes() {
         // replacements
         $values = array(
-            '{themeLabel}' => $this->label . ' default theme',
-            '{themeId}' => StringUtils::camelize($this->label . ' default theme'),
-            '{platformTheme}' => StringUtils::camelize($this->label . ' default theme', true)
+            '{themeLabel}' => $this->label . ' default platform theme',
+            '{platformThemeId}' => StringUtils::camelize($this->label . ' default platform theme'),
+            '{itemThemeId}' => StringUtils::camelize($this->label . ' default item theme'),
+            '{platformTheme}' => StringUtils::camelize($this->label . ' default platform theme', true),
+            '{itemTheme}' => StringUtils::camelize($this->label . ' default item theme', true)
         );
         $pathValues = array();
         foreach($values as $key => $value) {
@@ -169,9 +172,10 @@ class ExtensionCreator {
         $paths = array(
             array('model','theme','*.sample'),
             array('scripts','install','*.sample'),
-            array('views','templates','themes','platform','themeId','*.sample'),
+            array('scripts','update','*.sample'),
+            array('views','templates','themes','platform','platformThemeId','*.sample'),
             array('views','scss','themes','items','*.sample'),
-            array('views','scss','themes','platform','themeId','*.sample')
+            array('views','scss','themes','platform','platformThemeId','*.sample')
         );
 
         $templates = array();
