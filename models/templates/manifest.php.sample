@@ -2,7 +2,7 @@
 {licenseBlock}               
 
 return array(
-    'name' => 'oat-sa/extension-{gitId}',
+    'name' => '{id}',
 	'label' => '{name}',
 	'description' => '{description}',
     'license' => '{license}',
