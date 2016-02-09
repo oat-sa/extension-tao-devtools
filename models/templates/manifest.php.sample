@@ -13,6 +13,7 @@ return array(
     'acl' => array(
         array('grant', '{managementRole}', array('ext'=>'{id}')),
     ),
+    'install' => {installScripts},
     'uninstall' => array(
     ),
     'routes' => array(

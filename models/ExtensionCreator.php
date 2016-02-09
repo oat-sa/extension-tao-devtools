@@ -20,6 +20,8 @@
 
 namespace oat\taoDevTools\models;
 
+use Jig\Utils\StringUtils;
+
 /**
  * Creates a new extension
  * 
@@ -44,6 +46,8 @@ class ExtensionCreator {
     private $requires;
     
     private $options;
+
+    private $installScripts = array();
 
     public function __construct($id, $name, $version, $author, $namespace, $license, $description, $dependencies, $options) {
         $this->id = $id;
@@ -70,14 +74,18 @@ class ExtensionCreator {
     public function run() {
         try {
             $this->createDirectoryStructure();
-            $this->writebaseFiles();
             if (in_array('structure', $this->options)) {
                 $this->addSampleStructure();
             }
+            if (in_array('theme', $this->options)) {
+                $this->addInstallScript('php', '{__DIR__}/scripts/install/setThemeConfig.php');
+                $this->addSampleTheme();
+            }
+            $this->writebaseFiles();
             $this->addAutoloader();
             $this->prepareLanguages();
             
-            return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, __('Extension %s created.', $this->label));
+            return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, __('Extension %s created. Before you install the extension make sure you add it to /vendor/composer/autoload_psr4.php', $this->label));
         } catch (Exception $e) {
             \common_Logger::w('Failed creating extension "'.$this->id.'": '.$e->getMessage());
             return new \common_report_Report(\common_report_Report::TYPE_ERROR, __('Unable to create extension %s, please consult log.', $this->label));
@@ -116,7 +124,8 @@ class ExtensionCreator {
             '{dependencies}' => 'array(\''.implode('\',\'', array_keys($this->requires)).'\')',
             '{requires}' => \common_Utils::toHumanReadablePhpString($this->requires, 1),
             '{managementRole}' => GENERIS_NS.'#'.$this->id.'Manager',
-            '{licenseBlock}' => $this->getLicense() 
+            '{licenseBlock}' => $this->getLicense(),
+            '{installScripts}' => $this->substituteConstantTemplates(\common_Utils::toHumanReadablePhpString($this->installScripts, 1))
         );
         $map = array_merge($map, $extra);
         $content = str_replace(array_keys($map), array_values($map), $sample);
@@ -138,6 +147,45 @@ class ExtensionCreator {
             'views'.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$controllerName.DIRECTORY_SEPARATOR.'templateExample.tpl'
         );
     }
+
+    /**
+     * Adds sample code for theme support
+     */
+    protected function addSampleTheme() {
+        // replacements
+        $values = array(
+            '{themeLabel}' => $this->label . ' default theme',
+            '{themeId}' => StringUtils::camelize($this->label . ' default theme'),
+            '{platformTheme}' => StringUtils::camelize($this->label . ' default theme', true)
+        );
+        $pathValues = array();
+        foreach($values as $key => $value) {
+            $pathValues[trim($key, '{}')] = $value;
+        }
+
+        // copy templates
+        $templates = array();
+        $paths = array(
+            array('model','theme','*.sample'),
+            array('scripts','install','*.sample'),
+            array('views','templates','themes','platform','themeId','*.sample'),
+            array('views','scss','themes','items','*.sample'),
+            array('views','scss','themes','platform','themeId','*.sample')
+        );
+
+        $originalPath = getcwd();
+        chdir('./models/templates');
+        foreach($paths as $path) {
+            $templates = array_merge($templates, glob(implode(DIRECTORY_SEPARATOR, $path)));
+        }
+        chdir($originalPath);
+
+        foreach($templates as $template) {
+            $template = substr($template, 0, strrpos($template, '.'));
+            $this->copyFile($template, str_replace(array_keys($pathValues), $pathValues, $template), $values);
+        }
+    }
+
 
     protected function prepareLanguages() {
         $options = array(
@@ -189,5 +237,39 @@ class ExtensionCreator {
     
     protected static function escape($value) {
         return str_replace('\'', '\\\'', str_replace('\\', '\\\\', $value));
+    }
+
+
+    /**
+     * Add install scripts to the manifest
+     *
+     * @param string $section
+     * @param string $scriptPath without __DIR__
+     */
+    protected function addInstallScript($section, $scriptPath) {
+        $this->installScripts[$section][] = $scriptPath;
+    }
+
+    /**
+     * Formats 'foo/{CONSTANT_BAR}/quux' as 'foo/'.CONSTANT_BAR.'/quux'
+     *
+     * @param $value
+     * @return string
+     */
+    protected function substituteConstantTemplates($value) {
+        $returnValue = '';
+        foreach(explode("\n", $value) as $line) {
+            $quote = substr(trim($line), 0, 1);
+            $line = preg_replace_callback(
+                '~{([\w]+)}~',
+                function($matches) use ($quote) {
+                    $matches[1] = $quote . '.' . $matches[1] . '.' . $quote;
+                    return $matches[1];
+                },
+                $line
+            );
+            $returnValue .= str_replace(array($quote.$quote . '.', '.' . $quote.$quote), '', $line);
+        }
+        return  $returnValue;
     }
 }
