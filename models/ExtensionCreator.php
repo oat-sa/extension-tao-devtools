@@ -77,9 +77,11 @@ class ExtensionCreator {
             if (in_array('structure', $this->options)) {
                 $this->addSampleStructure();
             }
-            if (in_array('theme', $this->options)) {
-                $this->addInstallScript('php', '{__DIR__}/scripts/install/setThemeConfig.php');
-                $this->setupThemes();
+            if (in_array('itemtheme', $this->options)) {
+                $this->addItemThemes();
+            }
+            if (in_array('platformtheme', $this->options)) {
+                $this->addPlatformTheme();
             }
             $this->writebaseFiles();
             $this->addAutoloader();
@@ -113,21 +115,8 @@ class ExtensionCreator {
         if (!file_exists(dirname($destination))) {
             mkdir(dirname($destination), 0770, true);
         }
-        $map = array(
-        	'{id}' => $this->id,
-            '{gitId}' => str_replace('_', '-', StringUtils::underscorize($this->id)),
-            '{name}' => self::escape($this->label),
-            '{version}' => self::escape($this->version),
-            '{author}' => self::escape($this->author),
-            '{license}' => self::escape($this->license),
-            '{description}' => self::escape($this->description),
-            '{authorNs}' => $this->authorNamespace,
-            '{dependencies}' => 'array(\''.implode('\',\'', array_keys($this->requires)).'\')',
-            '{requires}' => \common_Utils::toHumanReadablePhpString($this->requires, 1),
-            '{managementRole}' => GENERIS_NS.'#'.$this->id.'Manager',
-            '{licenseBlock}' => $this->getLicense(),
-            '{installScripts}' => $this->substituteConstantTemplates(\common_Utils::toHumanReadablePhpString($this->installScripts, 1))
-        );
+        $map = $this->getVariableMapping();
+        $map['{installScripts}'] = $this->substituteConstantTemplates(\common_Utils::toHumanReadablePhpString($this->installScripts, 1));
         $map = array_merge($map, $extra);
         $content = str_replace(array_keys($map), array_values($map), $sample);
         return file_put_contents($destination, $content);
@@ -136,6 +125,7 @@ class ExtensionCreator {
     protected function writeBaseFiles() {
         $this->copyFile('manifest.php');
         $this->copyFile('composer.json');
+        $this->copyFile('scripts/update/Updater.php');
     }
     
     protected function addSampleStructure() {
@@ -152,13 +142,10 @@ class ExtensionCreator {
     /**
      * Adds sample code for theme support
      */
-    protected function setupThemes() {
+    protected function addItemThemes() {
         // replacements
         $values = array(
-            '{themeLabel}' => $this->label . ' default platform theme',
-            '{platformThemeId}' => StringUtils::camelize($this->label . ' default platform theme'),
             '{itemThemeId}' => StringUtils::camelize($this->label . ' default item theme'),
-            '{platformTheme}' => StringUtils::camelize($this->label . ' default platform theme', true),
             '{itemTheme}' => StringUtils::camelize($this->label . ' default item theme', true)
         );
         $pathValues = array();
@@ -170,12 +157,7 @@ class ExtensionCreator {
         $samplePath = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDevTools')->getDir()
             .'models'.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR;
         $paths = array(
-            array('model','theme','*.sample'),
-            array('scripts','install','*.sample'),
-            array('scripts','update','*.sample'),
-            array('views','templates','themes','platform','platformThemeId','*.sample'),
             array('views','scss','themes','items','*.sample'),
-            array('views','scss','themes','platform','platformThemeId','*.sample')
         );
 
         $templates = array();
@@ -188,8 +170,49 @@ class ExtensionCreator {
             $template = substr($template, 0, strrpos($template, '.'));
             $this->copyFile($template, str_replace(array_keys($pathValues), $pathValues, $template), $values);
         }
+        
+        $this->copyFile('scripts/install/AddItemThemes.php', null, $values);
+        $this->addInstallScript('php', '{authorNs}\\{id}\\scripts\\install\\AddItemThemes');
+        
     }
 
+    protected function addPlatformTheme() {
+        // replacements
+        $values = array(
+            '{themeLabel}' => $this->label . ' Theme',
+            '{platformThemeId}' => StringUtils::camelize($this->label . ' default platform theme'),
+            '{platformTheme}' => ucfirst($this->id).'Theme'
+        );
+        $pathValues = array();
+        foreach($values as $key => $value) {
+            $pathValues[trim($key, '{}')] = $value;
+        }
+    
+        // copy templates
+        $samplePath = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDevTools')->getDir()
+        .'models'.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR;
+        $paths = array(
+            array('views','templates','themes','platform','platformThemeId','*.sample'),
+            array('views','scss','themes','platform','platformThemeId','*.sample')
+        );
+    
+        $templates = array();
+        foreach($paths as $path) {
+            $templates = array_merge($templates, glob($samplePath.implode(DIRECTORY_SEPARATOR, $path)));
+        }
+    
+        foreach($templates as $template) {
+            $template = \tao_helpers_File::getRelPath($samplePath, $template);
+            $template = substr($template, 0, strrpos($template, '.'));
+            $this->copyFile($template, str_replace(array_keys($pathValues), $pathValues, $template), $values);
+        }
+        
+        $this->copyFile('model/theme/platformTheme.php','model/theme/'.ucfirst($this->id).'Theme.php', $values);
+        
+        $this->copyFile('scripts/install/setPlatformTheme.php', null, $values);
+        $this->addInstallScript('php', '{__DIR__}/scripts/install/setPlatformTheme.php');
+        
+    }
 
     protected function prepareLanguages() {
         $options = array(
@@ -253,7 +276,24 @@ class ExtensionCreator {
     protected function addInstallScript($section, $scriptPath) {
         $this->installScripts[$section][] = $scriptPath;
     }
-
+    
+    protected function getVariableMapping() {
+        return array(
+            '{id}' => $this->id,
+            '{gitId}' => str_replace('_', '-', StringUtils::underscorize($this->id)),
+            '{name}' => self::escape($this->label),
+            '{version}' => self::escape($this->version),
+            '{author}' => self::escape($this->author),
+            '{license}' => self::escape($this->license),
+            '{description}' => self::escape($this->description),
+            '{authorNs}' => $this->authorNamespace,
+            '{dependencies}' => 'array(\''.implode('\',\'', array_keys($this->requires)).'\')',
+            '{requires}' => \common_Utils::toHumanReadablePhpString($this->requires, 1),
+            '{managementRole}' => GENERIS_NS.'#'.$this->id.'Manager',
+            '{licenseBlock}' => $this->getLicense()
+        );
+    }
+    
     /**
      * Formats 'foo/{CONSTANT_BAR}/quux' as 'foo/'.CONSTANT_BAR.'/quux'
      *
@@ -262,7 +302,9 @@ class ExtensionCreator {
      */
     protected function substituteConstantTemplates($value) {
         $lines = array();
+        $map = $this->getVariableMapping();
         foreach(explode(PHP_EOL, $value) as $line) {
+            $line = str_replace(array_keys($map), array_values($map), $line);
             $quote = substr(trim($line), 0, 1);
             $line = preg_replace_callback(
                 '~{([\w]+)}~',
