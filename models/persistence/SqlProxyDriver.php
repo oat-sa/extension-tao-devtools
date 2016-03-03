@@ -17,7 +17,10 @@ use PDO;
 
 class SqlProxyDriver implements \common_persistence_sql_Driver{
 
-    private $count = 0;
+    private $readcount = 0;
+    
+    private $writecount = 0;
+    
     
     /**
      * @var string
@@ -57,7 +60,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      */
     public function query($statement, $params) {
 
-        $this->count++;
+        $this->readcount++;
         return $this->persistence->query($statement, $params);
     }
 
@@ -69,7 +72,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      * @return mixed
      */
     public function exec($statement, $params) {
-        $this->count++;
+        $this->writecount++;
         return $this->persistence->exec($statement, $params);
     }
 
@@ -81,7 +84,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      * @return mixed
      */
     public function insert($tableName, array $data) {
-        $this->count++;
+        $this->writecount++;
         return $this->persistence->insert($tableName, $data);
     }
 
@@ -124,6 +127,6 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
     
     public function __destruct()
     {
-        \common_Logger::i($this->count.' queries to '.$this->id);
+        \common_Logger::i($this->writecount.'/'.$this->readcount.' queries to '.$this->id);
     }
 }
