@@ -31,7 +31,8 @@ class ProxyModel extends ConfigurableService implements Model
      */
     function getRdfInterface()
     {
-        return new core_kernel_persistence_smoothsql_SmoothRdf($this);
+        $one = current($this->getOption(self::OPTION_MODELS));
+        return $one->getInterfaceRdfInterface();
     }
 
     /**

@@ -38,50 +38,43 @@ class ProxyResource implements \core_kernel_persistence_ResourceInterface
 
     public function call($method, array $arguments)
     {
-        try {
-            $debug = debug_backtrace();
-            $previousCall = $debug[1]['class'];
-
-            switch ($previousCall) {
-                case 'oat\taoDevTools\models\proxyModel\ProxyProperty':
-                    $implementationFunction = 'getPropertyImplementation';
-                    break;
-                case 'oat\taoDevTools\models\proxyModel\ProxyClass':
-                    $implementationFunction = 'getClassImplementation';
-                    break;
-                default:
-                    $implementationFunction = 'getResourceImplementation';
-                    break;
-            }
-
-            $previousResult = '';
-            $invalid = false;
-            $i=0;
-            foreach ($this->models as $key => $model) {
-                $implementation = $model->getRdfsInterface()->$implementationFunction();
-                $result = call_user_func_array(array($implementation, $method), $arguments);
-
-                if ($i > 0 && $result != $previousResult) {
-                    $invalid = true;
-                    break;
-                }
-
-                $previousResult = $result;
-                $i++;
-            }
-
-            if ($invalid) {
-                \common_Logger::e('Data integrity violation for method ' . $method);
-                \common_Logger::i(print_r($previousResult, true));
-                \common_Logger::i(print_r($result, true));
-                \common_Logger::i(' --------------- ');
-                throw new \Exception('Different results detected.');
-            }
-
-            return $result;
-        } catch (\Exception $e) {
-            \common_Logger::e($e->getMessage());
+        switch (get_class($this)) {
+            case 'oat\taoDevTools\models\proxyModel\ProxyProperty':
+                $implementationFunction = 'getPropertyImplementation';
+                break;
+            case 'oat\taoDevTools\models\proxyModel\ProxyClass':
+                $implementationFunction = 'getClassImplementation';
+                break;
+            default:
+                $implementationFunction = 'getResourceImplementation';
+                break;
         }
+
+        $previousResult = '';
+        $invalid = false;
+        $i=0;
+        foreach ($this->models as $key => $model) {
+            $implementation = $model->getRdfsInterface()->$implementationFunction();
+            $result = call_user_func_array(array($implementation, $method), $arguments);
+
+            if ($i > 0 && $result != $previousResult) {
+                $invalid = true;
+                break;
+            }
+
+            $previousResult = $result;
+            $i++;
+        }
+
+        if ($invalid) {
+            \common_Logger::e('Data integrity violation for method ' . $method);
+            \common_Logger::i(print_r($previousResult, true));
+            \common_Logger::i(print_r($result, true));
+            \common_Logger::i(' --------------- ');
+            throw new \Exception('Different results detected.');
+        }
+
+        return $result;
     }
 
     public function getTypes(core_kernel_classes_Resource $resource)
