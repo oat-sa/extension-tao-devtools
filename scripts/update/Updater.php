@@ -36,7 +36,7 @@ class Updater extends \common_ext_ExtensionUpdater
         
         $currentVersion = $initialVersion;
         
-        $this->skip('0','2.10.0');
+        $this->skip('0','2.11.0');
 
         
         return null;
