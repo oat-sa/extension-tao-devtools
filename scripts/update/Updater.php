@@ -33,12 +33,6 @@ class Updater extends \common_ext_ExtensionUpdater
      */
     public function update($initialVersion)
     {
-        
-        $currentVersion = $initialVersion;
-        
-        $this->skip('0','2.11.0');
-
-        
-        return null;
+        $this->skip('0','2.11.1');
     }
 }
