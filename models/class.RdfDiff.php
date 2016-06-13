@@ -141,15 +141,6 @@ class taoDevTools_models_RdfDiff
         return $string;
     }
 
-    public function exportAdditionalsToRdf()
-    {
-        $exporter = new taoDevTools_models_RdfExport();
-        foreach ($this->toAdd as $trip) {
-            $exporter->addTriple($data);
-        }
-        return $exporter->__toString();
-    }
-
     private function escape($string)
     {
         $search = array(
