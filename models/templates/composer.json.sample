@@ -1,6 +1,6 @@
 {
 
-    "name": "oat-sa/extension-{gitId}",
+    "name": "{gitId}",
     "description" : "{description}",
     "type" : "tao-extension",
     "authors" : [
