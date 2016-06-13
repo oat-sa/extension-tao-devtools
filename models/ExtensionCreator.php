@@ -180,7 +180,7 @@ class ExtensionCreator {
         // replacements
         $values = array(
             '{themeLabel}' => $this->label . ' Theme',
-            '{platformThemeId}' => StringUtils::camelize($this->label . ' default platform theme'),
+            '{platformThemeId}' => StringUtils::camelize($this->label . ' theme'),
             '{platformTheme}' => ucfirst($this->id).'Theme'
         );
         $pathValues = array();
@@ -193,7 +193,8 @@ class ExtensionCreator {
         .'models'.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR;
         $paths = array(
             array('views','templates','themes','platform','platformThemeId','*.sample'),
-            array('views','scss','themes','platform','platformThemeId','*.sample')
+            array('views','scss','themes','platform','platformThemeId','*.sample'),
+            array('views','img','themes','platform','platformThemeId','*.sample')
         );
     
         $templates = array();
@@ -209,8 +210,8 @@ class ExtensionCreator {
         
         $this->copyFile('model/theme/platformTheme.php','model/theme/'.ucfirst($this->id).'Theme.php', $values);
         
-        $this->copyFile('scripts/install/setPlatformTheme.php', null, $values);
-        $this->addInstallScript('php', '{__DIR__}/scripts/install/setPlatformTheme.php');
+        $this->copyFile('scripts/install/SetPlatformTheme.php', null, $values);
+        $this->addInstallScript('php', '{authorNs}\\{id}\\scripts\\install\\SetPlatformTheme');
         
     }
 
@@ -278,9 +279,12 @@ class ExtensionCreator {
     }
     
     protected function getVariableMapping() {
+        $gitId = ($this->authorNamespace == 'oat'
+            ? 'oat-sa/extension-'.str_replace('_', '-', StringUtils::underscorize($this->id))
+            : $this->authorNamespace.'/'.$this->id);
         return array(
             '{id}' => $this->id,
-            '{gitId}' => str_replace('_', '-', StringUtils::underscorize($this->id)),
+            '{gitId}' => $gitId,
             '{name}' => self::escape($this->label),
             '{version}' => self::escape($this->version),
             '{author}' => self::escape($this->author),
