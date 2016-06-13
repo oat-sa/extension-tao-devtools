@@ -77,6 +77,7 @@ class Extension
 
 		$verElt = \tao_helpers_form_FormFactory::getElement('version', 'Textbox');
 		$verElt->addValidator(\tao_helpers_form_FormFactory::getValidator('NotEmpty'));
+		$verElt->setValue('0.1.0');
 		$this->form->addElement($verElt);
 		
 		$authorElt = \tao_helpers_form_FormFactory::getElement('author', 'Textbox');
@@ -104,16 +105,6 @@ class Extension
 		//$descElt->setValue(__('Use the * character to replace any string'));
 		$this->form->addElement($descElt);
 		
-		$extIds = array();
-		foreach (\common_ext_ExtensionsManager::singleton()->getInstalledExtensions() as $ext) {
-		    $extIds[$ext->getId()] = $ext->getId();
-		}
-		$depElt = \tao_helpers_form_FormFactory::getElement('dependencies', 'Checkbox');
-		$depElt->setDescription(__('Depends on'));
-		$depElt->setOptions($extIds);
-		$depElt->setValue('tao');
-		$this->form->addElement($depElt);
-		
 		$chainingElt = \tao_helpers_form_FormFactory::getElement('samples', 'Checkbox');
 		$chainingElt->setDescription(__('Samples'));
 		$chainingElt->setOptions(array(
@@ -131,6 +122,16 @@ class Extension
 		));
 		$chainingElt->setValue('structure');
 		$this->form->addElement($chainingElt);
+		
+		$extIds = array();
+		foreach (\common_ext_ExtensionsManager::singleton()->getInstalledExtensions() as $ext) {
+		    $extIds[$ext->getId()] = $ext->getId();
+		}
+		$depElt = \tao_helpers_form_FormFactory::getElement('dependencies', 'Checkbox');
+		$depElt->setDescription(__('Depends on'));
+		$depElt->setOptions($extIds);
+		$depElt->setValue('tao');
+		$this->form->addElement($depElt);
     }
 
 }
