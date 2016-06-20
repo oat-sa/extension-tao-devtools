@@ -1,0 +1,46 @@
+<?php
+{licenseBlock}
+
+namespace {authorNs}\{id}\scripts\install;
+
+// Item themes
+use oat\tao\model\ThemeRegistry;
+use Jig\Utils\StringUtils;
+use oat\tao\model\ThemeNotFoundException;
+
+class AddItemThemes extends \common_ext_action_InstallAction {
+
+    private $itemThemes = array(
+        '{itemThemeId}'
+    );
+    
+    private $defaultTheme = '{itemThemeId}';
+    
+    public function __invoke($params)
+    {
+        $registry = ThemeRegistry::getRegistry();
+        foreach($this->itemThemes as $itemThemeId){
+            $pathFragment = StringUtils::removeSpecChars($itemThemeId);
+            $themeId = StringUtils::camelize($pathFragment);
+            $registry->registerTheme(
+                $itemThemeId,
+                $itemThemeId,
+                implode(DIRECTORY_SEPARATOR, array('{id}', 'views', 'css', 'themes', 'items', $pathFragment, 'theme.css')),
+                array('items')
+            );
+        }
+        
+        $registry->setDefaultTheme('items', $this->defaultTheme);
+        
+        // TAO theme would usually be removed from the stack if custom themes are used
+        // Make sure another theme has been set to default in this case.
+        if($this->defaultTheme !== 'tao') {
+            try {
+                $registry->unregisterTheme('tao');
+            } catch(ThemeNotFoundException $e) {
+                // theme was already deleted, nothing to worry about
+            }
+        }
+        
+    }
+} 

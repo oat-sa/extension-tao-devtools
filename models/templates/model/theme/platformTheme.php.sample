@@ -30,7 +30,7 @@ class {platformTheme} extends DefaultTheme
     /**
      * Theme's id, by default label without spec chars
      */
-    const THEME_ID = '{themeId}';
+    const THEME_ID = '{platformThemeId}';
 
 
     /**

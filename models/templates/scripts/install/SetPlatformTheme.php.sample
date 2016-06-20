@@ -1,0 +1,21 @@
+<?php
+{licenseBlock}
+
+namespace {authorNs}\{id}\scripts\install;
+
+// Platform themes
+use {authorNs}\{id}\model\theme\{platformTheme};
+use oat\oatbox\service\ServiceManager;
+use oat\tao\model\theme\ThemeService;
+
+/**
+ * Sets the provided Theme as default theme
+ */
+class SetPlatformTheme extends \common_ext_action_InstallAction {
+
+    public function __invoke($params) {
+        $themeService = $this->getServiceManager()->get(ThemeService::SERVICE_ID);
+        $themeService->setTheme(new {platformTheme}());
+        $this->getServiceManager()->register(ThemeService::SERVICE_ID, $themeService);
+    }
+}

@@ -1,6 +1,6 @@
 {
 
-    "name": "{authorNs}/{id}",
+    "name": "{gitId}",
     "description" : "{description}",
     "type" : "tao-extension",
     "authors" : [

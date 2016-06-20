@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE structures SYSTEM "../doc/structures.dtd">
+<!DOCTYPE structures SYSTEM "../../tao/doc/structures.dtd">
 <structures>
 	<structure id="{id}_main" name="{name}" level="15" group="main">
 		<description />
