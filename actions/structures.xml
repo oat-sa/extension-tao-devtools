@@ -52,6 +52,16 @@
                     </action>
                 </actions>
             </section>
+			<section id="keychecker" name="Key checker" url="/taoDevTools/KeyChecker/index">
+				<actions>
+					<action id="keychecker-shortcuts" name="Shortcuts" url="/taoDevTools/KeyChecker/index" group="content" context="*" binding="showShortcuts">
+						<icon id="icon-edit"/>
+					</action>
+					<action id="keychecker-results" name="Results" url="/taoDevTools/KeyChecker/index" group="content" context="*" binding="showResults">
+						<icon id="icon-preview"/>
+					</action>
+				</actions>
+			</section>
 		</sections>
 	</structure>
 </structures>
