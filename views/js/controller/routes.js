@@ -19,6 +19,11 @@ define(function(){
             'actions' : {
                 'index' : 'controller/fontConversion/fileUpload'
             }
+        },
+        'KeyChecker' : {
+            'actions' : {
+                'index' : 'controller/KeyChecker/index'
+            }
         }
     };
 });

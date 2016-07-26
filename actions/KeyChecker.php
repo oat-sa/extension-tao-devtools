@@ -14,25 +14,24 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014 (original work) Open Assessment Technologies SA;
- *
- *
+ * Copyright (c) 2016 (original work) Open Assessment Technologies SA ;
  */
-namespace oat\taoDevTools\scripts\update;
+/**
+ * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
+ */
+
+namespace oat\taoDevTools\actions;
 
 /**
- * 
- * @author Joel Bout <joel@taotesting.com>
+ * Class KeyChecker
+ *
+ * Displays a testbed to check which shortcuts can be caught through the browser, and test if they can be prevented.
+ *
+ * @package oat\taoDevTools\actions
  */
-class Updater extends \common_ext_ExtensionUpdater
+class KeyChecker extends \tao_actions_CommonModule
 {
-    /**
-     * 
-     * @param string $currentVersion
-     * @return string $versionUpdatedTo
-     */
-    public function update($initialVersion)
-    {
-        $this->skip('0','2.14.0');
+    public function index() {
+        $this->setView('KeyChecker/index.tpl');
     }
 }
