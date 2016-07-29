@@ -1,4 +1,5 @@
-module.exports = function(grunt) { 
+module.exports = function(grunt) {
+    'use strict';
 
     var requirejs   = grunt.config('requirejs') || {};
     var clean       = grunt.config('clean') || {};
@@ -13,16 +14,19 @@ module.exports = function(grunt) {
      * Remove bundled and bundling files
      */
     clean.taodevtoolsbundle = [out];
-    
+
     /**
-     * Compile tao files into a bundle 
+     * Compile tao files into a bundle
      */
     requirejs.taodevtoolsbundle = {
         options: {
             baseUrl : '../js',
             dir : out,
             mainConfigFile : './config/requirejs.build.js',
-            paths : { 'taoDevTools' : root + '/taoDevTools/views/js' },
+            paths : {
+                'taoDevTools' : root + '/taoDevTools/views/js',
+                'taoDevToolsCss' : root + '/taoDevTools/views/css'
+            },
             modules : [{
                 name: 'taoDevTools/controller/routes',
                 include : ext.getExtensionsControllers(['taoDevTools']),
