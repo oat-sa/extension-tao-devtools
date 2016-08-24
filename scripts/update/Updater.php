@@ -27,12 +27,12 @@ namespace oat\taoDevTools\scripts\update;
 class Updater extends \common_ext_ExtensionUpdater
 {
     /**
-     * 
-     * @param string $currentVersion
+     *
+     * @param string $initialVersion
      * @return string $versionUpdatedTo
      */
     public function update($initialVersion)
     {
-        $this->skip('0','2.14.0');
+        $this->skip('0', '2.14.1');
     }
 }
