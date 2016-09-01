@@ -34,6 +34,11 @@ class ItemTools extends \tao_actions_CommonModule {
     public function viewPackage() {
         $item = new \core_kernel_classes_Resource($this->getRequestParameter('id'));
         $packer = new Packer($item);
+
+        if (method_exists($packer, 'setServiceLocator')) {
+            $packer->setServiceLocator($this->getServiceManager());
+        }
+
         $package = $packer->pack();
         
         $json = json_encode($package, JSON_PRETTY_PRINT);
