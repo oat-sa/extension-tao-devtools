@@ -40,7 +40,8 @@ foreach($todefine as $contant => $value){
 $params = $argv;
 array_shift($params);
 $totalTtNum = (isset($params[0]))?$params[0]:500;
-$totalProctorNum = (isset($params[1]) && is_numeric($params[1]) && $params[1] !== 0)?$totalTtNum/$params[1]: $totalTtNum/ 20;
+$ttByProctor = (isset($params[1]) && is_numeric($params[1]) && $params[1] !== 0)?$params[1]:20;
+$totalProctorNum = $totalTtNum/$ttByProctor;
 $totalProctorNum = ($totalProctorNum < 1)?1:$totalProctorNum;
 
 $testTakerCrudService = oat\taoTestTaker\models\CrudService::singleton();
@@ -49,58 +50,6 @@ $testCenterService = \oat\taoProctoring\model\TestCenterService::singleton();
 $proctorManagementService = \oat\taoProctoring\model\ProctorManagementService::singleton();
 $testTakerService = \oat\taoTestTaker\models\TestTakerService::singleton();
 $userClass = new \core_kernel_classes_Class(CLASS_TAO_USER);
-
-
-//create sample group
-$testCenter = $testCenterService->createInstance(
-    new \core_kernel_classes_Class($testCenterService::CLASS_URI),
-    'jmeter_test_center'
-);
-
-$tts = array();
-$subClass = $testTakerService->createSubClass($testTakerService->getRootClass(), 'jmeter_test_taker_'.$totalTtNum);
-
-$i = 0;
-$ttNum = 1;
-while($i < $totalTtNum){
-    if($userService->loginAvailable('jmeter_TT_' . $ttNum)){
-        $tt = $testTakerCrudService->createFromArray(array(
-            PROPERTY_USER_LOGIN => 'jmeter_TT_' . $ttNum,
-            PROPERTY_USER_PASSWORD => 'jmeter_TT_' . $ttNum,
-            RDFS_LABEL => 'jmeter_tt' . $ttNum,
-            PROPERTY_USER_FIRSTNAME => 'jmeter_tt_' . $ttNum,
-            PROPERTY_USER_LASTNAME => 'jmeter_tt_' . $ttNum,
-            RDF_TYPE => $subClass
-        ));
-        $tts[] = $tt->getUri();
-        $testCenterService->addTestTaker($tt->getUri(), $testCenter);
-        $i++;
-    }
-    $ttNum++;
-}
-
-$i = 0;
-$proctorNum = 1;
-while($i < $totalProctorNum){
-    if($userService->loginAvailable('Jmeter_proctor_' . $proctorNum)){
-        $proctor = $userService->addUser(
-            'Jmeter_proctor_' . $proctorNum,
-            'Jmeter_proctor_' . $proctorNum,
-            new \core_kernel_classes_Resource("http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole"),
-            $userClass
-        );
-        $proctor->setPropertyValue(
-            new core_kernel_classes_Property($proctorManagementService::PROPERTY_ASSIGNED_PROCTOR_URI),
-            $testCenter
-        );
-        $proctor->setPropertyValue(
-            new core_kernel_classes_Property($proctorManagementService::PROPERTY_ADMINISTRATOR_URI),
-            $testCenter
-        );
-        $i++;
-    }
-    $proctorNum++;
-}
 
 
 //create delivery
@@ -118,18 +67,63 @@ if(!empty($testUris)){
     $report = \oat\taoDeliveryRdf\model\SimpleDeliveryFactory::create($deliveryClass, $test, $label);
     /** @var \core_kernel_classes_Resource $delivery */
     $delivery = $report->getData();
-    //add delivery to eligible list
-    \oat\taoProctoring\model\EligibilityService::singleton()->createEligibility($testCenter, $delivery);
-    \oat\taoProctoring\model\EligibilityService::singleton()->setEligibleTestTakers($testCenter, $delivery, $tts);
-
-    //assign tt to delivery
-    \oat\taoProctoring\helpers\DeliveryHelper::assignTestTakers($tts, $delivery->getUri(), $testCenter->getUri());
 } else {
     echo 'No test found';
 }
 
+$i = 0;
+$proctorNum = 1;
+$ttNum = 1;
 
+$subClass = $testTakerService->createSubClass($testTakerService->getRootClass(), 'jmeter_test_taker_'.$totalTtNum);
+while($i < $totalProctorNum){
+    if($userService->loginAvailable('Jmeter_proctor_' . $proctorNum)){
+        $tts = array();
+        //create sample group
+        $testCenter = $testCenterService->createInstance(
+            new \core_kernel_classes_Class($testCenterService::CLASS_URI),
+            'jmeter_test_center_'.$proctorNum
+        );
 
+        $proctor = $userService->addUser(
+            'Jmeter_proctor_' . $proctorNum,
+            'Jmeter_proctor_' . $proctorNum,
+            new \core_kernel_classes_Resource("http://www.tao.lu/Ontologies/TAOProctor.rdf#ProctorRole"),
+            $userClass
+        );
+        $proctor->setPropertyValue(
+            new core_kernel_classes_Property($proctorManagementService::PROPERTY_ASSIGNED_PROCTOR_URI),
+            $testCenter
+        );
+        $proctor->setPropertyValue(
+            new core_kernel_classes_Property($proctorManagementService::PROPERTY_ADMINISTRATOR_URI),
+            $testCenter
+        );
+        $i++;
 
+        $j = 0;
+        while($j < $ttByProctor){
+            if($userService->loginAvailable('jmeter_TT_' . $ttNum)){
+                $tt = $testTakerCrudService->createFromArray(array(
+                    PROPERTY_USER_LOGIN => 'jmeter_TT_' . $ttNum,
+                    PROPERTY_USER_PASSWORD => 'jmeter_TT_' . $ttNum,
+                    RDFS_LABEL => 'jmeter_tt' . $ttNum,
+                    PROPERTY_USER_FIRSTNAME => 'jmeter_tt_' . $ttNum,
+                    PROPERTY_USER_LASTNAME => 'jmeter_tt_' . $ttNum,
+                    RDF_TYPE => $subClass
+                ));
+                $tts[] = $tt->getUri();
+                $j++;
+            }
+            $ttNum++;
+        }
+        $testCenterService->addTestTaker($tt->getUri(), $testCenter);
+        //add delivery to eligible list
+        \oat\taoProctoring\model\EligibilityService::singleton()->createEligibility($testCenter, $delivery);
+        \oat\taoProctoring\model\EligibilityService::singleton()->setEligibleTestTakers($testCenter, $delivery, $tts);
 
-
+        //assign tt to delivery
+        \oat\taoProctoring\helpers\DeliveryHelper::assignTestTakers($tts, $delivery->getUri(), $testCenter->getUri());
+    }
+    $proctorNum++;
+}
