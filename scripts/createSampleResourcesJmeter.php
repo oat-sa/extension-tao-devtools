@@ -61,14 +61,24 @@ foreach($testClazz->getInstances(true) as $instance){
 
 $testUris = array_keys($tests);
 if(!empty($testUris)){
-    $test = new core_kernel_classes_Resource($testUris[0]);
-    $label = __("Delivery of %s", $test->getLabel());
+    $i = 0;
+    $delivery = null;
     $deliveryClass = new \core_kernel_classes_Class('http://www.tao.lu/Ontologies/TAODelivery.rdf#AssembledDelivery');
-    $report = \oat\taoDeliveryRdf\model\SimpleDeliveryFactory::create($deliveryClass, $test, $label);
-    /** @var \core_kernel_classes_Resource $delivery */
-    $delivery = $report->getData();
+    while(is_null($delivery) && $i< count($testUris)){
+        $test = new core_kernel_classes_Resource($testUris[$i]);
+        $label = __("Delivery of %s", $test->getLabel());
+        $report = \oat\taoDeliveryRdf\model\SimpleDeliveryFactory::create($deliveryClass, $test, $label);
+        /** @var \core_kernel_classes_Resource $delivery */
+        $delivery = $report->getData();
+        $i++;
+    }
+    if(is_null($delivery)){
+        echo 'No test compilable';
+        die();
+    }
 } else {
     echo 'No test found';
+    die();
 }
 
 $i = 0;
