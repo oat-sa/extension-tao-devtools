@@ -125,7 +125,8 @@ class ExtensionCreator {
             '{requires}' => \common_Utils::toHumanReadablePhpString($this->requires, 1),
             '{managementRole}' => GENERIS_NS.'#'.$this->id.'Manager',
             '{licenseBlock}' => $this->getLicense(),
-            '{installScripts}' => $this->substituteConstantTemplates(\common_Utils::toHumanReadablePhpString($this->installScripts, 1))
+            '{installScripts}' => $this->substituteConstantTemplates(\common_Utils::toHumanReadablePhpString($this->installScripts, 1)),
+            '{devtools}' => \common_ext_ExtensionsManager::singleton()->getInstalledVersion('taoDevTools')
         );
         $map = array_merge($map, $extra);
         $content = str_replace(array_keys($map), array_values($map), $sample);
