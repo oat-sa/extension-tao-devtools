@@ -1,6 +1,9 @@
 <?php
-{licenseBlock}               
+{licenseBlock}
 
+/**
+ * Generated using taoDevTools {devtools}
+ */
 return array(
     'name' => '{id}',
     'label' => '{name}',
