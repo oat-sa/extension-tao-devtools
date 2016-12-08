@@ -129,11 +129,15 @@ while($i < $totalProctorNum){
         }
         $testCenterService->addTestTaker($tt->getUri(), $testCenter);
         //add delivery to eligible list
-        \oat\taoProctoring\model\EligibilityService::singleton()->createEligibility($testCenter, $delivery);
-        \oat\taoProctoring\model\EligibilityService::singleton()->setEligibleTestTakers($testCenter, $delivery, $tts);
+        /** @var \oat\taoProctoring\model\EligibilityService $eligibilityService */
+        $eligibilityService = \oat\oatbox\service\ServiceManager::getServiceManager()->get(\oat\taoProctoring\model\EligibilityService::SERVICE_ID);
+        $eligibilityService->createEligibility($testCenter, $delivery);
+        $eligibilityService->setEligibleTestTakers($testCenter, $delivery, $tts);
 
         //assign tt to delivery
-        \oat\taoProctoring\helpers\DeliveryHelper::assignTestTakers($tts, $delivery->getUri(), $testCenter->getUri());
+        if($eligibilityService->isManageable()){
+            \oat\taoProctoring\helpers\DeliveryHelper::assignTestTakers($tts, $delivery->getUri(), $testCenter->getUri());
+        }
     }
     $proctorNum++;
 }
