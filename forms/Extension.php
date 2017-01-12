@@ -71,15 +71,18 @@ class Extension
     protected function initElements()
     {
 		$idElt = \tao_helpers_form_FormFactory::getElement('name', 'Textbox');
+		$idElt->setDescription(__('Identifier'));
 		$idElt->addValidator(\tao_helpers_form_FormFactory::getValidator('NotEmpty'));
 		$idElt->addValidator(\tao_helpers_form_FormFactory::getValidator('AlphaNum'));
 		$this->form->addElement($idElt);
 
 		$verElt = \tao_helpers_form_FormFactory::getElement('version', 'Textbox');
+		$verElt->setDescription(__('Version'));
 		$verElt->addValidator(\tao_helpers_form_FormFactory::getValidator('NotEmpty'));
 		$this->form->addElement($verElt);
 		
 		$authorElt = \tao_helpers_form_FormFactory::getElement('author', 'Textbox');
+		$authorElt->setDescription(__('Author'));
 		$authValid = \tao_helpers_form_FormFactory::getValidator('NotEmpty');
 		$authorElt->addValidator($authValid);
 		$authorElt->setValue('Open Assessment Technologies SA');
@@ -93,15 +96,17 @@ class Extension
 		$this->form->addElement($nsElt);
 		
 		$licenseElt = \tao_helpers_form_FormFactory::getElement('license', 'Textbox');
+		$licenseElt->setDescription(__('License'));
 		$licenseElt->setValue('GPL-2.0');
 		$this->form->addElement($licenseElt);
 		
 		$idElt = \tao_helpers_form_FormFactory::getElement('label', 'Textbox');
+		$idElt->setDescription(__('Label'));
 		$idElt->addValidator(\tao_helpers_form_FormFactory::getValidator('NotEmpty'));
 		$this->form->addElement($idElt);
 
 		$descElt = \tao_helpers_form_FormFactory::getElement('description', 'Textarea');
-		//$descElt->setValue(__('Use the * character to replace any string'));
+		$descElt->setDescription(__('Description'));
 		$this->form->addElement($descElt);
 		
 		$extIds = array();
