@@ -56,9 +56,13 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      * @return mixed
      */
     public function query($statement, $params) {
-
         $this->count++;
-        return $this->persistence->query($statement, $params);
+        try {
+            return $this->persistence->query($statement, $params);
+        } catch (PDOException $e) {
+            common_Logger::w('Failed: '.$statement);
+            throw $e;
+        }
     }
 
     /**
@@ -70,7 +74,12 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      */
     public function exec($statement, $params) {
         $this->count++;
-        return $this->persistence->exec($statement, $params);
+        try {
+            return $this->persistence->exec($statement, $params);
+        } catch (PDOException $e) {
+            common_Logger::w('Failed: '.$statement);
+            throw $e;
+        }
     }
 
     /**
@@ -82,7 +91,12 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      */
     public function insert($tableName, array $data) {
         $this->count++;
-        return $this->persistence->insert($tableName, $data);
+        try {
+            return $this->persistence->insert($tableName, $data);
+        } catch (PDOException $e) {
+            common_Logger::w('Failed: '.$statement);
+            throw $e;
+        }
     }
 
     /**
