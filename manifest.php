@@ -23,15 +23,15 @@ $extpath = dirname(__FILE__).DIRECTORY_SEPARATOR;
 $taopath = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'tao'.DIRECTORY_SEPARATOR;
 
 return array(
-	'name' => 'taoDevTools',
-	'label' => 'Development Tools',
+    'name' => 'taoDevTools',
+    'label' => 'Development Tools',
     'description' => 'Developer tools that can assist you in creating new extensions, run scripts, destroy your install',
     'license' => 'GPL-2.0',
-    'version' => '2.17.0',
-	'author' => 'Open Assessment Technologies',
-	'requires' => array(
-	    'tao' => '>=2.7.0'
-	),
+    'version' => '2.18.0',
+    'author' => 'Open Assessment Technologies',
+    'requires' => array(
+        'tao' => '>=2.7.0'
+    ),
     'managementRole' => 'http://www.tao.lu/Ontologies/TAO.rdf#TaoDevToolsRole',
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#SysAdminRole', array('ext'=>'taoDevTools')),
@@ -42,23 +42,23 @@ return array(
     'routes' => array(
         '/taoDevTools' => 'oat\\taoDevTools\\actions'
     ),    
-	'constants' => array(
-		# actions directory
-		"DIR_ACTIONS"			=> $extpath."actions".DIRECTORY_SEPARATOR,
-	
-		# views directory
-		"DIR_VIEWS"				=> $extpath."views".DIRECTORY_SEPARATOR,
-	
-		# default module name
-		'DEFAULT_MODULE_NAME'	=> 'Groups',
-	
-		#default action name
-		'DEFAULT_ACTION_NAME'	=> 'index',
-	
-		#BASE URL (usually the domain root)
-		'BASE_URL'				=> ROOT_URL .'taoDevTools/',
-	
-		#BASE WWW the web resources path
-		'BASE_WWW'				=> ROOT_URL .'taoDevTools/views/',
-	)
+    'constants' => array(
+        # actions directory
+        "DIR_ACTIONS"            => $extpath."actions".DIRECTORY_SEPARATOR,
+    
+        # views directory
+        "DIR_VIEWS"                => $extpath."views".DIRECTORY_SEPARATOR,
+    
+        # default module name
+        'DEFAULT_MODULE_NAME'    => 'Groups',
+    
+        #default action name
+        'DEFAULT_ACTION_NAME'    => 'index',
+    
+        #BASE URL (usually the domain root)
+        'BASE_URL'                => ROOT_URL .'taoDevTools/',
+    
+        #BASE WWW the web resources path
+        'BASE_WWW'                => ROOT_URL .'taoDevTools/views/',
+    )
 );

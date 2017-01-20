@@ -224,7 +224,7 @@ class ExtensionCreator {
     protected function getLicense() {
         $licenseDirectory = dirname(__FILE__).DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'licenses'.DIRECTORY_SEPARATOR;
         $candidate = $licenseDirectory.strtolower($this->license);
-        if (file_exists($candidate)) {
+        if (!empty($this->license) && file_exists($candidate)) {
             $content = file_get_contents($candidate);
         } else {
             $content = file_get_contents($licenseDirectory.'unknown');
