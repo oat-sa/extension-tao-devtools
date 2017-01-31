@@ -21,7 +21,7 @@
 namespace oat\taoDevTools\scripts\update;
 
 /**
- * 
+ *
  * @author Joel Bout <joel@taotesting.com>
  */
 class Updater extends \common_ext_ExtensionUpdater
@@ -33,6 +33,6 @@ class Updater extends \common_ext_ExtensionUpdater
      */
     public function update($initialVersion)
     {
-        $this->skip('0', '2.18.0');
+        $this->skip('0', '2.19.0');
     }
 }
