@@ -10,10 +10,9 @@
 
 namespace oat\taoDevTools\models\persistence;
 
-
-use common_persistence_Persistence;
-use oat\taoDevTools\models\Monitor\Monitor;
+use common_Logger;
 use PDO;
+use PDOException;
 
 class SqlProxyDriver implements \common_persistence_sql_Driver{
 
@@ -37,7 +36,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      *
      * @return \common_persistence_Persistence
      */
-    function connect($id, array $params) {
+    public function connect($id, array $params) {
 
         $this->id = $id;
 
@@ -67,15 +66,17 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
 
     /**
      * Proxy to exec
-     * @param $statement
-     * @param $params
+     * @param mixed $statement
+     * @param array $params
      *
+     * @param array $types
      * @return mixed
+     * @throws \Exception
      */
-    public function exec($statement, $params) {
+    public function exec($statement, array $params, array $types) {
         $this->count++;
         try {
-            return $this->persistence->exec($statement, $params);
+            return $this->persistence->exec($statement, $params, $types);
         } catch (PDOException $e) {
             common_Logger::w('Failed: '.$statement);
             throw $e;
@@ -84,7 +85,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
 
     /**
      * Proxy to insert
-     * @param       $tableName
+     * @param string $tableName
      * @param array $data
      *
      * @return mixed
@@ -94,7 +95,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
         try {
             return $this->persistence->insert($tableName, $data);
         } catch (PDOException $e) {
-            common_Logger::w('Failed: '.$statement);
+            common_Logger::w('Failed: '.$tableName);
             throw $e;
         }
     }
@@ -138,6 +139,6 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
     
     public function __destruct()
     {
-        \common_Logger::i($this->count.' queries to '.$this->id);
+        common_Logger::i($this->count.' queries to '.$this->id);
     }
 }
