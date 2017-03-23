@@ -24,6 +24,12 @@ define(function(){
             'actions' : {
                 'index' : 'controller/KeyChecker/index'
             }
+        },
+        'TestRunner' : {
+            'actions' : {
+                'index' : 'controller/TestRunner/index',
+                'timer' : 'controller/TestRunner/timer'
+            }
         }
     };
 });

@@ -10,6 +10,7 @@ module.exports = function(grunt) {
     sass.taodevtools.files = { };
     sass.taodevtools.files[root + 'css/devtools.css'] = root + 'scss/devtools.scss';
     sass.taodevtools.files[root + 'css/keychecker.css'] = root + 'scss/keychecker.scss';
+    sass.taodevtools.files[root + 'css/testrunner.css'] = root + 'scss/testrunner.scss';
 
     watch.taodevtoolssass = {
         files : [root + 'scss/**/*.scss'],
