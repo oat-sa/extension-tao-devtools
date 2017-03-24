@@ -102,6 +102,7 @@ class TestRunner extends \tao_actions_SinglePageModule
         $extraTime = null;
         $timers = null;
         $running = false;
+        $currentItemTags = null;
         $stateUri = $deliveryExecution->getState()->getUri();
         $state = $this->getStateLabel($deliveryExecution->getState());
 
@@ -119,7 +120,6 @@ class TestRunner extends \tao_actions_SinglePageModule
                 $itemSession = $session->getAssessmentItemSessionStore()->getAssessmentItemSession($itemRef, $occurrence);
                 $attempt = $itemSession['numAttempts']->getValue();
 
-                $title = $session->getAssessmentTest()->getTitle();
                 $remaining = $this->getRemainingTime($session);
                 $position = $this->getSessionPosition($session);
                 $identifiers = [
