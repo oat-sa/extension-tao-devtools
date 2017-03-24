@@ -157,7 +157,7 @@ class TestRunner extends \tao_actions_SinglePageModule
         $this->returnJson([
             'success' => true,
             'data' => [
-                'id' => md5($sessionId . $remaining . $position),
+                'id' => md5($sessionId . $currentItemTags . $position),
                 'running' => $running,
                 'state' => $state,
                 'stateUri' => $stateUri,
