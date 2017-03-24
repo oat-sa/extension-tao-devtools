@@ -81,7 +81,9 @@ class TestRunner extends \tao_actions_SinglePageModule
     public function timer()
     {
         $sessionId = $this->getRequestParameter('deliveryExecution');
+        $deliveryExecution = $this->getDeliveryExecution($sessionId);
         $this->setData('sessionId', $sessionId);
+        $this->setData('title', $deliveryExecution->getLabel());
         $this->composeView('test-runner', null, 'TestRunner/timer.tpl');
     }
 
@@ -102,7 +104,6 @@ class TestRunner extends \tao_actions_SinglePageModule
         $running = false;
         $stateUri = $deliveryExecution->getState()->getUri();
         $state = $this->getStateLabel($deliveryExecution->getState());
-        $title = $deliveryExecution->getLabel();
 
         if ($session) {
             if ($session->isRunning()) {
@@ -161,7 +162,6 @@ class TestRunner extends \tao_actions_SinglePageModule
                 'state' => $state,
                 'stateUri' => $stateUri,
                 'sessionId' => $sessionId,
-                'title' => $title,
                 'remaining' => $remaining,
                 'position' => $position,
                 'identifiers' => $identifiers,

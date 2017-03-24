@@ -240,9 +240,6 @@ define([
                     id: 'timestampLabel',
                     label: __('Timestamp')
                 }, {
-                    id: 'title',
-                    label: __('Title')
-                }, {
                     id: 'state',
                     label: __('State')
                 }, {
