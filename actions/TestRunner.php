@@ -49,7 +49,7 @@ class TestRunner extends \tao_actions_SinglePageModule
     {
         $webPath = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDevTools')->getConstant('BASE_WWW');
         \tao_helpers_Scriptloader::addCssFile($webPath . '/css/testrunner.css');
-        
+
         return parent::getLayout();
     }
 
@@ -110,11 +110,11 @@ class TestRunner extends \tao_actions_SinglePageModule
                 $running = true;
                 $extraTime = $this->getExtraTime($session);
                 $timers = $this->getTimeConstraints($session);
-                
+
                 $currentRoute = $session->getRoute()->current();
                 $itemRef = $currentRoute->getAssessmentItemRef();
                 $currentItemTags = $session->getItemAttemptTag($currentRoute);
-                
+
                 $occurrence = $currentRoute->getOccurence();
                 $itemSession = $session->getAssessmentItemSessionStore()->getAssessmentItemSession($itemRef, $occurrence);
                 $attempt = $itemSession['numAttempts']->getValue();
@@ -179,6 +179,9 @@ class TestRunner extends \tao_actions_SinglePageModule
     protected function formatDuration($duration)
     {
         if ($duration) {
+            if (method_exists($duration, 'getMicroseconds')) {
+                return $duration->getMicroseconds(true) / 1e6;
+            }
             return $duration->getSeconds(true);
         }
         return null;
@@ -192,7 +195,7 @@ class TestRunner extends \tao_actions_SinglePageModule
     {
         return \taoDelivery_models_classes_execution_ServiceProxy::singleton()->getDeliveryExecution($sessionId);
     }
-    
+
     /**
      * @param DeliveryExecution $deliveryExecution
      * @return TestSession
@@ -236,7 +239,7 @@ class TestRunner extends \tao_actions_SinglePageModule
                 // Only consider time constraints in force.
                 if ($tc->getMaximumRemainingTime() !== false) {
                     $hasTimer = true;
-                    $remaining = min($remaining, $tc->getMaximumRemainingTime()->getSeconds(true));
+                    $remaining = min($remaining, $this->formatDuration($tc->getMaximumRemainingTime()));
                 }
             }
         }
@@ -252,7 +255,8 @@ class TestRunner extends \tao_actions_SinglePageModule
      * @param TestSession $session
      * @return array
      */
-    protected function getTimeConstraints($session) {
+    protected function getTimeConstraints($session)
+    {
         $constraints = array();
 
         foreach ($session->getRegularTimeConstraints() as $tc) {
@@ -264,7 +268,7 @@ class TestRunner extends \tao_actions_SinglePageModule
                 $constraints[] = array(
                     'id' => $identifier,
                     'label' => method_exists($source, 'getTitle') ? $source->getTitle() : $identifier,
-                    'remaining' => $timeRemaining->getSeconds(true),
+                    'remaining' => $this->formatDuration($timeRemaining),
                     'type' => $source->getQtiClassName()
                 );
             }
@@ -277,7 +281,8 @@ class TestRunner extends \tao_actions_SinglePageModule
      * @param TestSession $session
      * @return array
      */
-    protected function getExtraTime($session) {
+    protected function getExtraTime($session)
+    {
         $timer = $session->getTimer();
 
         return [
@@ -290,7 +295,8 @@ class TestRunner extends \tao_actions_SinglePageModule
     /**
      * @return array
      */
-    protected function getStateLabels() {
+    protected function getStateLabels()
+    {
         return [
             ProctoredDeliveryExecution::STATE_AWAITING => __('Awaiting'),
             ProctoredDeliveryExecution::STATE_AUTHORIZED => __('Authorized but not started'),
@@ -306,7 +312,8 @@ class TestRunner extends \tao_actions_SinglePageModule
      * @param string|\core_kernel_classes_Resource $state
      * @return string
      */
-    protected function getStateLabel($state) {
+    protected function getStateLabel($state)
+    {
         $label = '';
         $uri = $state;
 
