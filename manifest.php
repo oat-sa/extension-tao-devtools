@@ -27,7 +27,7 @@ return array(
     'label' => 'Development Tools',
     'description' => 'Developer tools that can assist you in creating new extensions, run scripts, destroy your install',
     'license' => 'GPL-2.0',
-    'version' => '2.20.1',
+    'version' => '2.21.0',
     'author' => 'Open Assessment Technologies',
     'requires' => array(
         'tao' => '>=2.7.0'
@@ -35,6 +35,7 @@ return array(
     'managementRole' => 'http://www.tao.lu/Ontologies/TAO.rdf#TaoDevToolsRole',
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#SysAdminRole', array('ext'=>'taoDevTools')),
+        array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole', array('ext'=>'taoDevTools', 'mod' => 'TestRunner')),
     ),
     'uninstall' => array(
     ),

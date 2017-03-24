@@ -20,6 +20,10 @@
  */
 namespace oat\taoDevTools\scripts\update;
 
+use oat\tao\model\accessControl\func\AccessRule;
+use oat\tao\model\accessControl\func\AclProxy;
+use oat\taoDevTools\actions\TestRunner;
+
 /**
  *
  * @author Joel Bout <joel@taotesting.com>
@@ -34,5 +38,12 @@ class Updater extends \common_ext_ExtensionUpdater
     public function update($initialVersion)
     {
         $this->skip('0', '2.20.1');
+        
+        if ($this->isVersion('2.20.1')) {
+
+            AclProxy::applyRule(new AccessRule('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#DeliveryRole', TestRunner::class));
+            
+            $this->setVersion('2.21.0');
+        }
     }
 }
