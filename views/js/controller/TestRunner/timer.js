@@ -60,7 +60,7 @@ define([
             });
         });
 
-        dataDurations.sort(function(a, b) {
+        dataDurations.sort(function (a, b) {
             return a.label.localeCompare(b.label);
         });
 
@@ -86,78 +86,81 @@ define([
 
             var polling = pollingFactory({
                 interval: 1000,
-                action: function update(p) {
+                action: function action(p) {
                     var promise = p.async();
-                    request(dataUrl)
-                        .then(function (data) {
-                            var isNew = !last || lastId !== data.id || last.state !== data.state;
-                            var itemAttemptId;
-                            var isDiff;
-                            var promises = [];
-                            var localDurations = {};
-                            var localTimers = {};
-
-                            data.timestamp = Date.now();
-                            data.timestampLabel = moment(data.timestamp).format('LLL');
-                            data.remainingLabel = _.isEmpty(data.remaining) ? '-' : timeEncoder.encode(data.remaining);
-                            data.serverDuration = data.durations && formatDurations(data.durations.server);
-                            data.clientDuration = data.durations && formatDurations(data.durations.client);
-                            data.extraDuration = data.extraTime && formatDurations(data.extraTime);
-
-                            if (!data.running) {
-                                stopPolling();
-                            }
-
-                            if (data.identifiers) {
-                                itemAttemptId = data.identifiers.item + '#' + data.identifiers.attempt;
-                                promises.push(durationStore.getItem(itemAttemptId).then(function(duration) {
-                                    localDurations.duration = _.isNumber(duration) ? duration : 0;
-                                }));
-                            }
-
-                            if (data.timers) {
-                                _.forEach(data.timers, function(timer) {
-                                    promises.push(timerStore.getItem(timer.id).then(function(remaining) {
-                                        localTimers[timer.label] = _.isNumber(remaining) ? remaining / 1000 : 0;
-                                    }));
-                                });
-                            }
-
-                            return Promise.all(promises).then(function() {
-                                data.localDuration = formatDurations(localDurations);
-                                data.localTimers = formatDurations(localTimers);
-                                if (!last || isNew) {
-                                    data.startTimers = data.localTimers;
-                                } else if (last.startTimers) {
-                                    data.startTimers = last.startTimers;
-                                }
-
-                                isDiff = !_.isEqual(last, data);
-                                last = data;
-                                lastId = data.id;
-
-                                if (isNew) {
-                                    history.unshift(data);
-                                } else if (isDiff) {
-                                    history.shift();
-                                    history.unshift(data);
-                                }
-
-                                if (isNew || isDiff) {
-                                    $content.datatable('refresh', {
-                                        data: history
-                                    });
-                                }
-
-                                promise.resolve();
-                            });
-                        })
-                        .catch(function (err) {
-                            logger.error(err);
-                            promise.resolve();
-                        });
+                    update().then(function () {
+                        promise.resolve();
+                    });
                 }
             });
+
+            function update() {
+                return request(dataUrl)
+                    .then(function (data) {
+                        var isNew = !last || lastId !== data.id || last.state !== data.state;
+                        var itemAttemptId;
+                        var isDiff;
+                        var promises = [];
+                        var localDurations = {};
+                        var localTimers = {};
+
+                        data.timestamp = Date.now();
+                        data.timestampLabel = moment(data.timestamp).format('LLL');
+                        data.remainingLabel = _.isEmpty(data.remaining) ? '-' : timeEncoder.encode(data.remaining);
+                        data.serverDuration = data.durations && formatDurations(data.durations.server);
+                        data.clientDuration = data.durations && formatDurations(data.durations.client);
+                        data.extraDuration = data.extraTime && formatDurations(data.extraTime);
+
+                        if (!data.running) {
+                            stopPolling();
+                        }
+
+                        if (data.identifiers) {
+                            itemAttemptId = data.identifiers.item + '#' + data.identifiers.attempt;
+                            promises.push(durationStore.getItem(itemAttemptId).then(function (duration) {
+                                localDurations.duration = _.isNumber(duration) ? duration : 0;
+                            }));
+                        }
+
+                        if (data.timers) {
+                            _.forEach(data.timers, function (timer) {
+                                promises.push(timerStore.getItem(timer.id).then(function (remaining) {
+                                    localTimers[timer.label] = _.isNumber(remaining) ? remaining / 1000 : 0;
+                                }));
+                            });
+                        }
+
+                        return Promise.all(promises).then(function () {
+                            data.localDuration = formatDurations(localDurations);
+                            data.localTimers = formatDurations(localTimers);
+                            if (!last || isNew) {
+                                data.startTimers = data.localTimers;
+                            } else if (last.startTimers) {
+                                data.startTimers = last.startTimers;
+                            }
+
+                            isDiff = !_.isEqual(last, data);
+                            last = data;
+                            lastId = data.id;
+
+                            if (isNew) {
+                                history.unshift(data);
+                            } else if (isDiff) {
+                                history.shift();
+                                history.unshift(data);
+                            }
+
+                            if (isNew || isDiff) {
+                                $content.datatable('refresh', {
+                                    data: history
+                                });
+                            }
+                        });
+                    })
+                    .catch(function (err) {
+                        logger.error(err);
+                    });
+            }
 
             function reload() {
                 stopPolling();
@@ -175,12 +178,14 @@ define([
                 polling.start();
                 buttons.stop.show();
                 buttons.start.hide();
+                buttons.ping.hide();
             }
 
             function stopPolling() {
                 polling.stop();
                 buttons.stop.hide();
                 buttons.start.show();
+                buttons.ping.show();
             }
 
             buttons.back = buttonFactory({
@@ -214,6 +219,19 @@ define([
                 icon: 'stop',
                 renderTo: $toolbar
             }).on('click', stopPolling).hide();
+
+            buttons.ping = buttonFactory({
+                id: 'ping',
+                label: __('Ping'),
+                type: 'info',
+                icon: 'target',
+                renderTo: $toolbar
+            }).on('click', function() {
+                buttons.ping.disable();
+                update().then(function() {
+                    buttons.ping.enable();
+                });
+            }).hide();
 
             $content.datatable({
                 paginationStrategyTop: 'none',
@@ -255,15 +273,15 @@ define([
             });
 
             Promise.all([
-                storeFactory('timer-' + sessionId).then(function(store) {
+                storeFactory('timer-' + sessionId).then(function (store) {
                     timerStore = store;
                 }),
-                storeFactory('duration-' + sessionId).then(function(store) {
+                storeFactory('duration-' + sessionId).then(function (store) {
                     durationStore = store;
                 })
-            ]).then(function() {
+            ]).then(function () {
                 startPolling();
-            }).catch(function(err) {
+            }).catch(function (err) {
                 logger.error(err);
             });
         }
