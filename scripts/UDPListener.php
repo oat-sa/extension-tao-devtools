@@ -45,8 +45,9 @@ class UDPListener {
 	}
 	
 	public function render($pData) {
-	
-		echo "\033[".self::$COLOR[$pData['s']].'m'.$pData['d']." (".implode(',',$pData['t']).")\033[0m\n";
+
+		$prefix = isset($pData['p'])?'['.$pData['p'].']':'';
+		echo "\033[".self::$COLOR[$pData['s']].'m'.$prefix.$pData['d']." (".implode(',',$pData['t']).")\033[0m\n";
 		if (isset($pData['b']) && ($pData['s'] >= 3)) {
             echo "\033[" . self::$COLOR[5] . 'm' . @$pData['f'] . ' @L' . @$pData['l'] . "\033[0m\n";
 
