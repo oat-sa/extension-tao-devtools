@@ -46,11 +46,9 @@ class UDPListener {
 	
 	public function render($pData) {
 
-		$prefix = isset($pData['p'])?'['.$pData['p'].']':'';
+		$prefix = !empty($pData['p'])?'['.$pData['p'].']':'';
 		echo "\033[".self::$COLOR[$pData['s']].'m'.$prefix.$pData['d']." (".implode(',',$pData['t']).")\033[0m\n";
 		if (isset($pData['b']) && ($pData['s'] >= 3)) {
-            echo "\033[" . self::$COLOR[5] . 'm' . @$pData['f'] . ' @L' . @$pData['l'] . "\033[0m\n";
-
             $this->renderBacktrace($pData['b']);
 		} elseif (in_array('DEPRECATED', $pData['t']) && isset($pData['b'][1])) {
 			echo "\t".$pData['b'][1]['file'].'('.$pData['b'][1]['line'].")\n";
