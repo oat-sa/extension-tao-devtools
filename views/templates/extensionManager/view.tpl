@@ -1,4 +1,4 @@
-<link rel="stylesheet" type="text/css" href="<?= BASE_WWW ?>css/extensionManager.css" />
+<link rel="stylesheet" type="text/css" href="<?= \oat\tao\helpers\Template::css('extensionManager.css', 'taoDevTools') ?>" />
 
 <?php if(isset($message)): ?>
 <div id="message">
