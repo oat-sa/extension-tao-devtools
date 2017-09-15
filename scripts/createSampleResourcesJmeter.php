@@ -22,6 +22,8 @@
  * Usage : php createSampleResourcesJmeter.php [NbOfTestTaker] [NbOfTestTakerByProctor]
  */
 
+use oat\tao\model\TaoOntology;
+
 require_once dirname(__FILE__).'/../../taoDeliveryRdf/includes/constants.php';
 require_once dirname(__FILE__).'/../../taoTests/includes/raw_start.php';
 require_once dirname(__FILE__).'/../../tao/includes/raw_start.php';
@@ -49,12 +51,12 @@ $userService = \tao_models_classes_UserService::singleton();
 $testCenterService = \oat\taoProctoring\model\TestCenterService::singleton();
 $proctorManagementService = \oat\taoProctoring\model\ProctorManagementService::singleton();
 $testTakerService = \oat\taoTestTaker\models\TestTakerService::singleton();
-$userClass = new \core_kernel_classes_Class(CLASS_TAO_USER);
+$userClass = new \core_kernel_classes_Class(TaoOntology::CLASS_TAO_USER);
 
 
 //create delivery
 $tests = [];
-$testClazz = new core_kernel_classes_Class(TAO_TEST_CLASS);
+$testClazz = new core_kernel_classes_Class(TaoOntology::TEST_CLASS);
 foreach($testClazz->getInstances(true) as $instance){
     $tests[$instance->getUri()] = $instance->getLabel();
 }

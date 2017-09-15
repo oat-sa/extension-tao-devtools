@@ -20,6 +20,7 @@
  */
 namespace oat\taoDevTools\scripts;
 
+use oat\tao\model\TaoOntology;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\tao\model\accessControl\func\AclProxy;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
@@ -64,8 +65,8 @@ class RestoreModelOne implements Action, ServiceLocatorAwareInterface
         if (count($params) >= 2) {
             $login = array_shift($params);
             $password = array_shift($params);
-            $sysAdmin = $this->getResource(INSTANCE_ROLE_SYSADMIN);
-            $userClass = $this->getClass(CLASS_TAO_USER);
+            $sysAdmin = $this->getResource(TaoOntology::INSTANCE_ROLE_SYSADMIN);
+            $userClass = $this->getClass(TaoOntology::CLASS_TAO_USER);
             \core_kernel_users_Service::singleton()->addUser($login, $password, $sysAdmin, $userClass);
         }
         
