@@ -65,8 +65,8 @@ class RestoreModelOne implements Action, ServiceLocatorAwareInterface
         if (count($params) >= 2) {
             $login = array_shift($params);
             $password = array_shift($params);
-            $sysAdmin = $this->getResource(TaoOntology::INSTANCE_ROLE_SYSADMIN);
-            $userClass = $this->getClass(TaoOntology::CLASS_TAO_USER);
+            $sysAdmin = $this->getResource(TaoOntology::PROPERTY_INSTANCE_ROLE_SYSADMIN);
+            $userClass = $this->getClass(TaoOntology::CLASS_URI_TAO_USER);
             \core_kernel_users_Service::singleton()->addUser($login, $password, $sysAdmin, $userClass);
         }
         

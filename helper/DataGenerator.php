@@ -38,7 +38,7 @@ class DataGenerator
         
         $generationId = NameGenerator::generateRandomString(4);
         
-        $topClass = new \core_kernel_classes_Class(TaoOntology::ITEM_CLASS);
+        $topClass = new \core_kernel_classes_Class(TaoOntology::ITEM_CLASS_URI);
         $class = $topClass->createSubClass('Generation '.$generationId);
         $fileClass = new \core_kernel_classes_Class('http://www.tao.lu/Ontologies/generis.rdf#File');
         
@@ -57,8 +57,8 @@ class DataGenerator
     }
     
     public static function generateGlobalManager($count = 100) {
-        $topClass = new \core_kernel_classes_Class(TaoOntology::CLASS_TAO_USER);
-        $role = new \core_kernel_classes_Resource(TaoOntology::INSTANCE_ROLE_GLOBALMANAGER);
+        $topClass = new \core_kernel_classes_Class(TaoOntology::CLASS_URI_TAO_USER);
+        $role = new \core_kernel_classes_Resource(TaoOntology::PROPERTY_INSTANCE_ROLE_GLOBALMANAGER);
         $class = self::generateUsers($count, $topClass, $role, 'Backoffice user', 'user');
         
         return $class;
@@ -69,11 +69,11 @@ class DataGenerator
         $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoGroups');
         
         
-        $topClass = new \core_kernel_classes_Class(TaoOntology::SUBJECT_CLASS);
-        $role = new \core_kernel_classes_Resource(TaoOntology::INSTANCE_ROLE_DELIVERY);
+        $topClass = new \core_kernel_classes_Class(TaoOntology::SUBJECT_CLASS_URI);
+        $role = new \core_kernel_classes_Resource(TaoOntology::PROPERTY_INSTANCE_ROLE_DELIVERY);
         $class = self::generateUsers($count, $topClass, $role, 'Test-Taker ', 'tt');
         
-        $groupClass = new \core_kernel_classes_Class(TaoOntology::GROUP_CLASS);
+        $groupClass = new \core_kernel_classes_Class(TaoOntology::GROUP_CLASS_URI);
         $group = $groupClass->createInstanceWithProperties(array(
             RDFS_LABEL => $class->getLabel()
         ));
