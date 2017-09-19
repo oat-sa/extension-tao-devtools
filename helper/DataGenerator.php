@@ -29,6 +29,29 @@ use oat\taoGroups\models\GroupsService;
 
 class DataGenerator
 {
+    public static function generateTests($count = 100) {
+        $count = 200;
+        $fileClass = new \core_kernel_classes_Class('http://www.tao.lu/Ontologies/generis.rdf#File');
+        $generationId = NameGenerator::generateRandomString(4);
+        $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDevTools');
+        $service = \taoQtiTest_models_classes_QtiTestService::singleton();
+        $topClass = new \core_kernel_classes_Class(TAO_TEST_CLASS);
+
+        $class = $topClass->createSubClass('Generation ' . $generationId);
+        $sampleFile = $ext->getDir() . 'data/tests/sample_test_1503673792.zip';
+
+        helpers_TimeOutHelper::setTimeOutLimit(helpers_TimeOutHelper::LONG);
+        for ($i = 0; $i < $count; $i++) {
+            $report = $service->importMultipleTests($class, $sampleFile, false);
+            foreach ($report as $subReport) {
+                $subReport->getData()->rdfsResource->setLabel(NameGenerator::generateTitle());
+            }
+        }
+        helpers_TimeOutHelper::reset();
+
+        return $class;
+    }
+
     public static function generateItems($count = 100) {
         // load QTI constants
         \common_ext_ExtensionsManager::singleton()->getExtensionById('taoQtiItem');
