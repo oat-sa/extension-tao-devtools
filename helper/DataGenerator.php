@@ -22,6 +22,8 @@
  */
 namespace oat\taoDevTools\helper;
 
+use oat\generis\model\GenerisRdf;
+use oat\generis\model\OntologyRdfs;
 use oat\taoQtiItem\model\qti\ImportService;
 use helpers_TimeOutHelper;
 use oat\taoTestTaker\models\TestTakerService;
@@ -74,7 +76,7 @@ class DataGenerator
         
         $groupClass = new \core_kernel_classes_Class(TAO_GROUP_CLASS);
         $group = $groupClass->createInstanceWithProperties(array(
-            RDFS_LABEL => $class->getLabel()
+            OntologyRdfs::RDFS_LABEL => $class->getLabel()
         ));
         
         foreach ($class->getInstances() as $user) {
@@ -97,14 +99,14 @@ class DataGenerator
         helpers_TimeOutHelper::setTimeOutLimit(helpers_TimeOutHelper::LONG);
         for ($i = 0; $i < $count; $i++) {
             $tt = $subClass->createInstanceWithProperties(array(
-                RDFS_LABEL => $label.' '.$i,
-                PROPERTY_USER_UILG	=> 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
-                PROPERTY_USER_DEFLG => 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
-                PROPERTY_USER_LOGIN	=> $prefix.$i,
-                PROPERTY_USER_PASSWORD => \core_kernel_users_Service::getPasswordHash()->encrypt('pass'.$i),
-                PROPERTY_USER_ROLES => $role,
-                PROPERTY_USER_FIRSTNAME => $label.' '.$i,
-                PROPERTY_USER_LASTNAME => 'Family '.$generationId
+                OntologyRdfs::RDFS_LABEL => $label.' '.$i,
+                GenerisRdf::PROPERTY_USER_UILG	=> 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
+                GenerisRdf::PROPERTY_USER_DEFLG => 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
+                GenerisRdf::PROPERTY_USER_LOGIN	=> $prefix.$i,
+                GenerisRdf::PROPERTY_USER_PASSWORD => \core_kernel_users_Service::getPasswordHash()->encrypt('pass'.$i),
+                GenerisRdf::PROPERTY_USER_ROLES => $role,
+                GenerisRdf::PROPERTY_USER_FIRSTNAME => $label.' '.$i,
+                GenerisRdf::PROPERTY_USER_LASTNAME => 'Family '.$generationId
             ));
         }
         
