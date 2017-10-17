@@ -16,16 +16,26 @@ class UDPListener {
 		"/pg_fetch_row\(\): Unable to jump to row -2 on PostgreSQL result index/"
 	);
 
+	private $url;
 	private $socket;
+	private $filter;
+	private $showTime;
 	
-	public function __construct($pUrl) {
-		$this->socket = stream_socket_server($pUrl, $errno, $errstr, STREAM_SERVER_BIND);
+	public function __construct($pUrl, $pOptions = []) {
+	    $this->url = $pUrl;
+        $this->showTime = isset($pOptions['time']) ? $pOptions['time'] : false;
+        $this->filter = isset($pOptions['filter']) ? $pOptions['filter'] : null;
+	    if ($this->filter && substr($this->filter, 0, 1) != '/' && substr($this->filter, -1) != '/') {
+            $this->filter = "/$this->filter/";
+        }
+		$this->socket = stream_socket_server($this->url, $errno, $errstr, STREAM_SERVER_BIND);
 		if (!$this->socket) {
 			die("$errstr ($errno)");
 		}
 	}
 	
 	public function listen() {
+        echo "Listening to $this->url\n";
 		do {
 			$received = stream_socket_recvfrom($this->socket, 33000, 0, $peer);
 	
@@ -47,12 +57,20 @@ class UDPListener {
 	public function render($pData) {
 
 		$prefix = !empty($pData['p'])?'['.$pData['p'].']':'';
-		echo "\033[".self::$COLOR[$pData['s']].'m'.$prefix.$pData['d']." (".implode(',',$pData['t']).")\033[0m\n";
+		$message = "\033[".self::$COLOR[$pData['s']].'m'.$prefix.$pData['d']." (".implode(',',$pData['t']).")\033[0m\n";
 		if (isset($pData['b']) && ($pData['s'] >= 3)) {
-            $this->renderBacktrace($pData['b']);
+            $message .= $this->renderBacktrace($pData['b']);
 		} elseif (in_array('DEPRECATED', $pData['t']) && isset($pData['b'][1])) {
-			echo "\t".$pData['b'][1]['file'].'('.$pData['b'][1]['line'].")\n";
+            $message .=  "\t".$pData['b'][1]['file'].'('.$pData['b'][1]['line'].")\n";
 		}
+		
+		if (!$this->filter || preg_match($this->filter, $message)) {
+		    if ($this->showTime) {
+                $now = DateTime::createFromFormat('U.u', microtime(true));
+                echo $now->format('[H:i:s.u]');
+            }
+            echo $message;
+        }
 	}
 	
 	public function renderBacktrace($pData) {
@@ -66,6 +84,7 @@ class UDPListener {
 		}
 		$prefixlen = strlen($this->getCommonPrefix($file));
 		
+		$backtrace = '';
 		foreach ($pData as $row) {
 			$string = ''
 				.(isset($row["file"]) ? substr($row["file"], $prefixlen) : '---')
@@ -75,8 +94,9 @@ class UDPListener {
 				.(isset($row["class"]) ? $row["class"].'::' : '')
 				.(isset($row["function"]) ? $row["function"]."()" : '---')
 			;
-			echo "\t".$string."\n";
+            $backtrace .=  "\t".$string."\n";
 		}
+		return $backtrace;
 	}
 	
 	public function getCommonPrefix($pData) {
@@ -98,30 +118,65 @@ class UDPListener {
 	}
 }
 
-$raw = $argv;
-array_shift($raw);
-$parms = array();
-while (!empty($raw)) {
-	$current = array_shift($raw);
-	if ($current == '--') {
-		break;
-	}
-	if (substr($current, 0, 1) == '-') {
-		$key = substr($current, 1);
-	}
-	if (empty($raw)) {
-		echo 'missing param value for '.$key."\n";
-		die();
-	}
-	$value = array_shift($raw);
-	$parms[$key] = $value;
+class Parameters {
+    private $parameters;
+    
+    public function __construct(array $options, array $longOptions = [])
+    {
+        $this->parameters = getopt(implode('', $options), $longOptions);
+        $this->checkMandatoryValues($options, $longOptions);
+    }
+    
+    private function checkMandatoryValues($options, $longOptions)
+    {
+        global $argv;
+
+        $mandatory = array_merge(
+            $this->getMandatoryValues($options, '-'),
+            $this->getMandatoryValues($longOptions, '--')
+        );
+        
+        foreach($argv as $arg) {
+            if (isset($mandatory[$arg]) && !isset($this->parameters[$mandatory[$arg]])) {
+                die("Missing param value for $arg\n");
+            }
+        }
+    }
+    
+    private function getMandatoryValues($options, $prefix)
+    {
+        $mandatory = [];
+        foreach ($options as $opt) {
+            if (substr($opt, -1) == ':' && substr($opt, -2) != '::') {
+                $name = substr($opt, 0, -1);
+                $mandatory[$prefix . $name] = $name;
+            }
+        }
+        return $mandatory;
+    }
+    
+    public function has($short, $long = null)
+    {
+        return isset($this->parameters[$short]) || ($long && isset($this->parameters[$long]));
+    }
+    
+    public function get($short, $long = null, $default = null)
+    {
+        if ($long && isset($this->parameters[$long])) {
+            return $this->parameters[$long];
+        }
+        if (isset($this->parameters[$short])) {
+            return $this->parameters[$short];
+        }   
+        return $default;
+    }
 }
-$url = 'udp://';
-$url .= isset($parms['h']) ? $parms['h'] : '127.0.0.1';
-$url .= ':'.(isset($parms['p']) ? $parms['p'] : '5775');
-echo "Listening to $url\n";
+$parameters = new Parameters(['h:', 'p:', 'f:', 't'], ['host:', 'port:', 'filter:', 'time']);
 
-$udr = new UDPListener($url);
+$url = 'udp://' . $parameters->get('h', 'host', '127.0.0.1') . ':' . $parameters->get('p', 'port', '5775');
+
+$udr = new UDPListener($url, [
+    'filter' => $parameters->get('f', 'filter'),
+    'time' => $parameters->has('t', 'time')
+]);
 $udr->listen();
-
-?>
