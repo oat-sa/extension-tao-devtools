@@ -19,26 +19,42 @@ class UDPListener
 
     private $url;
     private $socket;
-    private $filter;
+    private $prefixFilter;
+    private $contentFilter;
     private $showTime;
 
     public function __construct($pUrl, $pOptions = [])
     {
         $this->url = $pUrl;
         $this->showTime = isset($pOptions['time']) ? $pOptions['time'] : false;
-        $this->filter = isset($pOptions['filter']) ? $pOptions['filter'] : null;
-        if ($this->filter && substr($this->filter, 0, 1) != '/' && substr($this->filter, -1) != '/') {
-            $this->filter = "/$this->filter/";
+        $this->prefixFilter = $this->forceRegExp(isset($pOptions['prefix']) ? $pOptions['prefix'] : null);
+        $this->contentFilter = $this->forceRegExp(isset($pOptions['filter']) ? $pOptions['filter'] : null);
+        if ($this->contentFilter && substr($this->contentFilter, 0, 1) != '/' && substr($this->contentFilter, -1) != '/') {
+            $this->contentFilter = "/$this->contentFilter/";
         }
         $this->socket = stream_socket_server($this->url, $errno, $errstr, STREAM_SERVER_BIND);
         if (!$this->socket) {
             die("$errstr ($errno)");
         }
     }
+    
+    private function forceRegExp($reg)
+    {
+        if ($reg && substr($reg, 0, 1) != '/' && substr($reg, -1) != '/') {
+            $reg = "/$reg/";
+        }
+        return $reg;
+    }
 
     public function listen()
     {
         echo "Listening to $this->url\n";
+        if ($this->prefixFilter) {
+            echo "Filtering prefix that match $this->prefixFilter\n";
+        }
+        if ($this->contentFilter) {
+            echo "Filtering content that match $this->contentFilter\n";
+        }
         do {
             $received = stream_socket_recvfrom($this->socket, 33000, 0, $peer);
 
@@ -61,19 +77,21 @@ class UDPListener
     {
 
         $prefix = !empty($pData['p']) ? '[' . $pData['p'] . ']' : '';
-        $message = "\033[" . self::$COLOR[$pData['s']] . 'm' . $prefix . $pData['d'] . " (" . implode(',', $pData['t']) . ")\033[0m\n";
-        if (isset($pData['b']) && ($pData['s'] >= 3)) {
-            $message .= $this->renderBacktrace($pData['b']);
-        } elseif (in_array('DEPRECATED', $pData['t']) && isset($pData['b'][1])) {
-            $message .= "\t" . $pData['b'][1]['file'] . '(' . $pData['b'][1]['line'] . ")\n";
-        }
-
-        if (!$this->filter || preg_match($this->filter, $message)) {
-            if ($this->showTime) {
-                $now = DateTime::createFromFormat('U.u', microtime(true));
-                echo $now->format('[H:i:s.u]');
+        if (!$this->prefixFilter || preg_match($this->prefixFilter, $prefix)) {
+            $message = "\033[" . self::$COLOR[$pData['s']] . 'm' . $prefix . $pData['d'] . " (" . implode(',', $pData['t']) . ")\033[0m\n";
+            if (isset($pData['b']) && ($pData['s'] >= 3)) {
+                $message .= $this->renderBacktrace($pData['b']);
+            } elseif (in_array('DEPRECATED', $pData['t']) && isset($pData['b'][1])) {
+                $message .= "\t" . $pData['b'][1]['file'] . '(' . $pData['b'][1]['line'] . ")\n";
             }
-            echo $message;
+
+            if (!$this->contentFilter || preg_match($this->contentFilter, $message)) {
+                if ($this->showTime) {
+                    $now = DateTime::createFromFormat('U.u', microtime(true));
+                    echo $now->format('[H:i:s.u]');
+                }
+                echo $message;
+            }
         }
     }
 
@@ -178,12 +196,13 @@ class Parameters
     }
 }
 
-$parameters = new Parameters(['h:', 'p:', 'f:', 't'], ['host:', 'port:', 'filter:', 'time']);
+$parameters = new Parameters(['h:', 'p:', 'x:', 'f:', 't'], ['host:', 'port:', 'prefix:', 'filter:', 'time']);
 
 $url = 'udp://' . $parameters->get('h', 'host', '127.0.0.1') . ':' . $parameters->get('p', 'port', '5775');
 
 $udr = new UDPListener($url, [
     'filter' => $parameters->get('f', 'filter'),
+    'prefix' => $parameters->get('x', 'prefix'),
     'time' => $parameters->has('t', 'time')
 ]);
 $udr->listen();
