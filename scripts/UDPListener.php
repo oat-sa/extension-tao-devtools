@@ -10,7 +10,7 @@ class UDPListener
         '3' => '1;33', // yellow
         '4' => '1;31', // red
         '5' => '1;31', // red
-
+        'h' => '1;36', // cyan
     );
 
     private static $FILTER = array(
@@ -21,6 +21,7 @@ class UDPListener
     private $socket;
     private $prefixFilter;
     private $contentFilter;
+    private $highlightFilter;
     private $showTime;
 
     public function __construct($pUrl, $pOptions = [])
@@ -29,9 +30,7 @@ class UDPListener
         $this->showTime = isset($pOptions['time']) ? $pOptions['time'] : false;
         $this->prefixFilter = $this->forceRegExp(isset($pOptions['prefix']) ? $pOptions['prefix'] : null);
         $this->contentFilter = $this->forceRegExp(isset($pOptions['filter']) ? $pOptions['filter'] : null);
-        if ($this->contentFilter && substr($this->contentFilter, 0, 1) != '/' && substr($this->contentFilter, -1) != '/') {
-            $this->contentFilter = "/$this->contentFilter/";
-        }
+        $this->highlightFilter = $this->forceRegExp(isset($pOptions['highlight']) ? $pOptions['highlight'] : null);
         $this->socket = stream_socket_server($this->url, $errno, $errstr, STREAM_SERVER_BIND);
         if (!$this->socket) {
             die("$errstr ($errno)");
@@ -72,25 +71,42 @@ class UDPListener
 
         } while ($received !== false);
     }
+    
+    private function colorize($color = 0)
+    {
+        return "\033[${color}m";
+    }
 
     public function render($pData)
     {
-
         $prefix = !empty($pData['p']) ? '[' . $pData['p'] . ']' : '';
         if (!$this->prefixFilter || preg_match($this->prefixFilter, $prefix)) {
-            $message = "\033[" . self::$COLOR[$pData['s']] . 'm' . $prefix . $pData['d'] . " (" . implode(',', $pData['t']) . ")\033[0m\n";
+            $message = $prefix . $pData['d'] . " (" . implode(',', $pData['t']) . ")";
+            
             if (isset($pData['b']) && ($pData['s'] >= 3)) {
-                $message .= $this->renderBacktrace($pData['b']);
+                $trace = $this->renderBacktrace($pData['b']);
             } elseif (in_array('DEPRECATED', $pData['t']) && isset($pData['b'][1])) {
-                $message .= "\t" . $pData['b'][1]['file'] . '(' . $pData['b'][1]['line'] . ")\n";
+                $trace = "\t" . $pData['b'][1]['file'] . '(' . $pData['b'][1]['line'] . ")\n";
+            } else {
+                $trace = '';   
             }
+            
+            $fullMessage = $message . $trace;
 
-            if (!$this->contentFilter || preg_match($this->contentFilter, $message)) {
+            if (!$this->contentFilter || preg_match($this->contentFilter, $fullMessage)) {
+                if (!$this->highlightFilter || !preg_match($this->highlightFilter, $fullMessage)) {
+                    $color = self::$COLOR[$pData['s']];
+                } else {
+                    $color = self::$COLOR['h'];
+                }
+                echo $this->colorize($color);
                 if ($this->showTime) {
                     $now = DateTime::createFromFormat('U.u', microtime(true));
                     echo $now->format('[H:i:s.u]');
                 }
-                echo $message;
+                echo $message; 
+                echo $this->colorize() . "\n";
+                echo $trace;
             }
         }
     }
@@ -196,13 +212,32 @@ class Parameters
     }
 }
 
-$parameters = new Parameters(['h:', 'p:', 'x:', 'f:', 't'], ['host:', 'port:', 'prefix:', 'filter:', 'time']);
+$parameters = new Parameters(['h:', 'p:', 'x:', 'f:', 's:', 't'], ['host:', 'port:', 'prefix:', 'filter:', 'show:', 'time', 'help']);
+
+if ($parameters->has('help')) {
+    die(
+        "Displays the TAO logs sent through the network using UDP\n" .
+        "\n" .
+        "Usage: php " . basename(__FILE__) . " [option]\n" .
+        "\n" .
+        "Options:\n" .
+        "\t-h | --host <host>\tListen to the provided host (default: localhost)\n" .
+        "\t-p | --port <port>\tListen to the provided port (default: 5775)\n" .
+        "\t-x | --prefix <prefix>\tOnly show messages that match the provided prefix\n" .
+        "\t-f | --filter <filter>\tOnly show messages that match the provided filter\n" .
+        "\t-s | --show <filter>\tHighlights messages that match the provided filter\n" .
+        "\t-t | --time\t\tDisplay time for each message\n" .
+        "\t--help\t\t\tDisplay this help\n" .
+        "\n"
+    );
+}
 
 $url = 'udp://' . $parameters->get('h', 'host', '127.0.0.1') . ':' . $parameters->get('p', 'port', '5775');
 
 $udr = new UDPListener($url, [
     'filter' => $parameters->get('f', 'filter'),
     'prefix' => $parameters->get('x', 'prefix'),
+    'highlight' => $parameters->get('s', 'show'),
     'time' => $parameters->has('t', 'time')
 ]);
 $udr->listen();
