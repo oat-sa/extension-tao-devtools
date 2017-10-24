@@ -101,7 +101,7 @@ class UDPListener
                 }
                 echo $this->colorize($color);
                 if ($this->showTime) {
-                    $now = DateTime::createFromFormat('U.u', microtime(true));
+                    $now = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
                     echo $now->format('[H:i:s.u]');
                 }
                 echo $message; 
