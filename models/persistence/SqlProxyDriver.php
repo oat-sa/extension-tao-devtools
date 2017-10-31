@@ -1,18 +1,25 @@
 <?php
 /**
- * @Author      Antoine Delamarre <antoine.delamarre@vesperiagroup.com>
- * @Date        10/02/15
- * @File        ProxyDriver.php
- * @Copyright   Copyright (c) Doctena - All rights reserved
- * @Licence     Unauthorized copying of this source code, via any medium is strictly
- *              prohibited, proprietary and confidential.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; under version 2
+ * of the License (non-upgradable).
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * Copyright (c) 2017 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ *
  */
 
 namespace oat\taoDevTools\models\persistence;
 
-
-use common_persistence_Persistence;
-use oat\taoDevTools\models\Monitor\Monitor;
 use PDO;
 
 class SqlProxyDriver implements \common_persistence_sql_Driver{
@@ -61,8 +68,8 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
         $this->count++;
         try {
             return $this->persistence->query($statement, $params);
-        } catch (PDOException $e) {
-            common_Logger::w('Failed: '.$statement);
+        } catch (\PDOException $e) {
+            \common_Logger::w('Failed: '.$statement);
             throw $e;
         }
     }
@@ -79,8 +86,8 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
         $this->count++;
         try {
             return $this->persistence->exec($statement, $params);
-        } catch (PDOException $e) {
-            common_Logger::w('Failed: '.$statement);
+        } catch (\PDOException $e) {
+            \common_Logger::w('Failed: '.$statement);
             throw $e;
         }
     }
@@ -97,8 +104,8 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
         $this->count++;
         try {
             return $this->persistence->insert($tableName, $data);
-        } catch (PDOException $e) {
-            common_Logger::w('Failed insertion on table : '.$tableName);
+        } catch (\PDOException $e) {
+            \common_Logger::w('Failed insertion on table : '.$tableName);
             throw $e;
         }
     }
@@ -115,8 +122,8 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
         $this->count++;
         try {
             return $this->persistence->insertMultiple($tableName, $data);
-        } catch (PDOException $e) {
-            common_Logger::w('Failed insertion on table : '.$tableName);
+        } catch (\PDOException $e) {
+            \common_Logger::w('Failed insertion on table : '.$tableName);
             throw $e;
         }
     }
