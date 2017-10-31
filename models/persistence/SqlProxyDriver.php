@@ -37,7 +37,8 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      *
      * @return \common_persistence_Persistence
      */
-    function connect($id, array $params) {
+    function connect($id, array $params) 
+    {
 
         $this->id = $id;
 
@@ -55,7 +56,8 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      *
      * @return mixed
      */
-    public function query($statement, $params) {
+    public function query($statement, $params) 
+    {
         $this->count++;
         try {
             return $this->persistence->query($statement, $params);
@@ -72,7 +74,8 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      *
      * @return mixed
      */
-    public function exec($statement, $params) {
+    public function exec($statement, $params) 
+    {
         $this->count++;
         try {
             return $this->persistence->exec($statement, $params);
@@ -89,12 +92,31 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      *
      * @return mixed
      */
-    public function insert($tableName, array $data) {
+    public function insert($tableName, array $data) 
+    {
         $this->count++;
         try {
             return $this->persistence->insert($tableName, $data);
         } catch (PDOException $e) {
-            common_Logger::w('Failed: '.$statement);
+            common_Logger::w('Failed insertion on table : '.$tableName);
+            throw $e;
+        }
+    }
+    
+    /**
+     * Proxy to insertMultiple
+     * @param       $tableName
+     * @param array $data
+     *
+     * @return mixed
+     */
+    public function insertMultiple($tableName, array $data)
+    {
+        $this->count++;
+        try {
+            return $this->persistence->insertMultiple($tableName, $data);
+        } catch (PDOException $e) {
+            common_Logger::w('Failed insertion on table : '.$tableName);
             throw $e;
         }
     }
@@ -103,7 +125,8 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      * Proxy to getSchemaManager
      * @return mixed
      */
-    public function getSchemaManager() {
+    public function getSchemaManager() 
+    {
         return $this->persistence->getSchemaManager();
     }
 
@@ -111,7 +134,8 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      * Proxy to getPlatForm
      * @return mixed
      */
-    public function getPlatForm() {
+    public function getPlatForm() 
+    {
         return $this->persistence->getPlatForm();
     }
 
@@ -121,7 +145,8 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      *
      * @return mixed
      */
-    public function lastInsertId($name = null) {
+    public function lastInsertId($name = null) 
+    {
         return $this->persistence->lastInsertId($name);
     }
 
@@ -132,7 +157,8 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      *
      * @return mixed
      */
-    public function quote($parameter, $parameter_type = PDO::PARAM_STR) {
+    public function quote($parameter, $parameter_type = PDO::PARAM_STR) 
+    {
         return $this->persistence->quote($parameter, $parameter_type);
     }
     
