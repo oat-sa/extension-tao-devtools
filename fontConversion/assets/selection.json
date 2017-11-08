@@ -6003,7 +6003,7 @@
         "width": 986,
         "isMulticolor": false,
         "isMulticolor2": false,
-        "grid": 0,
+        "grid": 32,
         "tags": [
           "tooltip"
         ]
@@ -6012,7 +6012,7 @@
         {}
       ],
       "properties": {
-        "order": 8,
+        "order": 254,
         "id": 0,
         "name": "tooltip",
         "prevSize": 32,
