@@ -21,6 +21,7 @@
 namespace oat\taoDevTools\models;
 
 use Jig\Utils\StringUtils;
+use oat\generis\model\GenerisRdf;
 
 /**
  * Creates a new extension
@@ -123,7 +124,7 @@ class ExtensionCreator {
             '{authorNs}' => $this->authorNamespace,
             '{dependencies}' => 'array(\''.implode('\',\'', array_keys($this->requires)).'\')',
             '{requires}' => \common_Utils::toHumanReadablePhpString($this->requires, 1),
-            '{managementRole}' => GENERIS_NS.'#'.$this->id.'Manager',
+            '{managementRole}' => GenerisRdf::GENERIS_NS.'#'.$this->id.'Manager',
             '{licenseBlock}' => $this->getLicense(),
             '{installScripts}' => $this->substituteConstantTemplates(\common_Utils::toHumanReadablePhpString($this->installScripts, 1)),
             '{devtools}' => \common_ext_ExtensionsManager::singleton()->getInstalledVersion('taoDevTools')

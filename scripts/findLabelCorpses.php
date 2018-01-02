@@ -18,10 +18,13 @@
  *               
  * 
  */
+
+use oat\generis\model\OntologyRdfs;
+
 require_once dirname(__FILE__) . '/../includes/raw_start.php';
 
 $dbWrapper = core_kernel_classes_DbWrapper::singleton();
-$statement = $dbWrapper->query('SELECT DISTINCT "subject" FROM "statements" WHERE "predicate" in (\''.RDFS_LABEL.'\',\''.RDFS_COMMENT.'\')');
+$statement = $dbWrapper->query('SELECT DISTINCT "subject" FROM "statements" WHERE "predicate" in (\''.OntologyRdfs::RDFS_LABEL.'\',\''.OntologyRdfs::RDFS_COMMENT.'\')');
 
 while($r = $statement->fetch()){
     $subject = new core_kernel_classes_Resource($r['subject']);

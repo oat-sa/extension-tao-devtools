@@ -22,6 +22,11 @@
  * Usage : php createSampleResourcesJmeter.php [NbOfTestTaker] [NbOfTestTakerByProctor]
  */
 
+use oat\tao\model\TaoOntology;
+use oat\generis\model\GenerisRdf;
+use oat\generis\model\OntologyRdf;
+use oat\generis\model\OntologyRdfs;
+
 require_once dirname(__FILE__).'/../../taoDeliveryRdf/includes/constants.php';
 require_once dirname(__FILE__).'/../../taoTests/includes/raw_start.php';
 require_once dirname(__FILE__).'/../../tao/includes/raw_start.php';
@@ -49,12 +54,12 @@ $userService = \tao_models_classes_UserService::singleton();
 $testCenterService = \oat\taoProctoring\model\TestCenterService::singleton();
 $proctorManagementService = \oat\taoProctoring\model\ProctorManagementService::singleton();
 $testTakerService = \oat\taoTestTaker\models\TestTakerService::singleton();
-$userClass = new \core_kernel_classes_Class(CLASS_TAO_USER);
+$userClass = new \core_kernel_classes_Class(TaoOntology::CLASS_URI_TAO_USER);
 
 
 //create delivery
 $tests = [];
-$testClazz = new core_kernel_classes_Class(TAO_TEST_CLASS);
+$testClazz = new core_kernel_classes_Class(TaoOntology::TEST_CLASS_URI);
 foreach($testClazz->getInstances(true) as $instance){
     $tests[$instance->getUri()] = $instance->getLabel();
 }
@@ -115,12 +120,12 @@ while($i < $totalProctorNum){
         while($j < $ttByProctor){
             if($userService->loginAvailable('jmeter_TT_' . $ttNum)){
                 $tt = $testTakerCrudService->createFromArray(array(
-                    PROPERTY_USER_LOGIN => 'jmeter_TT_' . $ttNum,
-                    PROPERTY_USER_PASSWORD => 'jmeter_TT_' . $ttNum,
-                    RDFS_LABEL => 'jmeter_tt' . $ttNum,
-                    PROPERTY_USER_FIRSTNAME => 'jmeter_tt_' . $ttNum,
-                    PROPERTY_USER_LASTNAME => 'jmeter_tt_' . $ttNum,
-                    RDF_TYPE => $subClass
+                    GenerisRdf::PROPERTY_USER_LOGIN => 'jmeter_TT_' . $ttNum,
+                    GenerisRdf::PROPERTY_USER_PASSWORD => 'jmeter_TT_' . $ttNum,
+                    OntologyRdfs::RDFS_LABEL => 'jmeter_tt' . $ttNum,
+                    GenerisRdf::PROPERTY_USER_FIRSTNAME => 'jmeter_tt_' . $ttNum,
+                    GenerisRdf::PROPERTY_USER_LASTNAME => 'jmeter_tt_' . $ttNum,
+                    OntologyRdf::RDF_TYPE => $subClass
                 ));
                 $tts[] = $tt->getUri();
                 $j++;

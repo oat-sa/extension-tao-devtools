@@ -22,6 +22,9 @@
  */
 namespace oat\taoDevTools\helper;
 
+use oat\tao\model\TaoOntology;
+use oat\generis\model\GenerisRdf;
+use oat\generis\model\OntologyRdfs;
 use oat\taoQtiItem\model\qti\ImportService;
 use helpers_TimeOutHelper;
 use oat\taoTestTaker\models\TestTakerService;
@@ -37,7 +40,7 @@ class DataGenerator
         
         $generationId = NameGenerator::generateRandomString(4);
         
-        $topClass = new \core_kernel_classes_Class(TAO_ITEM_CLASS);
+        $topClass = new \core_kernel_classes_Class(TaoOntology::ITEM_CLASS_URI);
         $class = $topClass->createSubClass('Generation '.$generationId);
         $fileClass = new \core_kernel_classes_Class('http://www.tao.lu/Ontologies/generis.rdf#File');
         
@@ -56,8 +59,8 @@ class DataGenerator
     }
     
     public static function generateGlobalManager($count = 100) {
-        $topClass = new \core_kernel_classes_Class(CLASS_TAO_USER);
-        $role = new \core_kernel_classes_Resource(INSTANCE_ROLE_GLOBALMANAGER);
+        $topClass = new \core_kernel_classes_Class(TaoOntology::CLASS_URI_TAO_USER);
+        $role = new \core_kernel_classes_Resource(TaoOntology::PROPERTY_INSTANCE_ROLE_GLOBALMANAGER);
         $class = self::generateUsers($count, $topClass, $role, 'Backoffice user', 'user');
         
         return $class;
@@ -68,13 +71,13 @@ class DataGenerator
         $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoGroups');
         
         
-        $topClass = new \core_kernel_classes_Class(TAO_SUBJECT_CLASS);
-        $role = new \core_kernel_classes_Resource(INSTANCE_ROLE_DELIVERY);
+        $topClass = new \core_kernel_classes_Class(TaoOntology::SUBJECT_CLASS_URI);
+        $role = new \core_kernel_classes_Resource(TaoOntology::PROPERTY_INSTANCE_ROLE_DELIVERY);
         $class = self::generateUsers($count, $topClass, $role, 'Test-Taker ', 'tt');
         
-        $groupClass = new \core_kernel_classes_Class(TAO_GROUP_CLASS);
+        $groupClass = new \core_kernel_classes_Class(TaoOntology::GROUP_CLASS_URI);
         $group = $groupClass->createInstanceWithProperties(array(
-            RDFS_LABEL => $class->getLabel()
+            OntologyRdfs::RDFS_LABEL => $class->getLabel()
         ));
         
         foreach ($class->getInstances() as $user) {
@@ -97,14 +100,14 @@ class DataGenerator
         helpers_TimeOutHelper::setTimeOutLimit(helpers_TimeOutHelper::LONG);
         for ($i = 0; $i < $count; $i++) {
             $tt = $subClass->createInstanceWithProperties(array(
-                RDFS_LABEL => $label.' '.$i,
-                PROPERTY_USER_UILG	=> 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
-                PROPERTY_USER_DEFLG => 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
-                PROPERTY_USER_LOGIN	=> $prefix.$i,
-                PROPERTY_USER_PASSWORD => \core_kernel_users_Service::getPasswordHash()->encrypt('pass'.$i),
-                PROPERTY_USER_ROLES => $role,
-                PROPERTY_USER_FIRSTNAME => $label.' '.$i,
-                PROPERTY_USER_LASTNAME => 'Family '.$generationId
+                OntologyRdfs::RDFS_LABEL => $label.' '.$i,
+                GenerisRdf::PROPERTY_USER_UILG	=> 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
+                GenerisRdf::PROPERTY_USER_DEFLG => 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
+                GenerisRdf::PROPERTY_USER_LOGIN	=> $prefix.$i,
+                GenerisRdf::PROPERTY_USER_PASSWORD => \core_kernel_users_Service::getPasswordHash()->encrypt('pass'.$i),
+                GenerisRdf::PROPERTY_USER_ROLES => $role,
+                GenerisRdf::PROPERTY_USER_FIRSTNAME => $label.' '.$i,
+                GenerisRdf::PROPERTY_USER_LASTNAME => 'Family '.$generationId
             ));
         }
         
