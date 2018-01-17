@@ -129,6 +129,22 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
     }
 
     /**
+     * @param $tableName
+     * @param array $data
+     * @return mixed
+     */
+    public function updateMultiple($tableName, array $data)
+    {
+        $this->count++;
+        try {
+            return $this->persistence->updateMultiple($tableName, $data);
+        } catch (\PDOException $e) {
+            \common_Logger::w('Failed update multiple on table : '.$tableName);
+            throw $e;
+        }
+    }
+
+    /**
      * Proxy to getSchemaManager
      * @return mixed
      */
