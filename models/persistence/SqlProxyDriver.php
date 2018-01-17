@@ -129,9 +129,10 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
     }
 
     /**
-     * @param $tableName
+     * @param string $tableName
      * @param array $data
      * @return mixed
+     * @throws \Exception
      */
     public function updateMultiple($tableName, array $data)
     {
