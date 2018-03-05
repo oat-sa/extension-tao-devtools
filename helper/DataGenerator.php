@@ -27,11 +27,13 @@ use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyRdfs;
 use oat\taoQtiItem\model\qti\ImportService;
 use helpers_TimeOutHelper;
+use oat\taoQtiItem\model\qti\Service;
 use oat\taoTestTaker\models\TestTakerService;
 use oat\taoGroups\models\GroupsService;
 
 class DataGenerator
 {
+
     public static function generateItems($count = 100) {
         // load QTI constants
         \common_ext_ExtensionsManager::singleton()->getExtensionById('taoQtiItem');
@@ -56,6 +58,57 @@ class DataGenerator
         helpers_TimeOutHelper::reset();
         
         return $class;
+    }
+
+    /**
+     * Generates $count of problematic multilanguage items. The secondary item language version will have
+     * modification time a second after the default
+     *
+     * @param int $count
+     * @return array
+     */
+    public static function generateMultilanguageItems($count = 100)
+    {
+        $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDevTools');
+
+        $generationId = NameGenerator::generateRandomString(4);
+
+        $topClass = new \core_kernel_classes_Class(TaoOntology::ITEM_CLASS_URI);
+        $class = $topClass->createSubClass('Generation '.$generationId);
+
+        $sampleFile = $ext->getDir().'data/items/sampleItem.xml';
+
+        $generationData = [];
+        for ($i = 0; $i < $count; $i++) {
+
+            $report = ImportService::singleton()->importQTIFile($sampleFile, $class, false);
+            /** @var \core_kernel_classes_Resource $item */
+            $item = $report->getData();
+            $item->setLabel(NameGenerator::generateTitle());
+
+            $newLang = self::getRandomLanguage();
+            Service::singleton()->getDataItemByRdfItem($item, $newLang, false);
+
+            $newDir = \taoItems_models_classes_ItemsService::singleton()->getItemDirectory($item, $newLang);
+            $langPath = $newDir->getFileSystem()->getAdapter()->getPathPrefix() . $newDir->getPrefix();
+            if (!is_dir($langPath)) {
+                mkdir($langPath, 0755);
+            }
+            copy($sampleFile, $langPath . '/qti.xml');
+            touch($langPath . '/qti.xml', time()+1);
+
+            $generationData[] = [
+                'uri'   => $item->getUri(),
+                'name'  => $item->getLabel(),
+                'class' => $class,
+                'langs' => [
+                    DEFAULT_LANG,
+                    $newLang
+                ]
+            ];
+        }
+
+        return $generationData;
     }
     
     public static function generateGlobalManager($count = 100) {
@@ -113,5 +166,33 @@ class DataGenerator
         
         helpers_TimeOutHelper::reset();
         return $subClass;
+    }
+
+    /**
+     * Get languages list
+     *
+     * @return array
+     */
+    private static function getLanguagesList()
+    {
+        $availableLangs = \tao_helpers_I18n::getAvailableLangsByUsage(new \core_kernel_classes_Resource(TaoOntology::PROPERTY_STANCE_LANGUAGE_USAGE_DATA));
+        return array_keys($availableLangs);
+    }
+
+    /**
+     * Get random language from list of languages
+     *
+     * @return string A string represents IETF language code
+     */
+    private static function getRandomLanguage()
+    {
+        $langList = self::getLanguagesList();
+
+        $randomLanguage = DEFAULT_LANG;
+        while ($randomLanguage === DEFAULT_LANG) {
+            $randomLanguage = $langList[array_rand(self::getLanguagesList())];
+        }
+
+        return $randomLanguage;
     }
 }
