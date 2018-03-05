@@ -31,7 +31,8 @@ return array(
     'author' => 'Open Assessment Technologies',
     'requires' => array(
         'generis' => '>=6.6.0',
-        'tao' => '>=14.3.1'
+        'tao' => '>=14.3.1',
+        'taoQtiItem' = '>=13.4.0',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/TAO.rdf#TaoDevToolsRole',
     'acl' => array(
