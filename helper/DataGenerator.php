@@ -71,10 +71,8 @@ class DataGenerator
     {
         $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDevTools');
 
-        $generationId = NameGenerator::generateRandomString(4);
-
         $topClass = new \core_kernel_classes_Class(TaoOntology::ITEM_CLASS_URI);
-        $class = $topClass->createSubClass('Generation '.$generationId);
+        $class = $topClass->createSubClass('Junk data generation (' . (new \DateTime())->format('Y-m-d H:i:s') . ')');
 
         $sampleFile = $ext->getDir().'data/items/sampleItem.xml';
 
