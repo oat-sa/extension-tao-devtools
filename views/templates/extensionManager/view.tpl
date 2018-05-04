@@ -40,7 +40,7 @@
 						<ul class="plain">
 						<?php foreach ($ext->getDependencies() as $req => $version): ?>
 						  <?php if (!in_array($req, get_data('installedIds'))) : ?>
-							<li class="ext-id ext-<?= $req ?>" rel="<?= $req ?>"><?= $req ?></li>
+							<li class="ext-id ext-<?= $req ?>" rel="<?= $req ?>"><a href="#<?= $req ?>"><?= $req ?></a></li>
 							<?php endif;?>
 						<?php endforeach; ?>
 						</ul>
