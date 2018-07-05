@@ -35,7 +35,7 @@ class UserDebug extends \tao_actions_CommonModule {
 
 	/**
 	 * @access protected
-	 * @var tao_models_classes_UserService
+	 * @var \tao_models_classes_UserService
 	 */
 	protected $userService = null;
 
