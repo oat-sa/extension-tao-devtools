@@ -46,7 +46,7 @@ class WfEngineTool extends tao_actions_Main {
 
 	    $processExecutionUri = '';
 	    if(isset($_GET['processExecutionUri'])){
-	        $processExecutionUri = tao_helpers_Uri::decode($_GET['processExecutionUri']);
+	        $processExecutionUri = \tao_helpers_Uri::decode($_GET['processExecutionUri']);
 	    }
 	    
 	    $finishedOnly = false;

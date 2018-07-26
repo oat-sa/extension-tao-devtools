@@ -21,8 +21,6 @@
 
 namespace oat\taoDevTools\actions;
 
-use oat\taoQtiItem\model\qti\ImportService;
-use oat\taoDevTools\helper\NameGenerator;
 use oat\taoDevTools\helper\DataGenerator;
 
 /**

@@ -20,14 +20,13 @@
  */
 
 $extpath = dirname(__FILE__).DIRECTORY_SEPARATOR;
-$taopath = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'tao'.DIRECTORY_SEPARATOR;
 
 return array(
     'name' => 'taoDevTools',
     'label' => 'Development Tools',
     'description' => 'Developer tools that can assist you in creating new extensions, run scripts, destroy your install',
     'license' => 'GPL-2.0',
-    'version' => '3.11.0',
+    'version' => '3.12.0',
     'author' => 'Open Assessment Technologies',
     'requires' => array(
         'generis' => '>=6.14.0',
