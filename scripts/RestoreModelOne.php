@@ -22,12 +22,10 @@ namespace oat\taoDevTools\scripts;
 
 use oat\tao\model\TaoOntology;
 use oat\tao\scripts\update\OntologyUpdater;
-use oat\tao\model\accessControl\func\AclProxy;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use oat\oatbox\action\Action;
 use oat\generis\model\OntologyAwareTrait;
-use oat\tao\model\accessControl\func\AccessRule;
 
 /**
  * Restores a minimal viable model 1

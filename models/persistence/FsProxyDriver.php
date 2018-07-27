@@ -25,7 +25,7 @@ class FsProxyDriver extends ConfigurableService implements AdapterInterface
 
     /**
      * (non-PHPdoc)
-     * @see \oat\oatbox\filesystem\FlyWrapperTrait::getAdapter()
+     * @see FlyWrapperTrait::getAdapter()
      */
     public function getAdapter()
     {

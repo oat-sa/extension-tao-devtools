@@ -18,10 +18,7 @@
  *               
  * 
  */
-use oat\generis\model\data\ModelManager;
-use oat\generis\model\kernel\persistence\file\FileIterator;
 use oat\tao\model\extension\ExtensionModel;
-use oat\tao\scripts\update\ModelFixer;
 
 require_once dirname(__FILE__) . '/../includes/raw_start.php';
 

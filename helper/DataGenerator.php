@@ -27,20 +27,17 @@ use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyRdfs;
 use oat\taoQtiItem\model\qti\ImportService;
 use helpers_TimeOutHelper;
-use oat\taoTestTaker\models\TestTakerService;
 use oat\taoGroups\models\GroupsService;
 
 class DataGenerator
 {
     public static function generateItems($count = 100) {
-        // load QTI constants
-        \common_ext_ExtensionsManager::singleton()->getExtensionById('taoQtiItem');
         
         $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDevTools');
         
         $generationId = NameGenerator::generateRandomString(4);
         
-        $topClass = new \core_kernel_classes_Class(TaoOntology::ITEM_CLASS_URI);
+        $topClass = new \core_kernel_classes_Class(TaoOntology::CLASS_URI_ITEM);
         $class = $topClass->createSubClass('Generation '.$generationId);
         $fileClass = new \core_kernel_classes_Class('http://www.tao.lu/Ontologies/generis.rdf#File');
         
@@ -71,11 +68,11 @@ class DataGenerator
         $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoGroups');
         
         
-        $topClass = new \core_kernel_classes_Class(TaoOntology::SUBJECT_CLASS_URI);
+        $topClass = new \core_kernel_classes_Class(TaoOntology::CLASS_URI_SUBJECT);
         $role = new \core_kernel_classes_Resource(TaoOntology::PROPERTY_INSTANCE_ROLE_DELIVERY);
         $class = self::generateUsers($count, $topClass, $role, 'Test-Taker ', 'tt');
         
-        $groupClass = new \core_kernel_classes_Class(TaoOntology::GROUP_CLASS_URI);
+        $groupClass = new \core_kernel_classes_Class(TaoOntology::CLASS_URI_GROUP);
         $group = $groupClass->createInstanceWithProperties(array(
             OntologyRdfs::RDFS_LABEL => $class->getLabel()
         ));
