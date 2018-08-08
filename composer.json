@@ -57,7 +57,7 @@
     "minimum-stability" : "dev",
     "require": {
         "oat-sa/oatbox-extension-installer": "~1.1||dev-master",
-        "ccampbell/chromephp" : "dev-master"
+        "ccampbell/chromephp" : "~4.1.0"
     },
     "autoload" : {
         "psr-4" : {
