@@ -23,14 +23,11 @@
 module.exports = function(grunt) {
     'use strict';
 
-    var root = grunt.option('root');
-
     grunt.config.merge({
         bundle : {
             taodevtools : {
                 options : {
                     extension : 'taoDevTools',
-                    extensionPath : root + '/taoDevTools/views/js',
                     outputDir : 'loader',
                     bundles : [{
                         name : 'taoDevTools',
