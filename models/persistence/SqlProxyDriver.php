@@ -20,6 +20,7 @@
 
 namespace oat\taoDevTools\models\persistence;
 
+use Doctrine\DBAL\DBALException;
 use PDO;
 
 class SqlProxyDriver implements \common_persistence_sql_Driver{
@@ -62,13 +63,14 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      * @param $params
      *
      * @return mixed
+     * @throws DBALException
      */
     public function query($statement, $params) 
     {
         $this->count++;
         try {
             return $this->persistence->query($statement, $params);
-        } catch (\PDOException $e) {
+        } catch (DBALException $e) {
             \common_Logger::w('Failed: '.$statement);
             throw $e;
         }
@@ -80,13 +82,14 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      * @param $params
      *
      * @return mixed
+     * @throws DBALException
      */
     public function exec($statement, $params) 
     {
         $this->count++;
         try {
             return $this->persistence->exec($statement, $params);
-        } catch (\PDOException $e) {
+        } catch (DBALException $e) {
             \common_Logger::w('Failed: '.$statement);
             throw $e;
         }
@@ -98,13 +101,14 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      * @param array $data
      *
      * @return mixed
+     * @throws DBALException
      */
     public function insert($tableName, array $data) 
     {
         $this->count++;
         try {
             return $this->persistence->insert($tableName, $data);
-        } catch (\PDOException $e) {
+        } catch (DBALException $e) {
             \common_Logger::w('Failed insertion on table : '.$tableName);
             throw $e;
         }
@@ -116,13 +120,14 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
      * @param array $data
      *
      * @return mixed
+     * @throws DBALException
      */
     public function insertMultiple($tableName, array $data)
     {
         $this->count++;
         try {
             return $this->persistence->insertMultiple($tableName, $data);
-        } catch (\PDOException $e) {
+        } catch (DBALException $e) {
             \common_Logger::w('Failed insertion on table : '.$tableName);
             throw $e;
         }
@@ -139,7 +144,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
         $this->count++;
         try {
             return $this->persistence->updateMultiple($tableName, $data);
-        } catch (\PDOException $e) {
+        } catch (DBALException $e) {
             \common_Logger::w('Failed update multiple on table : '.$tableName);
             throw $e;
         }
