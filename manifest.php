@@ -29,8 +29,8 @@ return array(
     'version' => '4.0.0',
     'author' => 'Open Assessment Technologies',
     'requires' => array(
-        'generis' => '>=7.9.9',
-        'tao' => '>=20.2.2'
+        'generis' => '>=7.9.11',
+        'tao' => '>=21.1.2'
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/TAO.rdf#TaoDevToolsRole',
     'acl' => array(
