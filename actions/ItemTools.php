@@ -60,6 +60,8 @@ class ItemTools extends \tao_actions_CommonModule
 
     public function getAsset()
     {
+        $this->getServiceLocator()->get(\common_ext_ExtensionsManager::SERVICE_ID)->getExtensionById('taoItems');
+
         $item = $this->getResource($this->getRequestParameter('id'));
         $assetPath = $this->getRequestParameter('asset');
 

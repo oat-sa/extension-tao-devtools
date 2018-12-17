@@ -38,7 +38,6 @@ class DataCreation extends \tao_actions_Main
      */
     public function createItems()
     {
-        $this->defaultData();
         $count = $this->hasRequestParameter('count') ? $this->getRequestParameter('count') : 100;
 
         DataGenerator::generateItems($count);
@@ -48,7 +47,6 @@ class DataCreation extends \tao_actions_Main
 
     public function createTesttakers()
     {
-        $this->defaultData();
         $count = $this->hasRequestParameter('count') ? $this->getRequestParameter('count') : 1000;
 
         DataGenerator::generateTesttakers($count);
