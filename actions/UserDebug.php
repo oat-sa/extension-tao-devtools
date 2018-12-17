@@ -36,7 +36,7 @@ class UserDebug extends \tao_actions_CommonModule
 
 	protected function getUserService()
     {
-        return \tao_models_classes_UserService::singleton();
+        return $this->getServiceLocator()->get(\tao_models_classes_UserService::SERVICE_ID);
     }
 
 	/**
@@ -44,8 +44,7 @@ class UserDebug extends \tao_actions_CommonModule
 	 */
 	public function roles()
     {
-
-	    $currentSession = \common_session_SessionManager::getSession();
+	    $currentSession = $this->getSession();
 	    if ($currentSession instanceof \common_session_RestrictedSession) {
 	        $this->setData('roles', $currentSession->getUserRoles());
 	        $this->setView('userdebug/restore.tpl');
@@ -56,7 +55,7 @@ class UserDebug extends \tao_actions_CommonModule
 				$user = $this->getUserService()->getCurrentUser();
 				$filter = $myForm->getValue('rolefilter');
 				$userUri = $myForm->getValue('user');
-				if ($userUri != \common_session_SessionManager::getSession()->getUserUri()) {
+				if ($userUri != $currentSession->getUserUri()) {
 				    throw new \common_exception_Error('Security exception, user to be changed is not the current user');
 				}
 				$session = new \common_session_RestrictedSession($this->getSession(), $myForm->getValue('rolefilter'));
