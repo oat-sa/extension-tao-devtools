@@ -31,28 +31,20 @@ use oat\taoDevTools\forms\UserDebugRoles;
  * @subpackage actions
  *
  */
-class UserDebug extends \tao_actions_CommonModule {
+class UserDebug extends \tao_actions_CommonModule
+{
 
-	/**
-	 * @access protected
-	 * @var \tao_models_classes_UserService
-	 */
-	protected $userService = null;
-
-	/**
-	 * initialize the services
-	 */
-	public function __construct(){
-		parent::__construct();
-		$this->userService = \tao_models_classes_UserService::singleton();
-	}
+	protected function getUserService()
+    {
+        return $this->getServiceLocator()->get(\tao_models_classes_UserService::SERVICE_ID);
+    }
 
 	/**
 	 * Action dedicated to fake roles
 	 */
-	public function roles(){
-
-	    $currentSession = \common_session_SessionManager::getSession();
+	public function roles()
+    {
+	    $currentSession = $this->getSession();
 	    if ($currentSession instanceof \common_session_RestrictedSession) {
 	        $this->setData('roles', $currentSession->getUserRoles());
 	        $this->setView('userdebug/restore.tpl');
@@ -60,27 +52,28 @@ class UserDebug extends \tao_actions_CommonModule {
 	        $myFormContainer = new UserDebugRoles();
 	        $myForm = $myFormContainer->getForm();
 	        if($myForm->isSubmited() && $myForm->isValid()){
-				$user = $this->userService->getCurrentUser();
+				$user = $this->getUserService()->getCurrentUser();
 				$filter = $myForm->getValue('rolefilter');
 				$userUri = $myForm->getValue('user');
-				if ($userUri != \common_session_SessionManager::getSession()->getUserUri()) {
+				if ($userUri != $currentSession->getUserUri()) {
 				    throw new \common_exception_Error('Security exception, user to be changed is not the current user');
 				}
-				$session = new \common_session_RestrictedSession(\common_session_SessionManager::getSession(), $myForm->getValue('rolefilter'));
+				$session = new \common_session_RestrictedSession($this->getSession(), $myForm->getValue('rolefilter'));
 				\common_session_SessionManager::startSession($session);
 				$this->setData('roles', $currentSession->getUserRoles());
 				$this->setView('userdebug/restore.tpl');
 	        } else {
     	        $this->setData('formTitle'	, __("Restrict Roles"));
     	        $this->setData('myForm'		, $myForm->render());
-    	        
+
     	        $this->setView('form.tpl', 'tao');
 	        }
 	    }
 	}
-	
-	public function restore(){
-	    $currentSession = \common_session_SessionManager::getSession();
+
+	public function restore()
+    {
+	    $currentSession = $this->getSession();
 	    if ($currentSession instanceof \common_session_RestrictedSession) {
 	        $currentSession->restoreOriginal();
 	    }
