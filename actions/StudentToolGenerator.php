@@ -11,8 +11,8 @@ namespace oat\taoDevTools\actions;
 use Jig\Utils\StringUtils;
 
 
-class StudentToolGenerator extends \tao_actions_CommonModule {
-
+class StudentToolGenerator extends \tao_actions_CommonModule
+{
 
     /**
      * @var array
@@ -44,7 +44,8 @@ class StudentToolGenerator extends \tao_actions_CommonModule {
      *
      * @throws \Exception
      */
-    protected function generateTool() {
+    protected function generateTool()
+    {
 
         $this->data = $this->getMappedArguments();
         $generatorPath = str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__)) . '/studentToolGenerator';
@@ -151,7 +152,8 @@ class StudentToolGenerator extends \tao_actions_CommonModule {
      *
      * @return array
      */
-    protected function getPatterns() {
+    protected function getPatterns()
+    {
         $patterns = array();
         foreach($this->data as $pattern => $replacement) {
             $patterns[]     = '{' . $pattern . '}';
@@ -164,7 +166,8 @@ class StudentToolGenerator extends \tao_actions_CommonModule {
      *
      * @return array
      */
-    protected function getReplacements() {
+    protected function getReplacements()
+    {
         return array_values($this -> data);
     }
-} 
+}

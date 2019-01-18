@@ -32,14 +32,16 @@ use oat\taoDevTools\models\ExtensionCreator;
  * @subpackage actions
  *
  */
-class ExtensionsManager extends \tao_actions_ExtensionsManager {
+class ExtensionsManager extends \tao_actions_ExtensionsManager
+{
 
 	/**
 	 * Index page
 	 */
-	public function index() {
+	public function index()
+    {
 
-		$extensionManager = \common_ext_ExtensionsManager::singleton();
+		$extensionManager = $this->getServiceLocator()->get(\common_ext_ExtensionsManager::SERVICE_ID);
 		$all = array();
 		$installed = array();
 		foreach ($extensionManager->getInstalledExtensions() as $ext) {
@@ -55,14 +57,15 @@ class ExtensionsManager extends \tao_actions_ExtensionsManager {
 		$this->setView('extensionManager/view.tpl');
 
 	}
-	
+
 	/**
 	 * Form to create a new extension
 	 */
-	public function create() {
+	public function create()
+    {
 	    $formContainer = new Extension();
 	    $myForm = $formContainer->getForm();
-	    
+
 	    if ($myForm->isValid() && $myForm->isSubmited()) {
 	        $creator = new ExtensionCreator(
 	            $myForm->getValue('name'),
