@@ -199,7 +199,7 @@ class taoDevTools_scripts_TaoOpenapiGenerator extends tao_scripts_Runner
             $this->out('------------');
             $this->out('Missed refs:');
             foreach ($this->missedSchemaRefs as $missedRef => $extId) {
-                $this->out("$missedRef in $extId", ['color' => 'red']);
+                $this->out("'$missedRef' in $extId", ['color' => 'red']);
             }
             $this->out('');
             $this->out('WITH ERRORS', ['color' => 'red']);
