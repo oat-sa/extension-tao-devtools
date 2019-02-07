@@ -21,16 +21,20 @@
 namespace oat\taoDevTools\helper;
 
 use OpenApi\Annotations\OpenApi;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Wrapper for OpenApi\scan function with additional info
  */
 class OpenapiScanner
 {
+    const MISSED_REF_ERROR_RE = '/\$ref "#\/components\/schemas\/(.*?)" not found for/';
+    const PATH_NOT_FOUND_ERROR = 'Required @OA\Info() not found';
+    const INFO_NOT_FOUND_ERROR = 'Required @OA\PathItem() not found';
+
     /**
      * @param string $directory
      * @param array $options
-     * @param bool $validate
      * @return OpenapiScanner\ScanResult
      */
     public static function scan($directory, $options = [])
@@ -40,17 +44,16 @@ class OpenapiScanner
         $processors = array_key_exists('processors', $options) ? $options['processors'] : \OpenApi\Analysis::processors();
         $exclude = array_key_exists('exclude', $options) ? $options['exclude'] : null;
 
-        // Crawl directory and parse all files
-        $finder = \OpenApi\Util::finder($directory, $exclude);
-        foreach ($finder as $file) {
-            $analysis->addAnalysis($analyser->fromFile($file->getPathname()));
-        }
+        $otherErrors = [];
+        self::addFiles($analysis, $analyser, \OpenApi\Util::finder($directory, $exclude), $otherErrors);
+
         // Post processing
         $analysis->process($processors);
         // Validation (Generate notices & warnings)
-        $missedRefs = self::validate($analysis);
+        $missedRefs = [];
+        self::validate($analysis, $missedRefs, $otherErrors);
 
-        return new OpenapiScanner\ScanResult($analysis, $missedRefs);
+        return new OpenapiScanner\ScanResult($analysis, $missedRefs, $otherErrors);
     }
 
     /**
@@ -75,44 +78,80 @@ class OpenapiScanner
             $destAnalysis->addAnnotation($schema, $schema->_context);
         }
 
+        // To avoid duplication of already existed schemas in openapi
+        $destAnalysis->openapi->components->schemas = [];
         // Post processing
         $destAnalysis->process(\OpenApi\Analysis::processors());
         // Validation (Generate notices & warnings)
-        $missedRefs = self::validate($destAnalysis);
+        $missedRefs = $otherErrors = [];
+        self::validate($destAnalysis, $missedRefs, $otherErrors);
 
-        return new OpenapiScanner\ScanResult($destAnalysis, $missedRefs);
+        return new OpenapiScanner\ScanResult($destAnalysis, $missedRefs, $otherErrors);
     }
 
     /**
      * @param \OpenApi\Analysis $analysis
-     * @return string[] missedRefs
+     * @param bool[] $missedRefs keys: ref, value: true (search optimization)
+     * @param string[] $otherErrors
+     * @return void missedRefs
      */
-    protected static function validate(\OpenApi\Analysis $analysis) {
+    protected static function validate(\OpenApi\Analysis $analysis, array &$missedRefs, array &$otherErrors) {
         /** @var callable $oldLogClosure */
         $oldLogClosure = \OpenApi\Logger::getInstance()->log;
-        $missedRefs = [];
+
+        \OpenApi\Logger::getInstance()->log =
+            function ($entry) use (&$missedRefs, &$otherErrors) {
+                $matches = [];
+                if (is_string($entry)) {
+                    if (preg_match(self::MISSED_REF_ERROR_RE, $entry, $matches)) {
+                        $missedRefs[$matches[1]] = true;
+                        return;
+                    }
+                    if ($entry === self::INFO_NOT_FOUND_ERROR || $entry === self::PATH_NOT_FOUND_ERROR) {
+                        return;
+                    }
+                }
+
+                if ($entry instanceof \Exception) {
+                    $entry = $entry->getMessage();
+                }
+
+                $otherErrors[] = $entry;
+            };
 
         try {
-
-            \OpenApi\Logger::getInstance()->log =
-                function ($entry, $type) use (&$missedRefs, $oldLogClosure) {
-                    $matches = [];
-                    if (is_string($entry) &&
-                        preg_match('/\$ref "#\/components\/schemas\/(.*?)" not found for/', $entry, $matches)
-                    ) {
-                        $missedRefs[$matches[1]] = true;
-                    }
-                    else {
-                        $oldLogClosure($entry, $type);
-                    }
-                };
-
             @$analysis->validate();
         }
         finally {
             \OpenApi\Logger::getInstance()->log = $oldLogClosure;
         }
+    }
 
-        return $missedRefs;
+    protected static function addFiles(
+        \OpenApi\Analysis $analysis,
+        \OpenApi\StaticAnalyser $analyser,
+        Finder $finder,
+        array &$otherErrors
+    ) {
+        /** @var callable $oldLogClosure */
+        $oldLogClosure = \OpenApi\Logger::getInstance()->log;
+
+        \OpenApi\Logger::getInstance()->log =
+            function ($entry) use (&$otherErrors) {
+                if ($entry instanceof \Exception) {
+                    $entry = $entry->getMessage();
+                }
+                $otherErrors[] = $entry;
+            };
+
+        try {
+            // Crawl directory and parse all files
+            foreach ($finder as $file) {
+                $analysis->addAnalysis($analyser->fromFile($file->getPathname()));
+            }
+        }
+        finally {
+            \OpenApi\Logger::getInstance()->log = $oldLogClosure;
+        }
     }
 }

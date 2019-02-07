@@ -33,13 +33,20 @@ class ScanResult
     public $missedSchemaRefs;
 
     /**
-     * @param \OpenApi\Analysis $analysis
-     * @param string[] $missedSchemaRefs
+     * @var string[]
      */
-    public function __construct(\OpenApi\Analysis $analysis, $missedSchemaRefs = [])
+    public $otherErrors;
+
+    /**
+     * @param \OpenApi\Analysis $analysis
+     * @param bool[] $missedSchemaRefs
+     * @param string[] $otherErrors
+     */
+    public function __construct(\OpenApi\Analysis $analysis, $missedSchemaRefs = [], $otherErrors = [])
     {
         $this->analysis = $analysis;
         $this->missedSchemaRefs = $missedSchemaRefs;
+        $this->otherErrors = $otherErrors;
     }
 
     /**
@@ -47,6 +54,20 @@ class ScanResult
      */
     public function hasMissedRefs() {
         return \count($this->missedSchemaRefs) > 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasOtherErrors() {
+        return \count($this->otherErrors) > 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasAnyErrors() {
+        return $this->hasMissedRefs() || $this->hasOtherErrors();
     }
 
     /**
@@ -100,6 +121,6 @@ class ScanResult
             }
         }
 
-        return array_keys($result);
+        return $result;
     }
 }
