@@ -20,6 +20,7 @@
 
 namespace oat\taoDevTools\actions;
 
+use oat\tao\model\routing\AnnotationReader\security;
 use oat\taoDevTools\forms\UserDebugRoles;
 
 /**
@@ -41,6 +42,7 @@ class UserDebug extends \tao_actions_CommonModule {
 
 	/**
 	 * initialize the services
+     * @security("hide")
 	 */
 	public function __construct(){
 		parent::__construct();

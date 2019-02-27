@@ -19,13 +19,19 @@
  */
 namespace oat\taoDevTools\actions;
 
+use oat\tao\model\routing\AnnotationReader\security;
 use oat\taoItems\model\pack\Packer;
 use oat\taoItems\model\asset\Loader;
 /**
  * Package visualisation
  */
 class ItemTools extends \tao_actions_CommonModule {
-    
+
+    /**
+     * ItemTools constructor.
+     * @security("hide");
+     * @throws \common_ext_ExtensionException
+     */
     public function __construct() {
         // load item constants
         \common_ext_ExtensionsManager::singleton()->getExtensionById('taoItems');

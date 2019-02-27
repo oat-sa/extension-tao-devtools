@@ -33,12 +33,6 @@ use oat\taoDevTools\helper\DataGenerator;
  */
 class DataCreation extends \tao_actions_Main
 {
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Work in progress
      */

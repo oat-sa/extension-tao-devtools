@@ -7,6 +7,7 @@
 
 namespace oat\taoDevTools\actions;
 
+use oat\tao\model\routing\AnnotationReader\security;
 use ZipArchive;
 
 class FontConversion extends \tao_actions_CommonModule
@@ -18,6 +19,11 @@ class FontConversion extends \tao_actions_CommonModule
     private $currentSelection;
     private $taoDir;
 
+    /**
+     * FontConversion constructor.
+     * @throws \Exception
+     * @security("hide");
+     */
     public function __construct()
     {
         $this->tmpDir           = \tao_helpers_File::createTempDir();
