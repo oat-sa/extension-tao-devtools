@@ -65,8 +65,10 @@ class ExtensionsManager extends \tao_actions_ExtensionsManager
     {
 	    $formContainer = new Extension();
 	    $myForm = $formContainer->getForm();
+	    $myForm->addCsrfTokenProtection();
 
 	    if ($myForm->isValid() && $myForm->isSubmited()) {
+	        $this->validateCsrf();
 	        $creator = new ExtensionCreator(
 	            $myForm->getValue('name'),
 	            $myForm->getValue('label'),

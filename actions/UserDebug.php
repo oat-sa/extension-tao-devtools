@@ -51,7 +51,9 @@ class UserDebug extends \tao_actions_CommonModule
 	    } else {
 	        $myFormContainer = new UserDebugRoles();
 	        $myForm = $myFormContainer->getForm();
+            $myForm->addCsrfTokenProtection();
 	        if($myForm->isSubmited() && $myForm->isValid()){
+                $this->validateCsrf();
 				$user = $this->getUserService()->getCurrentUser();
 				$filter = $myForm->getValue('rolefilter');
 				$userUri = $myForm->getValue('user');
