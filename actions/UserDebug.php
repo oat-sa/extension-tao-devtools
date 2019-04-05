@@ -54,8 +54,6 @@ class UserDebug extends \tao_actions_CommonModule
             $myForm->addCsrfTokenProtection();
 	        if($myForm->isSubmited() && $myForm->isValid()){
                 $this->validateCsrf();
-				$user = $this->getUserService()->getCurrentUser();
-				$filter = $myForm->getValue('rolefilter');
 				$userUri = $myForm->getValue('user');
 				if ($userUri != $currentSession->getUserUri()) {
 				    throw new \common_exception_Error('Security exception, user to be changed is not the current user');
@@ -65,7 +63,7 @@ class UserDebug extends \tao_actions_CommonModule
 				$this->setData('roles', $currentSession->getUserRoles());
 				$this->setView('userdebug/restore.tpl');
 	        } else {
-    	        $this->setData('formTitle'	, __("Restrict Roles"));
+    	        $this->setData('formTitle'	, __('Restrict Roles'));
     	        $this->setData('myForm'		, $myForm->render());
 
     	        $this->setView('form.tpl', 'tao');

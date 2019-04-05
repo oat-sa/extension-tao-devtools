@@ -82,6 +82,11 @@ class ExtensionsManager extends \tao_actions_ExtensionsManager
             );
 	        $report = $creator->run();
 	        $this->setData('myForm', __('Extension created'));
+            $this->returnJson([
+                'success' => true,
+                'message' => __('Extension created')
+            ]);
+            return;
 	    } else {
 	        $this->setData('myForm', $myForm->render());
 	    }
