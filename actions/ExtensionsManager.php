@@ -14,7 +14,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2019 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -68,7 +68,6 @@ class ExtensionsManager extends \tao_actions_ExtensionsManager
 	    $myForm->addCsrfTokenProtection();
 
 	    if ($myForm->isValid() && $myForm->isSubmited()) {
-	        $this->validateCsrf();
 	        $creator = new ExtensionCreator(
 	            $myForm->getValue('name'),
 	            $myForm->getValue('label'),
@@ -82,11 +81,6 @@ class ExtensionsManager extends \tao_actions_ExtensionsManager
             );
 	        $report = $creator->run();
 	        $this->setData('myForm', __('Extension created'));
-            $this->returnJson([
-                'success' => true,
-                'message' => __('Extension created')
-            ]);
-            return;
 	    } else {
 	        $this->setData('myForm', $myForm->render());
 	    }
