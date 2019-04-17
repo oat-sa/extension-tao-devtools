@@ -21,6 +21,7 @@
 namespace oat\taoDevTools\actions;
 
 use oat\taoDevTools\forms\UserDebugRoles;
+use tao_helpers_form_FormContainer as FormContainer;
 
 /**
  * This controller provide the actions to manage the user settings
@@ -49,9 +50,9 @@ class UserDebug extends \tao_actions_CommonModule
 	        $this->setData('roles', $currentSession->getUserRoles());
 	        $this->setView('userdebug/restore.tpl');
 	    } else {
-	        $myFormContainer = new UserDebugRoles();
+	        $myFormContainer = new UserDebugRoles([], [FormContainer::CSRF_PROTECTION_OPTION => true]);
 	        $myForm = $myFormContainer->getForm();
-            $myForm->addCsrfTokenProtection();
+
 	        if($myForm->isSubmited() && $myForm->isValid()){
 				$userUri = $myForm->getValue('user');
 				if ($userUri != $currentSession->getUserUri()) {

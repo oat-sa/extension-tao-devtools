@@ -22,6 +22,7 @@ namespace oat\taoDevTools\actions;
 
 use oat\taoDevTools\forms\Extension;
 use oat\taoDevTools\models\ExtensionCreator;
+use tao_helpers_form_FormContainer as FormContainer;
 
 /**
  * Extensions management controller
@@ -63,9 +64,8 @@ class ExtensionsManager extends \tao_actions_ExtensionsManager
 	 */
 	public function create()
     {
-	    $formContainer = new Extension();
+	    $formContainer = new Extension([], [FormContainer::CSRF_PROTECTION_OPTION => true]);
 	    $myForm = $formContainer->getForm();
-	    $myForm->addCsrfTokenProtection();
 
 	    if ($myForm->isValid() && $myForm->isSubmited()) {
 	        $creator = new ExtensionCreator(
