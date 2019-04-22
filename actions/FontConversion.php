@@ -402,6 +402,7 @@ class FontConversion extends \tao_actions_CommonModule
      */
     public function downloadCurrentSelection()
     {
+        $this->init();
         header('Content-disposition: attachment; filename=selection.json');
         header('Content-type: application/json');
         echo(file_get_contents($this->currentSelection));
