@@ -406,6 +406,7 @@ class FontConversion extends \tao_actions_CommonModule
         header('Content-disposition: attachment; filename=selection.json');
         header('Content-type: application/json');
         echo(file_get_contents($this->currentSelection));
+        exit();
     }
 
     /**
