@@ -24,10 +24,11 @@
 define([
     'jquery',
     'i18n',
-    'helpers',
+    'util/url',
     'layout/section',
-    'ui/feedback'
-], function($, __, helpers, section, feedback){
+    'ui/feedback',
+    'ui/modal'
+], function($, __, urlUtil, section, feedback){
 
     var ext_installed = [];
     var toInstall = [];
@@ -38,10 +39,10 @@ define([
     function getDependencies(extension) {
         var dependencies = [];
         $('#' + extension + ' .dependencies li:not(.installed)').each(function() {
-                var ext = $(this).attr('rel');
-                var deps = getDependencies(ext);
-                deps.push(ext);
-                dependencies = dependencies.concat(deps);
+            var ext = $(this).attr('rel');
+            var deps = getDependencies(ext);
+            deps.push(ext);
+            dependencies = dependencies.concat(deps);
         });
         return dependencies;
     }
@@ -52,7 +53,7 @@ define([
         var i;
         for (i = 0; i < orig.length; i++) {
             if ($.inArray(orig[i], a) < 0){
-                    a.push(orig[i]);
+                a.push(orig[i]);
             }
         }
         return a;
@@ -69,11 +70,10 @@ define([
         progressConsole(__('Installing extension %s...').replace('%s', ext));
         $.ajax({
             type: "POST",
-            url: helpers._url('install', 'ExtensionsManager', 'tao'),
+            url: urlUtil.route('install', 'ExtensionsManager', 'tao'),
             data: 'id='+ext,
             dataType: 'json',
             success: function(data) {
-                helpers.loaded();
                 if (data.success) {
                     progressConsole(__('> Extension %s succesfully installed.').replace('%s', ext));
 
@@ -104,7 +104,6 @@ define([
                 type: "GET",
                 url: $($('#main-menu a')[0]).prop('href'),
                 success: function(data) {
-                    helpers.loaded();
                     $('#installProgress .bar').animate({backgroundColor:'#6b6'}, 1000);
                     $('#installProgress p.status').text(__('Installation done.'));
                     progressConsole(__('> Installation done.'));
@@ -148,7 +147,7 @@ define([
                 section.create({
                     id : 'devtools-newextension',
                     name : __('Create new extension'),
-                    url : helpers._url('create', 'ExtensionsManager', 'taoDevTools'),
+                    url : urlUtil.route('create', 'ExtensionsManager', 'taoDevTools'),
                     contentBlock : true
                 })
                     .show();
@@ -176,6 +175,10 @@ define([
             });
 
             $('#installButton').click(function(event) {
+                var $modalContainer = $('#installProgress');
+
+                event.preventDefault();
+
                 //Prepare the list of extension to install in the order of dependency
                 toInstall = [];
                 $('#available-extensions-container input:checked').each(function() {
@@ -193,42 +196,38 @@ define([
                 percentByExt = 100 / toInstall.length;
 
                 //Show the dialog with the result
-                $('#installProgress p.status').text(__('%s extension(s) to install.').replace('%s', toInstall.length));
-                $('#installProgress .bar').width(0);
-                $('#installProgress .console').empty();
+                $('p.status', $modalContainer).text(__('%s extension(s) to install.').replace('%s', toInstall.length));
+                $('.bar', $modalContainer).width(0);
+                $('.console', $modalContainer).empty();
                 progressConsole(__('Do you wish to install the following extension(s):\n%s?').replace('%s', toInstall.join(', ')));
-                $('#installProgress').dialog({
-                    modal: true,
-                    width: 400,
-                    height: 300,
-                    buttons: [
-                        {
-                            text: __('No'),
-                            click: function() {
-                                $(this).dialog('close');
-                            }
-                        },
-                        {
-                            text: __('Yes'),
-                            click: function() {
-                                //Run the install one by one
-                                progressConsole(__('Preparing installation...'));
-                                $('.ui-dialog-buttonpane').remove();
-                                installError = 0;
-                                indexCurrentToInstall = 0;
-                                installNextExtension();
-                            }
-                        }
-                    ]
+
+                $('[data-control=cancel]', $modalContainer).on('click', function(e){
+                    e.preventDefault();
+                    $modalContainer.modal('close');
                 });
-                event.preventDefault();
+                $('[data-control=confirm]', $modalContainer).on('click', function(e){
+                    e.preventDefault();
+                    progressConsole(__('Preparing installation...'));
+                    $('.buttons', $modalContainer).remove();
+                    installError = 0;
+                    indexCurrentToInstall = 0;
+                    installNextExtension();
+                });
+
+                $modalContainer.modal({
+                    width : 400,
+                    height : 300,
+                    top : 150,
+                    disableEscape : true,
+                    disableClosing : true
+                });
             });
 
             $('.disableButton').click(function(event) {
                 var id = $(event.target).data('extid');
                 $.ajax({
                     type: "POST",
-                    url: helpers._url('disable', 'ExtensionsManager', 'taoDevTools'),
+                    url: urlUtil.route('disable', 'ExtensionsManager', 'taoDevTools'),
                     data: 'id='+id,
                     dataType: 'json',
                     success: function(data) {
@@ -248,7 +247,7 @@ define([
                 var id = $(event.target).data('extid');
                 $.ajax({
                     type: "POST",
-                    url: helpers._url('enable', 'ExtensionsManager', 'taoDevTools'),
+                    url: urlUtil.route('enable', 'ExtensionsManager', 'taoDevTools'),
                     data: 'id='+id,
                     dataType: 'json',
                     success: function(data) {
@@ -268,7 +267,7 @@ define([
                 var id = $(event.target).data('extid');
                 $.ajax({
                     type: "POST",
-                    url: helpers._url('uninstall', 'ExtensionsManager', 'taoDevTools'),
+                    url: urlUtil.route('uninstall', 'ExtensionsManager', 'taoDevTools'),
                     data: 'id='+id,
                     dataType: 'json',
                     success: function(data) {
