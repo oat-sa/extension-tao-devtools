@@ -1,22 +1,22 @@
 <?php
-/**  
+/**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; under version 2
  * of the License (non-upgradable).
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- * 
+ *
  * Copyright (c) 2013 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
- *               
- * 
+ *
+ *
  */
 namespace oat\taoDevTools\actions;
 
@@ -29,19 +29,20 @@ use oat\tao\model\search\SearchService;
 
 /**
  * The Main Module of tao development tools
- * 
+ *
  * @package taoDevTools
  * @subpackage actions
  * @license GPLv2  http://www.opensource.org/licenses/gpl-2.0.php
- * 
+ *
  */
-class ScriptRunner extends tao_actions_CommonModule {
+class ScriptRunner extends tao_actions_CommonModule
+{
 
-    public function index() {
+    public function index()
+    {
         $this->setData('actions', array(
         	'emptyCache' => __('Empty Cache'),
             'reindex' => __('Reindex all resources'),
-//            'compileJs' => __('Compile Java-Scripts'),
             'generatePo' => __('Regenerate locales files'),
             'createItems' => __('Create 100 qti Items'),
             'createTesttakers' => __('Create 1000 test takers'),
@@ -50,23 +51,26 @@ class ScriptRunner extends tao_actions_CommonModule {
         ));
         $this->setView('ScriptRunner/index.tpl');
 	}
-	
-	public function emptyCache() {
+
+	public function emptyCache()
+    {
 	    \common_cache_FileCache::singleton()->purge();
 	    return $this->returnJson(array(
 	        'success' => true,
 	    	'message' => __('Cache has been emptied')
 	    ));
 	}
-	
-	public function compileJs() {
+
+	public function compileJs()
+    {
 	    return $this->returnJson(array(
 	        'success' => true,
 	    	'message' => __('Javascripts have been compiled')
 	    ));
 	}
-	
-	public function generatePo() {
+
+	public function generatePo()
+    {
 	    $generator = new LocalesGenerator();
 	    $generator->generateAll();
 	    return $this->returnJson(array(
@@ -74,16 +78,18 @@ class ScriptRunner extends tao_actions_CommonModule {
 	        'message' => __('Translation files have been regenerated')
 	    ));
 	}
-	
-	public function reindex() {
+
+	public function reindex()
+    {
 	    $indexed = SearchService::runIndexing();
 	    return $this->returnJson(array(
 	        'success' => true,
 	        'message' => __('Reindexed %s resources', $indexed)
 	    ));
 	}
-	
-	public function createItems() {
+
+	public function createItems()
+    {
 	    $class = DataGenerator::generateItems(100);
 	    return $this->returnJson(array(
 	        'success' => true,
@@ -91,23 +97,26 @@ class ScriptRunner extends tao_actions_CommonModule {
 	    ));
 	}
 
-	public function createTesttakers() {
+	public function createTesttakers()
+    {
 	    $class = DataGenerator::generateTesttakers(1000);
 	    return $this->returnJson(array(
 	        'success' => true,
 	        'message' => __('Testtakers generated in class %s', $class->getLabel())
 	    ));
 	}
-	
-	public function createGlobalManager() {
+
+	public function createGlobalManager()
+    {
 	    $class = DataGenerator::generateGlobalManager(100);
 	    return $this->returnJson(array(
 	        'success' => true,
 	        'message' => __('Global managers generated in class %s', $class->getLabel())
 	    ));
 	}
-	
-	public function sendSelfMsg() {
+
+	public function sendSelfMsg()
+    {
 	    $message = new Message();
 	    $message->setTo(\common_session_SessionManager::getSession()->getUser());
 	    $message->setBody('<h1>Tao Dev Message send on the '.\tao_helpers_Date::displayeDate(time()).'</h1>');
@@ -117,6 +126,6 @@ class ScriptRunner extends tao_actions_CommonModule {
 	        'message' => __('Send a message')
 	    ));
 	}
-	
-	
+
+
 }

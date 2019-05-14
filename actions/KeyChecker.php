@@ -31,7 +31,8 @@ namespace oat\taoDevTools\actions;
  */
 class KeyChecker extends \tao_actions_CommonModule
 {
-    public function index() {
+    public function index()
+    {
         $this->setView('KeyChecker/index.tpl');
     }
 }

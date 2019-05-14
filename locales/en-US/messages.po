@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.1.0-sprint15\n"
-"PO-Revision-Date: 2015-12-23T13:12:12\n"
+"Project-Id-Version: TAO 3.3.0-sprint101\n"
+"PO-Revision-Date: 2019-05-10T12:26:45\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: en-US\n"
@@ -44,9 +44,6 @@ msgid "Before you start working with the TAO icon font make sure that this exten
 msgstr ""
 
 msgid "Cache has been emptied"
-msgstr ""
-
-msgid "Compile Java-Scripts"
 msgstr ""
 
 #, tao-public
@@ -96,7 +93,7 @@ msgstr ""
 msgid "Existing Icons"
 msgstr ""
 
-msgid "Extension %s created."
+msgid "Extension %s created. Before you install the extension make sure you add it to /vendor/composer/autoload_psr4.php"
 msgstr ""
 
 msgid "Extension can be created"
@@ -156,6 +153,10 @@ msgstr ""
 msgid "Javascripts have been compiled"
 msgstr ""
 
+#, tao-public
+msgid "Key checker"
+msgstr ""
+
 msgid "License"
 msgstr ""
 
@@ -206,6 +207,10 @@ msgstr ""
 msgid "Restricted session"
 msgstr ""
 
+#, tao-public
+msgid "Results"
+msgstr ""
+
 msgid "Rotatable"
 msgstr ""
 
@@ -221,6 +226,10 @@ msgstr ""
 
 #, tao-public
 msgid "Settings"
+msgstr ""
+
+#, tao-public
+msgid "Shortcuts"
 msgstr ""
 
 #, tao-public

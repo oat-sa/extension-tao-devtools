@@ -18,7 +18,13 @@ class FontConversion extends \tao_actions_CommonModule
     private $currentSelection;
     private $taoDir;
 
-    public function __construct()
+    public function index()
+    {
+        $this->init();
+        $this->setView('fontConversion/view.tpl');
+    }
+
+    protected function init()
     {
         $this->tmpDir           = \tao_helpers_File::createTempDir();
         $this->dir              = str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__));
@@ -44,11 +50,6 @@ class FontConversion extends \tao_actions_CommonModule
         $this->setData('icon-listing', $this->loadIconListing());
     }
 
-    public function index()
-    {
-        $this->setView('fontConversion/view.tpl');
-    }
-
     /**
      * Process the font archive
      *
@@ -56,6 +57,7 @@ class FontConversion extends \tao_actions_CommonModule
      */
     public function processFontArchive()
     {
+        $this->init();
 
         //return array('error' => __('Unable to read the file : ') . $archiveDir . '/style.css');
 
@@ -400,9 +402,11 @@ class FontConversion extends \tao_actions_CommonModule
      */
     public function downloadCurrentSelection()
     {
+        $this->init();
         header('Content-disposition: attachment; filename=selection.json');
         header('Content-type: application/json');
         echo(file_get_contents($this->currentSelection));
+        exit();
     }
 
     /**

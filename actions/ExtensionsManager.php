@@ -14,7 +14,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2019 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -22,6 +22,7 @@ namespace oat\taoDevTools\actions;
 
 use oat\taoDevTools\forms\Extension;
 use oat\taoDevTools\models\ExtensionCreator;
+use tao_helpers_form_FormContainer as FormContainer;
 
 /**
  * Extensions management controller
@@ -32,14 +33,16 @@ use oat\taoDevTools\models\ExtensionCreator;
  * @subpackage actions
  *
  */
-class ExtensionsManager extends \tao_actions_ExtensionsManager {
+class ExtensionsManager extends \tao_actions_ExtensionsManager
+{
 
 	/**
 	 * Index page
 	 */
-	public function index() {
+	public function index()
+    {
 
-		$extensionManager = \common_ext_ExtensionsManager::singleton();
+		$extensionManager = $this->getServiceLocator()->get(\common_ext_ExtensionsManager::SERVICE_ID);
 		$all = array();
 		$installed = array();
 		foreach ($extensionManager->getInstalledExtensions() as $ext) {
@@ -55,14 +58,15 @@ class ExtensionsManager extends \tao_actions_ExtensionsManager {
 		$this->setView('extensionManager/view.tpl');
 
 	}
-	
+
 	/**
 	 * Form to create a new extension
 	 */
-	public function create() {
-	    $formContainer = new Extension();
+	public function create()
+    {
+	    $formContainer = new Extension([], [FormContainer::CSRF_PROTECTION_OPTION => true]);
 	    $myForm = $formContainer->getForm();
-	    
+
 	    if ($myForm->isValid() && $myForm->isSubmited()) {
 	        $creator = new ExtensionCreator(
 	            $myForm->getValue('name'),
