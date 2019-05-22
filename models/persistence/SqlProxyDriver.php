@@ -195,4 +195,12 @@ class SqlProxyDriver implements \common_persistence_sql_Driver{
     {
         \common_Logger::i($this->count.' queries to '.$this->id);
     }
+
+    /**
+     * @return \Doctrine\DBAL\Connection
+     */
+    public function getDbalConnection()
+    {
+        return $this->persistence->getDriver()->getDbalConnection();
+    }
 }
