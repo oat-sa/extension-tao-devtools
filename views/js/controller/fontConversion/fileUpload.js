@@ -1,4 +1,4 @@
-define(['jquery', 'ui', 'ui/uploader', 'ui/feedback'], function($, ui, uploader, feedback){
+define(['jquery', 'uikitLoader', 'ui/uploader', 'ui/feedback'], function($, ui, uploader, feedback){
 
     var container = $('#upload-container');
 
