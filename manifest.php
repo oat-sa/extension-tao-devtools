@@ -26,7 +26,7 @@ return array(
     'label' => 'Development Tools',
     'description' => 'Developer tools that can assist you in creating new extensions, run scripts, destroy your install',
     'license' => 'GPL-2.0',
-    'version' => '6.1.0',
+    'version' => '6.2.0',
     'author' => 'Open Assessment Technologies',
     'requires' => array(
         'generis' => '>=11.1.0',
