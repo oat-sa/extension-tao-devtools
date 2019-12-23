@@ -29,6 +29,7 @@ module.exports = function(grunt) {
                 options : {
                     extension : 'taoDevTools',
                     outputDir : 'loader',
+                    paths: require('./paths.json'),
                     bundles : [{
                         name : 'taoDevTools',
                         default : true
