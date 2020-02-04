@@ -25,25 +25,26 @@ class taoDevTools_scripts_ApacheConfCreator extends tao_scripts_Runner
      * (non-PHPdoc)
      * @see tao_scripts_Runner::preRun()
      */
-    public function preRun(){
+    public function preRun()
+    {
 
-        if(!isset($this->parameters['target']) ){
-            $this->parameters['target'] = $this->parameters['t']; 
+        if (!isset($this->parameters['target'])) {
+            $this->parameters['target'] = $this->parameters['t'];
         }
 
-        if(!isset($this->parameters['documentRoot']) ){
+        if (!isset($this->parameters['documentRoot'])) {
             $this->parameters['documentRoot'] = $this->parameters['d'];
         }
-        if(!isset($this->parameters['serverName']) ){
+        if (!isset($this->parameters['serverName'])) {
             $this->parameters['serverName'] = $this->parameters['s'];
         }
-        if(!isset($this->parameters['tpl']) ){
-            $this->parameters['tpl'] = dirname(__FILE__). '/sample/sample.conf';
+        if (!isset($this->parameters['tpl'])) {
+            $this->parameters['tpl'] = dirname(__FILE__) . '/sample/sample.conf';
         }
         
-        $fileinfo =pathinfo($this->parameters['target']);
+        $fileinfo = pathinfo($this->parameters['target']);
         
-        if($fileinfo['extension'] != 'conf'){
+        if ($fileinfo['extension'] != 'conf') {
             $this->err('Extension of target file has to be conf', true);
         }
     }
@@ -60,37 +61,34 @@ class taoDevTools_scripts_ApacheConfCreator extends tao_scripts_Runner
         
         $serverName = $this->parameters['serverName'];
         $documentRoot = $this->parameters['documentRoot'];
-        $directory = array();
+        $directory = [];
         
         $it = new RecursiveDirectoryIterator($documentRoot);
 
         foreach (new RecursiveIteratorIterator($it) as $file) {
-            if($file->getFileName() == '.htaccess' 
-                && strpos($file->getPath(), 'install/checks/testRewrite') ===false){
-              
-          
-               $pathName = $file->getPathname();
-               $path = $file->getPath();
+            if (
+                $file->getFileName() == '.htaccess'
+                && strpos($file->getPath(), 'install/checks/testRewrite') === false
+            ) {
+                $pathName = $file->getPathname();
+                $path = $file->getPath();
                
-               $directory[$path] = "\t<Directory ". $path . ">\n";
-               $htaccess = file_get_contents($pathName);
-               $directory[$path] .= $htaccess;
-               $directory[$path] .= "\n\t</Directory>\n";
-               
+                $directory[$path] = "\t<Directory " . $path . ">\n";
+                $htaccess = file_get_contents($pathName);
+                $directory[$path] .= $htaccess;
+                $directory[$path] .= "\n\t</Directory>\n";
             }
         }
         
-        $directoryContent = implode("\n",array_values($directory));
+        $directoryContent = implode("\n", array_values($directory));
     
-        $maps = array(
-        	'{ServerName}' => $serverName,
+        $maps = [
+            '{ServerName}' => $serverName,
             '{DocumentRoot}' => $documentRoot,
             '{Directory}' => $directoryContent
-        );
+        ];
         
         $finalContent = str_replace(array_keys($maps), array_values($maps), $sample);
         file_put_contents($target, $finalContent);
     }
 }
-
-?>
