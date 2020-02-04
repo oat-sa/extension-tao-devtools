@@ -61,17 +61,18 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
 
     /**
      * Proxy to query
-     * @param $statement
-     * @param $params
+     * @param string $statement
+     * @param array $params
+     * @param array $types
      *
      * @return mixed
      * @throws DBALException
      */
-    public function query($statement, $params)
+    public function query($statement, $params, array $types = [])
     {
         $this->count++;
         try {
-            return $this->persistence->query($statement, $params);
+            return $this->persistence->query($statement, $params, $types);
         } catch (DBALException $e) {
             \common_Logger::w('Failed: ' . $statement);
             throw $e;
@@ -80,17 +81,18 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
 
     /**
      * Proxy to exec
-     * @param $statement
-     * @param $params
+     * @param string $statement
+     * @param array $params
+     * @param array $types
      *
      * @return mixed
      * @throws DBALException
      */
-    public function exec($statement, $params)
+    public function exec($statement, $params, array $types = [])
     {
         $this->count++;
         try {
-            return $this->persistence->exec($statement, $params);
+            return $this->persistence->exec($statement, $params, $types);
         } catch (DBALException $e) {
             \common_Logger::w('Failed: ' . $statement);
             throw $e;
@@ -99,17 +101,18 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
 
     /**
      * Proxy to insert
-     * @param       $tableName
+     * @param string $tableName
      * @param array $data
+     * @param array $types
      *
      * @return mixed
      * @throws DBALException
      */
-    public function insert($tableName, array $data)
+    public function insert($tableName, array $data, array $types = [])
     {
         $this->count++;
         try {
-            return $this->persistence->insert($tableName, $data);
+            return $this->persistence->insert($tableName, $data, $types);
         } catch (DBALException $e) {
             \common_Logger::w('Failed insertion on table : ' . $tableName);
             throw $e;
@@ -118,7 +121,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
     
     /**
      * Proxy to insertMultiple
-     * @param       $tableName
+     * @param string $tableName
      * @param array $data
      *
      * @return mixed
