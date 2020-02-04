@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,8 +29,7 @@ namespace oat\taoDevTools\forms;
  * @package tao
  * @subpackage actions_form
  */
-class UserDebugRoles
-    extends \tao_helpers_form_FormContainer
+class UserDebugRoles extends \tao_helpers_form_FormContainer
 {
     // --- ASSOCIATIONS ---
 
@@ -47,14 +47,14 @@ class UserDebugRoles
      */
     protected function initForm()
     {
-		$this->form = \tao_helpers_form_FormFactory::getForm('roleDebug');
-		
-		$action = \tao_helpers_form_FormFactory::getElement('save', 'Free');
-		$action->setValue('<button class="btn-info form-submiter" type="button" id="addButton"><span class="icon-tools"></span>'.__('Restrict').'</button>');
-		
-		
-		$this->form->setActions(array(), 'top');
-		$this->form->setActions(array($action), 'bottom');
+        $this->form = \tao_helpers_form_FormFactory::getForm('roleDebug');
+        
+        $action = \tao_helpers_form_FormFactory::getElement('save', 'Free');
+        $action->setValue('<button class="btn-info form-submiter" type="button" id="addButton"><span class="icon-tools"></span>' . __('Restrict') . '</button>');
+        
+        
+        $this->form->setActions([], 'top');
+        $this->form->setActions([$action], 'bottom');
     }
 
     /**
@@ -70,11 +70,11 @@ class UserDebugRoles
         $userElement->setValue(\common_session_SessionManager::getSession()->getUserUri());
         $this->form->addElement($userElement);
         
-        $roleOptions = array();
-        foreach(\common_session_SessionManager::getSession()->getUserRoles() as $role){
+        $roleOptions = [];
+        foreach (\common_session_SessionManager::getSession()->getUserRoles() as $role) {
             $roleResource = new \core_kernel_classes_Resource($role);
-			$roleOptions[$role] = $roleResource->getLabel();
-		}
+            $roleOptions[$role] = $roleResource->getLabel();
+        }
         
         $roleElement = \tao_helpers_form_FormFactory::getElement('rolefilter', 'Checkbox');
         $roleElement->setDescription(__('Keep roles'));
@@ -83,5 +83,4 @@ class UserDebugRoles
 
         $this->form->addElement($roleElement);
     }
-
 }

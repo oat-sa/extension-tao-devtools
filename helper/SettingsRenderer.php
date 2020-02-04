@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,30 +21,33 @@
  * @package taoDevTools
  *
  */
+
 namespace oat\taoDevTools\helper;
 
 use oat\oatbox\Configurable;
+
 /**
  * Name generator to generate searchable names
- * 
+ *
  * Based on:
- *  http://www.englishbanana.com/ (public domain) 
+ *  http://www.englishbanana.com/ (public domain)
  *  http://study4ielts.wikispaces.com/ (Creative Commons Attribution Share-Alike 3.0)
- * 
+ *
  * @author Joel Bout <joel@taotesting.com>
  *
  */
 class SettingsRenderer
 {
-    static public function renderValue($settingValue) {
+    public static function renderValue($settingValue)
+    {
         if (is_array($settingValue)) {
             return self::renderArray($settingValue);
         } elseif (is_string($settingValue)) {
-            return '"'.$settingValue.'"';
+            return '"' . $settingValue . '"';
         } elseif (is_numeric($settingValue)) {
             return $settingValue;
         } elseif (is_object($settingValue) && $settingValue instanceof Configurable) {
-            return get_class($settingValue).' : '.self::renderArray($settingValue->getOptions());
+            return get_class($settingValue) . ' : ' . self::renderArray($settingValue->getOptions());
         } elseif (is_bool($settingValue)) {
             return $settingValue ? 'true' : 'false';
         } elseif (is_null($settingValue)) {
@@ -53,12 +57,13 @@ class SettingsRenderer
         }
     }
     
-    static public function renderArray($settingArray) {
+    public static function renderArray($settingArray)
+    {
         $html = '<ul>';
         foreach ($settingArray as $key => $value) {
             $html .= ($key === 'password')
-                ? "<li>".$key.' = PASSWORD_HIDDEN</li>'
-                : "<li>".$key.(is_array($value) ? '' : ' = ').self::renderValue($value)."</li>";
+                ? "<li>" . $key . ' = PASSWORD_HIDDEN</li>'
+                : "<li>" . $key . (is_array($value) ? '' : ' = ') . self::renderValue($value) . "</li>";
         }
         $html .= "</ul>";
         return $html;

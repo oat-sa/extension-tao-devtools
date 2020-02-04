@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,6 +18,7 @@
  * Copyright (c) 2014 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
+
 namespace oat\taoDevTools\actions;
 
 /**
@@ -49,48 +51,48 @@ class SystemSettings extends \tao_actions_CommonModule
             $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById($this->getRequestParameter('classUri'));
             $data = $this->getKeys($ext);
         } else {
-    		$data = array(
-    			'data' 	=> __("Settings"),
-    			'attributes' => array(
-					'id' => 1,
-					'class' => 'node-class'
-				),
-    			'children' => array()
-    			);
-    		foreach (\common_ext_ExtensionsManager::singleton()->getInstalledExtensions() as $ext) {
-    		    if (file_exists(CONFIG_PATH.$ext->getId())) {
-        			$data['children'][] =  array(
-            		    'data' 	=> $ext->getManifest()->getLabel(),
-        			    'type' => 'class',
-            		    'attributes' => array(
-            		        'id' => $ext->getId(),
-            		        'class' => 'node-class',
-            		        'data-uri' => $ext->getId()
-            		    ),
-        			    'state'	=> 'closed'
-        		    );
-    		    }
-    		}
+            $data = [
+                'data'  => __("Settings"),
+                'attributes' => [
+                    'id' => 1,
+                    'class' => 'node-class'
+                ],
+                'children' => []
+                ];
+            foreach (\common_ext_ExtensionsManager::singleton()->getInstalledExtensions() as $ext) {
+                if (file_exists(CONFIG_PATH . $ext->getId())) {
+                    $data['children'][] =  [
+                        'data'  => $ext->getManifest()->getLabel(),
+                        'type' => 'class',
+                        'attributes' => [
+                            'id' => $ext->getId(),
+                            'class' => 'node-class',
+                            'data-uri' => $ext->getId()
+                        ],
+                        'state' => 'closed'
+                    ];
+                }
+            }
         }
-		$this->returnJson($data);
+        $this->returnJson($data);
     }
 
     public function getKeys(\common_ext_Extension $ext)
     {
-        $data = array();
+        $data = [];
 
-        $path = CONFIG_PATH.$ext->getId();
+        $path = CONFIG_PATH . $ext->getId();
         if (file_exists($path)) {
             foreach (new \DirectoryIterator($path) as $fileinfo) {
                 if (!$fileinfo->isDot() && substr($fileinfo->getFilename(), -strlen('.conf.php')) == '.conf.php') {
                     $key = substr($fileinfo->getFilename(), 0, -strlen('.conf.php'));
-                    $data[] =  array(
-                        'data' 	=> $key,
-                        'attributes' => array(
+                    $data[] =  [
+                        'data'  => $key,
+                        'attributes' => [
                             'id' => $key,
                             'class' => 'node-instance'
-                        )
-                    );
+                        ]
+                    ];
                 }
             }
         }
