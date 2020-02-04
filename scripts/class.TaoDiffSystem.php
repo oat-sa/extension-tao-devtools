@@ -50,7 +50,7 @@ class taoDevTools_scripts_TaoDiffSystem extends tao_scripts_Runner
 
     private function getAllExtensionManifests($directory)
     {
-        $returnValue = array();
+        $returnValue = [];
         $dir = new DirectoryIterator($directory);
         foreach ($dir as $fileinfo) {
             if ($fileinfo->isDir() && ! $fileinfo->isDot() && substr($fileinfo->getBasename(), 0, 1) != '.') {
@@ -83,27 +83,27 @@ class taoDevTools_scripts_TaoDiffSystem extends tao_scripts_Runner
      *            array options
      * @return mixed
      */
-    public function __construct($inputFormat = array(), $options = array())
+    public function __construct($inputFormat = [], $options = [])
     {
         if (count($inputFormat) == 0) {
             // Autoconfigure the script.
-            $inputFormat = array(
+            $inputFormat = [
                 'min' => 2,
-                'parameters' => array(
-                    array(
+                'parameters' => [
+                    [
                         'name' => 'previous',
                         'type' => 'string',
                         'shortcut' => 'p',
                         'description' => 'Previous tao directorty'
-                    ),
-                    array(
+                    ],
+                    [
                         'name' => 'output',
                         'type' => 'string',
                         'shortcut' => 'o',
                         'description' => 'Output folder'
-                    )
-                )
-            );
+                    ]
+                ]
+            ];
         }
         
         parent::__construct($inputFormat, $options);

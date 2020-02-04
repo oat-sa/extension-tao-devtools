@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,6 +18,7 @@
  * Copyright (c) 2014 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
+
 namespace oat\taoDevTools\actions;
 
 use oat\tao\model\controllerMap\Factory;
@@ -33,11 +35,12 @@ use oat\tao\model\controllerMap\Factory;
 class ControllerMap extends \tao_actions_CommonModule
 {
 
-    public function index() {
+    public function index()
+    {
 
         $factory = new Factory();
 
-        $data = array();
+        $data = [];
         foreach ($this->getServiceLocator()->get(\common_ext_ExtensionsManager::SERVICE_ID)->getInstalledExtensions() as $ext) {
             $data[$ext->getId()] = $factory->getControllers($ext->getId());
         }

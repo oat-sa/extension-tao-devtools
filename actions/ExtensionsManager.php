@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -36,57 +37,55 @@ use tao_helpers_form_FormContainer as FormContainer;
 class ExtensionsManager extends \tao_actions_ExtensionsManager
 {
 
-	/**
-	 * Index page
-	 */
-	public function index()
+    /**
+     * Index page
+     */
+    public function index()
     {
 
-		$extensionManager = $this->getServiceLocator()->get(\common_ext_ExtensionsManager::SERVICE_ID);
-		$all = array();
-		$installed = array();
-		foreach ($extensionManager->getInstalledExtensions() as $ext) {
-		    $all[] = $ext;
-		    $installed[] = $ext->getId();
-		}
-		foreach ($extensionManager->getAvailableExtensions() as $ext) {
-		    $all[] = $ext;
-		}
-		$all = \helpers_ExtensionHelper::sortById($all);
-		$this->setData('extensions',$all);
-		$this->setData('installedIds',$installed);
-		$this->setView('extensionManager/view.tpl');
+        $extensionManager = $this->getServiceLocator()->get(\common_ext_ExtensionsManager::SERVICE_ID);
+        $all = [];
+        $installed = [];
+        foreach ($extensionManager->getInstalledExtensions() as $ext) {
+            $all[] = $ext;
+            $installed[] = $ext->getId();
+        }
+        foreach ($extensionManager->getAvailableExtensions() as $ext) {
+            $all[] = $ext;
+        }
+        $all = \helpers_ExtensionHelper::sortById($all);
+        $this->setData('extensions', $all);
+        $this->setData('installedIds', $installed);
+        $this->setView('extensionManager/view.tpl');
+    }
 
-	}
-
-	/**
-	 * Form to create a new extension
-	 */
-	public function create()
+    /**
+     * Form to create a new extension
+     */
+    public function create()
     {
-	    $formContainer = new Extension([], [FormContainer::CSRF_PROTECTION_OPTION => true]);
-	    $myForm = $formContainer->getForm();
+        $formContainer = new Extension([], [FormContainer::CSRF_PROTECTION_OPTION => true]);
+        $myForm = $formContainer->getForm();
 
-	    if ($myForm->isValid() && $myForm->isSubmited()) {
-	        $creator = new ExtensionCreator(
-	            $myForm->getValue('name'),
-	            $myForm->getValue('label'),
-	            $myForm->getValue('version'),
-	            $myForm->getValue('author'),
-	            $myForm->getValue('authorNs'),
-	            $myForm->getValue('license'),
-	            $myForm->getValue('description'),
-	            $myForm->getValue('dependencies'),
-	            $myForm->getValue('samples')
+        if ($myForm->isValid() && $myForm->isSubmited()) {
+            $creator = new ExtensionCreator(
+                $myForm->getValue('name'),
+                $myForm->getValue('label'),
+                $myForm->getValue('version'),
+                $myForm->getValue('author'),
+                $myForm->getValue('authorNs'),
+                $myForm->getValue('license'),
+                $myForm->getValue('description'),
+                $myForm->getValue('dependencies'),
+                $myForm->getValue('samples')
             );
-	        $report = $creator->run();
-	        $this->setData('myForm', __('Extension created'));
-	    } else {
-	        $this->setData('myForm', $myForm->render());
-	    }
+            $report = $creator->run();
+            $this->setData('myForm', __('Extension created'));
+        } else {
+            $this->setData('myForm', $myForm->render());
+        }
 
-	    $this->setData('formTitle', __('Create a new Extension'));
-	    $this->setView('form.tpl', 'tao');
-	}
-
+        $this->setData('formTitle', __('Create a new Extension'));
+        $this->setView('form.tpl', 'tao');
+    }
 }

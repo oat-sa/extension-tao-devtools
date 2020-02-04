@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,6 +18,7 @@
  * Copyright (c) 2015 Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
+
 namespace oat\taoDevTools\models\logger;
 
 use \ChromePhp;
@@ -25,12 +27,11 @@ use \common_log_Item;
 use \common_Logger;
 
 /**
- * Send log to the browser 
+ * Send log to the browser
  * using either {@link https://craig.is/writing/chrome-logger} or firefox dev tools (from 43)
  *
  */
-class BrowserAppender
-    extends common_log_BaseAppender
+class BrowserAppender extends common_log_BaseAppender
 {
 
     /**
@@ -38,22 +39,22 @@ class BrowserAppender
      *
      * @param  Item item
      */
-    public function dolog( common_log_Item $item)
+    public function dolog(common_log_Item $item)
     {
-        if(php_sapi_name() != 'cli'){
-            switch($item->getSeverity()){
-            case common_Logger::ERROR_LEVEL :
-                ChromePhp::error($item->getDescription() . ' at ' . $item->getCallerFile() . ':' . $item->getCallerLine());
-                break;
-            case common_Logger::WARNING_LEVEL :
-                ChromePhp::warn($item->getDescription());
-                break;
-            case common_Logger::INFO_LEVEL :
-                ChromePhp::info($item->getDescription());
-                break;
-            default :
-                ChromePhp::log($item->getDescription());
-                break;
+        if (php_sapi_name() != 'cli') {
+            switch ($item->getSeverity()) {
+                case common_Logger::ERROR_LEVEL:
+                    ChromePhp::error($item->getDescription() . ' at ' . $item->getCallerFile() . ':' . $item->getCallerLine());
+                    break;
+                case common_Logger::WARNING_LEVEL:
+                    ChromePhp::warn($item->getDescription());
+                    break;
+                case common_Logger::INFO_LEVEL:
+                    ChromePhp::info($item->getDescription());
+                    break;
+                default:
+                    ChromePhp::log($item->getDescription());
+                    break;
             }
         }
     }

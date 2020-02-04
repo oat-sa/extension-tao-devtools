@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,44 +20,44 @@
  * @author lionel
  * @license GPLv2
  * @package package_name
- * @subpackage 
+ * @subpackage
  *
  */
 
 require_once dirname(__FILE__) . '/../includes/raw_start.php';
 
-$params = array(
+$params = [
     'min' => 3,
-    'parameters' => array(
-        array(
-            'name' 			=> 'serverName',
-            'type' 			=> 'string',
+    'parameters' => [
+        [
+            'name'          => 'serverName',
+            'type'          => 'string',
             'shortcut'      => 's',
-            'description'	=> 'server Name',
-            'required'		=> true,
-        ),
-        array(
-            'name' 			=> 'documentRoot',
-            'type' 			=> 'string',
+            'description'   => 'server Name',
+            'required'      => true,
+        ],
+        [
+            'name'          => 'documentRoot',
+            'type'          => 'string',
             'shortcut'      => 'd',
-            'description'	=> 'documentRoot ',
-            'required'		=> true,
-        ),
-        array(
-            'name' 			=> 'target',
-            'type' 			=> 'string',
+            'description'   => 'documentRoot ',
+            'required'      => true,
+        ],
+        [
+            'name'          => 'target',
+            'type'          => 'string',
             'shortcut'      => 't',
-            'description'	=> 'target file must end in .conf ',
-            'required'		=> true,
-        ),
-        array(
-            'name' 			=> 'tpl',
-            'type' 			=> 'string',
-            'description'	=> 'apache site conf template file ',
-            'required'		=> false,
-        ),
+            'description'   => 'target file must end in .conf ',
+            'required'      => true,
+        ],
+        [
+            'name'          => 'tpl',
+            'type'          => 'string',
+            'description'   => 'apache site conf template file ',
+            'required'      => false,
+        ],
 
-    )
-);
+    ]
+];
 
 new taoDevTools_scripts_ApacheConfCreator($params);

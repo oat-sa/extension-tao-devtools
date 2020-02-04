@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,6 +18,7 @@
  * Copyright (c) 2014 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
+
 namespace oat\taoDevTools\actions;
 
 use oat\generis\model\OntologyAwareTrait;
@@ -47,7 +49,7 @@ class ItemTools extends \tao_actions_CommonModule
 
         // private so copy/paste
         $data = $package->JsonSerialize();
-        $assets = array();
+        $assets = [];
         foreach ($data['assets'] as $type => $typeAssets) {
             $assets = array_merge($assets, $typeAssets);
         }
