@@ -8,17 +8,30 @@
 
 namespace oat\taoDevTools\actions;
 
+use common_Logger;
+use Exception;
+use RuntimeException;
+use tao_actions_CommonModule;
+use tao_helpers_File;
 use ZipArchive;
 
-class FontConversion extends \tao_actions_CommonModule
+class FontConversion extends tao_actions_CommonModule
 {
+    protected const FIELD_ERROR = 'error';
+    protected const FIELD_SUCCESS = 'success';
 
-    private $dir;
-    private $assetDir;
+    private $workingDirectory;
+    private $temporaryDirectory;
+    private $assetsDirectory;
     private $doNotEdit;
     private $currentSelection;
-    private $taoDir;
+    private $taoCoreExtensionDirectory;
 
+    /**
+     * Entry point to the tool
+     *
+     * @throws Exception
+     */
     public function index()
     {
         $this->init();
@@ -27,24 +40,26 @@ class FontConversion extends \tao_actions_CommonModule
 
     protected function init()
     {
-        $this->tmpDir           = \tao_helpers_File::createTempDir();
-        $this->dir              = str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__));
-        $this->taoDir           = dirname($this->dir) . '/tao';
-        $this->assetDir         = $this->dir . '/fontConversion/assets';
-        $this->doNotEdit        = file_get_contents($this->assetDir . '/do-not-edit.tpl');
-        $this->currentSelection = $this->assetDir . '/selection.json';
+        $this->temporaryDirectory = tao_helpers_File::createTempDir();
+        $this->workingDirectory = str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__));
+        $this->taoCoreExtensionDirectory = dirname($this->workingDirectory) . '/tao';
+        $this->assetsDirectory = $this->workingDirectory . '/fontConversion/assets';
+        $this->currentSelection = $this->assetsDirectory . '/selection.json';
 
-        $writables = [
-            $this->taoDir . '/views/css/font/tao/',
-            $this->taoDir . '/views/scss/inc/fonts/',
-            $this->taoDir . '/views/js/lib/ckeditor/skins/tao/scss/inc/',
-            $this->taoDir . '/helpers/',
-            $this->assetDir
+        /** todo: remove files template */
+        $this->doNotEdit = file_get_contents($this->assetsDirectory . '/do-not-edit.tpl');
+
+        $writable = [
+            $this->taoCoreExtensionDirectory . '/views/css/font/tao/',
+            $this->taoCoreExtensionDirectory . '/views/scss/inc/fonts/',
+            $this->taoCoreExtensionDirectory . '/views/js/lib/ckeditor/skins/tao/scss/inc/',
+            $this->taoCoreExtensionDirectory . '/helpers/',
+            $this->assetsDirectory,
         ];
 
-        foreach ($writables as $writable) {
-            if (!is_writable($writable)) {
-                throw new \Exception(implode("\n<br>", $writables) . ' must be writable');
+        foreach ($writable as $location ) {
+            if (!is_writable($location)) {
+                throw new RuntimeException(implode("\n<br>", $writable) . ' must be writable');
             }
         }
 
@@ -54,73 +69,69 @@ class FontConversion extends \tao_actions_CommonModule
     /**
      * Process the font archive
      *
-     * @return bool
+     * @return array|bool
+     * @throws Exception
      */
     public function processFontArchive()
     {
         $this->init();
 
-        //return array('error' => __('Unable to read the file : ') . $archiveDir . '/style.css');
-
         // upload result is either the path to the zip file or an array with errors
         $uploadResult = $this->uploadArchive();
-        if (!empty($uploadResult['error'])) {
-            $this -> returnJson($uploadResult);
+        if (!empty($uploadResult[self::FIELD_ERROR])) {
+            $this->returnJson($uploadResult);
             return false;
         }
 
         // extract result is either the path to the extracted files or an array with errors
         $extractResult = $this->extractArchive($uploadResult);
-        if (!empty($extractResult['error'])) {
-            $this -> returnJson($extractResult);
+        if (!empty($extractResult[self::FIELD_ERROR])) {
+            $this->returnJson($extractResult);
             return false;
         }
 
         // check if the new font contains at least al glyphs from the previous version
-        $currentSelection = json_decode(file_get_contents($extractResult . '/selection.json'));
-        $oldSelection     = json_decode(file_get_contents($this->currentSelection));
-        $integrityCheck   = $this->checkIntegrity($currentSelection, $oldSelection);
-        if (!empty($integrityCheck['error'])) {
-            $this -> returnJson($integrityCheck);
+        $currentSelection = json_decode(file_get_contents($extractResult . '/selection.json'), false);
+        $oldSelection = json_decode(file_get_contents($this->currentSelection), false);
+        $integrityCheck = $this->checkIntegrity($currentSelection, $oldSelection);
+        if (!empty($integrityCheck[self::FIELD_ERROR])) {
+            $this->returnJson($integrityCheck);
             return false;
         }
 
-        //generate tao scss
+        // generate tao scss
         $scssGenerationResult = $this->generateTaoScss($extractResult, $currentSelection->icons);
-        if (!empty($scssGenerationResult['error'])) {
-            $this -> returnJson($scssGenerationResult);
+        if (!empty($scssGenerationResult[self::FIELD_ERROR])) {
+            $this->returnJson($scssGenerationResult);
             return false;
         }
 
-        $ckGenerationResult = $this->generateCkScss($extractResult, $currentSelection->icons);
-        if (!empty($ckGenerationResult['error'])) {
-            $this -> returnJson($ckGenerationResult);
-            return false;
-        }
+        $this->generateCkScss(); // return path to the generated file, but not used anywhere
 
         // php generation result is either the path to the php class or an array with errors
         $phpGenerationResult = $this->generatePhpClass($currentSelection->icons);
-        if (!empty($phpGenerationResult['error'])) {
-            $this -> returnJson($phpGenerationResult);
+        if (!empty($phpGenerationResult[self::FIELD_ERROR])) {
+            $this->returnJson($phpGenerationResult);
             return false;
         }
 
         $distribution = $this->distribute($extractResult);
-        if (!empty($distribution['error'])) {
-            $this -> returnJson($distribution);
+        if (!empty($distribution[self::FIELD_ERROR])) {
+            $this->returnJson($distribution);
             return false;
         }
 
-        chdir($this -> taoDir . '/views/build');
+        chdir($this->taoCoreExtensionDirectory . '/views/build');
 
-        $compilationResult = $this -> compileCss();
-        if (!empty($compilationResult['error'])) {
-            $this -> returnJson($compilationResult);
+        $compilationResult = $this->compileCss();
+        if (!empty($compilationResult[self::FIELD_ERROR])) {
+            $this->returnJson($compilationResult);
             return false;
         }
 
-        $this -> returnJson(['success' => 'The TAO icon font has been updated']);
-        return  true;
+        $this->returnJson([self::FIELD_SUCCESS => __('The TAO icon font has been updated')]);
+
+        return true;
     }
 
     /**
@@ -130,9 +141,8 @@ class FontConversion extends \tao_actions_CommonModule
      */
     protected function uploadArchive()
     {
-
         if ($_FILES['content']['error'] !== UPLOAD_ERR_OK) {
-            \common_Logger::w('File upload failed with error ' . $_FILES['content']['error']);
+            common_Logger::w('File upload failed with error ' . $_FILES['content']['error']);
             switch ($_FILES['content']['error']) {
                 case UPLOAD_ERR_INI_SIZE:
                 case UPLOAD_ERR_FORM_SIZE:
@@ -145,12 +155,13 @@ class FontConversion extends \tao_actions_CommonModule
                     $error = __('File upload failed');
                     break;
             }
-            return ['error' => $error];
+            return $this->error($error);
         }
 
-        $filePath = $this->tmpDir . '/' . $_FILES['content']['name'];
+        $filePath = $this->temporaryDirectory . '/' . $_FILES['content']['name'];
+
         if (!move_uploaded_file($_FILES['content']['tmp_name'], $filePath)) {
-            return ['error' => __('Unable to move uploaded file')];
+            return $this->error(__('Unable to move uploaded file'));
         }
 
         return $filePath;
@@ -164,19 +175,22 @@ class FontConversion extends \tao_actions_CommonModule
      */
     protected function extractArchive($archiveFile)
     {
-        $archiveDir    = dirname($archiveFile);
-        $archiveObj    = new ZipArchive();
-        $archiveHandle = $archiveObj->open($archiveFile);
+        $archiveDirectory = dirname($archiveFile);
+        $archive = new ZipArchive();
+        $archiveHandle = $archive->open($archiveFile);
+
         if (true !== $archiveHandle) {
-            return ['error' => __('Could not open archive')];
+            return $this->error(__('Could not open archive'));
         }
 
-        if (!$archiveObj->extractTo($archiveDir)) {
-            $archiveObj->close();
-            return ['error' => __('Could not extract archive')];
+        if (!$archive->extractTo($archiveDirectory)) {
+            $archive->close();
+            return $this->error(__('Could not extract archive'));
         }
-        $archiveObj->close();
-        return $archiveDir;
+
+        $archive->close();
+
+        return $archiveDirectory;
     }
 
     /**
@@ -188,23 +202,27 @@ class FontConversion extends \tao_actions_CommonModule
      */
     protected function checkIntegrity($currentSelection, $oldSelection)
     {
-        $metadataExists = property_exists($currentSelection, 'metadata') && property_exists($currentSelection->metadata, 'name');
+        $metadataExists = property_exists($currentSelection, 'metadata')
+            && property_exists($currentSelection->metadata, 'name');
 
-        $prefExists = property_exists($currentSelection, 'preferences') && property_exists($currentSelection->preferences, 'fontPref')
-            && property_exists($currentSelection->preferences->fontPref, 'metadata') && property_exists($currentSelection->preferences->fontPref->metadata, 'fontFamily') ;
+        $prefExists = property_exists($currentSelection, 'preferences')
+            && property_exists($currentSelection->preferences, 'fontPref')
+            && property_exists($currentSelection->preferences->fontPref, 'metadata')
+            && property_exists($currentSelection->preferences->fontPref->metadata, 'fontFamily') ;
 
         if (
             ($metadataExists && $currentSelection->metadata->name !== 'tao')
             || ($prefExists && $currentSelection->preferences->fontPref->metadata->fontFamily !== 'tao')
             || (!$prefExists && !$metadataExists)
         ) {
-            return ['error' => __('You need to change the font name to "tao" in the icomoon preferences')];
+            return $this->error(__('You need to change the font name to "tao" in the icomoon preferences'));
         }
+
         $newSet = $this->dataToGlyphSet($currentSelection);
         $oldSet = $this->dataToGlyphSet($oldSelection);
 
-        return !!count(array_diff($oldSet, $newSet))
-            ? ['error' => __('Font incomplete!  Is the extension in sync width git?  Have you removed any glyphs?')]
+        return (bool)count(array_diff($oldSet, $newSet))
+            ? $this->error(__('Font incomplete! Is the extension in sync width git? Have you removed any glyphs?'))
             : true;
     }
 
@@ -214,50 +232,53 @@ class FontConversion extends \tao_actions_CommonModule
      * @param $data
      * @return array
      */
-    protected function dataToGlyphSet($data)
+    protected function dataToGlyphSet(object $data)
     {
         $glyphs = [];
         foreach ($data->icons as $iconProperties) {
             $glyphs[] = $iconProperties->properties->name;
         }
+
         return $glyphs;
     }
 
     /**
-     * Generate TAO scss
+     * Generate TAO SCSS
      *
      * @param $archiveDir
      * @param $icons
-     * @return bool
+     * @return array
      */
     protected function generateTaoScss($archiveDir, $icons)
     {
         if (!is_readable($archiveDir . '/style.css')) {
-            return ['error' => __('Unable to read the file : ') . $archiveDir . '/style.css'];
+            return $this->error(__('Unable to read the file : ') . $archiveDir . '/style.css');
         }
+
         $cssContent = file_get_contents($archiveDir . '/style.css');
-        $iconCss    = [
+
+        $iconCss = [
             'classes' => '',
-            'def'     => '',
-            'vars'    => ''
+            'def' => '',
+            'vars' => '',
         ];
 
         // font-face
-        $cssContentArr  = explode('[class^="icon-"]', $cssContent);
-        $iconCss['def'] = str_replace('fonts/tao.', '#{$fontPath}tao/tao.', $cssContentArr[0]) . "\n";
+        $cssContentArr = explode('[class^="icon-"]', $cssContent);
+        $iconCss['def'] = str_replace('fonts/tao.', '#{$fontPath}tao/tao.', $cssContentArr[0]) . PHP_EOL;
 
         // font-family etc.
-        $cssContentArr   = explode('.icon', $cssContentArr[1]);
+        $cssContentArr = explode('.icon', $cssContentArr[1]);
         $iconCss['vars'] = str_replace(', [class*=" icon-"]', '@mixin tao-icon-setup', $cssContentArr[0]);
 
         // the actual css code
-        $iconCss['classes'] = '[class^="icon-"], [class*=" icon-"] { @include tao-icon-setup; }' . "\n";
+        $iconCss['classes'] = '[class^="icon-"], [class*=" icon-"] { @include tao-icon-setup; }' . PHP_EOL;
 
         // build code for PHP icon class and tao-*.scss files
         foreach ($icons as $iconProperties) {
             $properties = $iconProperties->properties;
-            $icon       = $properties->name;
-            $iconHex    = dechex($properties->code);
+            $icon = $properties->name;
+            $iconHex = dechex($properties->code);
 
             // tao-*.scss data
             $iconCss['vars'] .= '@mixin icon-' . $icon . ' { content: "\\' . $iconHex . '"; }' . "\n";
@@ -267,7 +288,7 @@ class FontConversion extends \tao_actions_CommonModule
         // compose and write SCSS files
         $retVal = [];
         foreach ($iconCss as $key => $value) {
-            $retVal[$key] = $this->tmpDir . '/_tao-icon-' . $key . '.scss';
+            $retVal[$key] = $this->temporaryDirectory . '/_tao-icon-' . $key . '.scss';
             file_put_contents($retVal[$key], $this->doNotEdit . $iconCss[$key]);
         }
         return $retVal;
@@ -280,23 +301,22 @@ class FontConversion extends \tao_actions_CommonModule
      */
     protected function generateCkScss()
     {
-
-        $ckIni = parse_ini_file($this->assetDir . '/ck-editor-classes.ini');
+        $ckIni = parse_ini_file($this->assetsDirectory . '/ck-editor-classes.ini');
 
         // ck toolbar icons
-        $cssContent = '@import "inc/bootstrap";' . "\n";
-        $cssContent .= '.cke_button_icon, .cke_button { @include tao-icon-setup;}' . "\n";
+        $cssContent = '@import "inc/bootstrap";' . PHP_EOL;
+        $cssContent .= '.cke_button_icon, .cke_button { @include tao-icon-setup;}' . PHP_EOL;
 
         foreach ($ckIni as $ckIcon => $taoIcon) {
             if (!$taoIcon) {
                 continue;
             }
-            $cssContent .= '.' . $ckIcon . ':before { @include ' . $taoIcon . ';}' . "\n";
+            $cssContent .= sprintf('.%s:before { @include %s; }', $ckIcon, $taoIcon) . PHP_EOL;
         }
 
-        file_put_contents($this->tmpDir . '/_ck-icons.scss', $this->doNotEdit . $cssContent);
+        file_put_contents($this->temporaryDirectory . '/_ck-icons.scss', $this->doNotEdit . $cssContent);
 
-        return $this->tmpDir . '/_ck-icons.scss';
+        return $this->temporaryDirectory . '/_ck-icons.scss';
     }
 
     /**
@@ -307,7 +327,9 @@ class FontConversion extends \tao_actions_CommonModule
      */
     protected function generatePhpClass($iconSet)
     {
-        $phpClass     = file_get_contents($this->assetDir . '/class.Icon.tpl');
+        // todo: replace by https://github.com/nette/php-generator
+
+        $phpClass     = file_get_contents($this->assetsDirectory . '/class.Icon.tpl');
         $phpClassPath = $this->tmpDir . '/class.Icon.php';
         $constants    = '';
         $functions    = '';
@@ -340,7 +362,7 @@ class FontConversion extends \tao_actions_CommonModule
 
         if (false === strpos($parseResult, 'No syntax errors detected')) {
             $parseResult = strtok($parseResult, PHP_EOL);
-            return ['error' => $parseResult];
+            return $this->error($parseResult);
         }
 
         return $phpClassPath;
@@ -349,38 +371,39 @@ class FontConversion extends \tao_actions_CommonModule
     /**
      * Distribute generated files to their final destination
      *
-     * @param $tmpDir
+     * @param $temporaryDirectory
+     *
      * @return array|bool
      */
-    protected function distribute($tmpDir)
+    protected function distribute($temporaryDirectory)
     {
         // copy fonts
-        foreach (glob($tmpDir . '/fonts/tao.*') as $font) {
-            if (!copy($font, $this->taoDir . '/views/css/font/tao/' . basename($font))) {
-                return ['error' => 'Failed to copy ' . $font];
+        foreach (glob($temporaryDirectory . '/fonts/tao.*') as $font) {
+            if (!copy($font, $this->taoCoreExtensionDirectory . '/views/css/font/tao/' . basename($font))) {
+                return $this->error(__('Failed to copy ') . $font);
             }
-        };
+        }
 
         // copy icon scss
-        foreach (glob($tmpDir . '/_tao-icon-*.scss') as $scss) {
-            if (!copy($scss, $this->taoDir . '/views/scss/inc/fonts/' . basename($scss))) {
-                return ['error' => 'Failed to copy ' . $scss];
+        foreach (glob($temporaryDirectory . '/_tao-icon-*.scss') as $scss) {
+            if (!copy($scss, $this->taoCoreExtensionDirectory . '/views/scss/inc/fonts/' . basename($scss))) {
+                return $this->error(__('Failed to copy ') . $scss);
             }
-        };
+        }
 
         // copy ck editor styles
-        if (!copy($tmpDir . '/_ck-icons.scss', $this->taoDir . '/views/js/lib/ckeditor/skins/tao/scss/inc/_ck-icons.scss')) {
-            return ['error' => 'Failed to copy ' . $tmpDir . '/_ck-icons.scss'];
+        if (!copy($temporaryDirectory . '/_ck-icons.scss', $this->taoCoreExtensionDirectory . '/views/js/lib/ckeditor/skins/tao/scss/inc/_ck-icons.scss')) {
+            return $this->error(__('Failed to copy ') . $temporaryDirectory . '/_ck-icons.scss');
         }
 
         // copy helper class
-        if (!copy($tmpDir . '/class.Icon.php', $this->taoDir . '/helpers/class.Icon.php')) {
-            return ['error' => 'Failed to copy ' . $tmpDir . '/class.Icon.php'];
+        if (!copy($temporaryDirectory . '/class.Icon.php', $this->taoCoreExtensionDirectory . '/helpers/class.Icon.php')) {
+            return $this->error(__('Failed to copy ') . $temporaryDirectory . '/class.Icon.php');
         }
 
         // copy selection to assets
-        if (!copy($tmpDir . '/selection.json', $this->assetDir . '/selection.json')) {
-            return ['error' => 'Failed to copy ' . $tmpDir . '/selection.json'];
+        if (!copy($temporaryDirectory . '/selection.json', $this->assetsDirectory . '/selection.json')) {
+            return $this->error(__('Failed to copy ') . $temporaryDirectory . '/selection.json');
         }
 
         return true;
@@ -389,12 +412,13 @@ class FontConversion extends \tao_actions_CommonModule
     /**
      * Compile CSS
      *
-     * @return bool
+     * @return array
      */
     protected function compileCss()
     {
         system('grunt taosass', $result);
-        return $result === 0;
+
+        return $result !== 0 ? $this->error(__('CSS compilation failed')) : [];
     }
 
     /**
@@ -405,20 +429,8 @@ class FontConversion extends \tao_actions_CommonModule
         $this->init();
         header('Content-disposition: attachment; filename=selection.json');
         header('Content-type: application/json');
-        echo(file_get_contents($this->currentSelection));
+        readfile($this->currentSelection);
         exit();
-    }
-
-    /**
-     * Sort existing icons by name
-     *
-     * @param $a
-     * @param $b
-     * @return bool
-     */
-    protected function sortIconListing($a, $b)
-    {
-        return $a->properties->name > $b->properties->name;
     }
 
     /**
@@ -428,9 +440,26 @@ class FontConversion extends \tao_actions_CommonModule
      */
     protected function loadIconListing()
     {
-        $icons = json_decode(file_get_contents($this->currentSelection));
-        $icons = $icons->icons;
-        usort($icons, [$this, 'sortIconListing']);
+        $json = json_decode(file_get_contents($this->currentSelection), false);
+
+        $icons = array_map(static function ($item) {
+            return $item->properties->name;
+        }, $json['icons']);
+
+        asort($icons);
+
         return $icons;
+    }
+
+    /**
+     * Wrapper for error handling inside class
+     *
+     * @param string $msg
+     *
+     * @return array
+     */
+    private function error($msg = '')
+    {
+        return [self::FIELD_ERROR => $msg];
     }
 }
