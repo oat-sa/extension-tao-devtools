@@ -1,29 +1,52 @@
 <?php
-
 /**
- * Creates all resources related to the tao font from the icomoon export
- * Antoine Robin <antoine.robin@vesperiagroup.com>
- * based on work of Dieter Raber <dieter@taotesting.com>
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; under version 2
+ * of the License (non-upgradable).
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * Copyright (c) 2014-2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  */
 
 namespace oat\taoDevTools\actions;
 
 use common_Logger;
 use Exception;
+use Nette\PhpGenerator\PhpFile;
+use Nette\PhpGenerator\PsrPrinter;
+use oat\tao\model\icon\IconBuilderTrait;
 use RuntimeException;
 use tao_actions_CommonModule;
 use tao_helpers_File;
 use ZipArchive;
 
+/**
+ * Class FontConversion creates all resources related to the tao font from the icomoon export
+ * Antoine Robin <antoine.robin@vesperiagroup.com>
+ * based on work of Dieter Raber <dieter@taotesting.com>
+ * Adjusted by Ivan Klimchuk <ivan@taotesting.com>
+ *
+ * @package oat\taoDevTools\actions
+ */
 class FontConversion extends tao_actions_CommonModule
 {
     protected const FIELD_ERROR = 'error';
     protected const FIELD_SUCCESS = 'success';
 
+    protected const DO_NOT_EDIT_TEXT = '/* Do not edit */';
+
     private $workingDirectory;
     private $temporaryDirectory;
     private $assetsDirectory;
-    private $doNotEdit;
     private $currentSelection;
     private $taoCoreExtensionDirectory;
 
@@ -45,9 +68,6 @@ class FontConversion extends tao_actions_CommonModule
         $this->taoCoreExtensionDirectory = dirname($this->workingDirectory) . '/tao';
         $this->assetsDirectory = $this->workingDirectory . '/fontConversion/assets';
         $this->currentSelection = $this->assetsDirectory . '/selection.json';
-
-        /** todo: remove files template */
-        $this->doNotEdit = file_get_contents($this->assetsDirectory . '/do-not-edit.tpl');
 
         $writable = [
             $this->taoCoreExtensionDirectory . '/views/css/font/tao/',
@@ -289,7 +309,7 @@ class FontConversion extends tao_actions_CommonModule
         $retVal = [];
         foreach ($iconCss as $key => $value) {
             $retVal[$key] = $this->temporaryDirectory . '/_tao-icon-' . $key . '.scss';
-            file_put_contents($retVal[$key], $this->doNotEdit . $iconCss[$key]);
+            file_put_contents($retVal[$key], self::DO_NOT_EDIT_TEXT . $iconCss[$key]);
         }
         return $retVal;
     }
@@ -314,7 +334,7 @@ class FontConversion extends tao_actions_CommonModule
             $cssContent .= sprintf('.%s:before { @include %s; }', $ckIcon, $taoIcon) . PHP_EOL;
         }
 
-        file_put_contents($this->temporaryDirectory . '/_ck-icons.scss', $this->doNotEdit . $cssContent);
+        file_put_contents($this->temporaryDirectory . '/_ck-icons.scss', self::DO_NOT_EDIT_TEXT . $cssContent);
 
         return $this->temporaryDirectory . '/_ck-icons.scss';
     }
@@ -325,36 +345,70 @@ class FontConversion extends tao_actions_CommonModule
      * @param $iconSet
      * @return array|string
      */
-    protected function generatePhpClass($iconSet)
+    protected function generatePhpClass(array $iconSet = [])
     {
-        // todo: replace by https://github.com/nette/php-generator
+        $license = <<<LICENSE
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; under version 2
+of the License (non-upgradable).
 
-        $phpClass     = file_get_contents($this->assetsDirectory . '/class.Icon.tpl');
-        $phpClassPath = $this->tmpDir . '/class.Icon.php';
-        $constants    = '';
-        $functions    = '';
-        $patterns     = ['{CONSTANTS}', '{FUNCTIONS}', '{DATE}', '{DO_NOT_EDIT}'];
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-        foreach ($iconSet as $iconProperties) {
-            $icon = $iconProperties->properties->name;
-            // constants
-            $constName = 'CLASS_' . strtoupper(str_replace('-', '_', $icon));
-            // functions
-            $iconFn = strtolower(trim($icon));
-            $iconFn = str_replace(' ', '', ucwords(preg_replace('~[\W_-]+~', ' ', $iconFn)));
-            $functions .= '    public static function icon' . $iconFn . '($options=array()){' . "\n"
-                . '        return self::buildIcon(self::' . $constName . ', $options);' . "\n" . '    }' . "\n\n";
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-            $constants .= '    const ' . $constName . ' = \'icon-' . $icon . '\';' . "\n";
-        }
+Copyright (c) 2014-2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+LICENSE;
 
-        $phpClass = str_replace(
-            $patterns,
-            [$constants, $functions, date('Y-m-d H:i:s'), $this->doNotEdit],
-            $phpClass
+        $file = new PhpFile();
+        $file->addComment($license);
+        $file->addUse(IconBuilderTrait::class);
+
+        $class = $file->addClass('tao_helpers_Icon');
+
+        $phpDocProperties = [
+            'access' => 'public',
+            'author' => 'Dieter Raber, <dieter@taotesting.com>',
+            'date' => date('Y-m-d H:i:s'),
+            'package' => 'tao',
+        ];
+
+        array_walk($phpDocProperties, static function (&$item, $key) {
+            $item = sprintf("@%s\t\t%s", $key, $item);
+        });
+
+        $class->setComment(
+            sprintf("Icon helper for tao – helpers/class.Icon.php\n\nPLEASE, DO NOT EDIT THIS CLASS. IT GENERATED AUTOMATICALLY\n\n%s", implode(PHP_EOL, $phpDocProperties))
         );
 
-        file_put_contents($phpClassPath, $phpClass);
+        $class->addTrait('IconBuilderTrait');
+
+        foreach ($iconSet as $icon) {
+            $iconName = $icon->properties->name;
+
+            // adding class constants
+            $constantName = sprintf('CLASS_%s', strtoupper(str_replace('-', '_', $iconName)));
+            $constantValue = sprintf('icon-%s', $iconName);
+
+            $class->addConstant($constantName, $constantValue)->setPublic();
+
+            // adding methods
+            $methodName = 'icon' . str_replace(' ', '', ucwords(preg_replace('~[\W_-]+~', ' ', $iconName)));
+
+            $method = $class->addMethod($methodName)->setStatic()->setPublic();
+
+            $method->addParameter('options')->setType('array')->setDefaultValue([]);
+            $method->addBody('return self::buildIcon(self::?, $options);', [$constantName]);
+        }
+
+        $phpClassPath = $this->temporaryDirectory . '/class.Icon.php';
+
+        file_put_contents($phpClassPath, (new PsrPrinter())->printFile($file));
 
         ob_start();
         system('php -l ' . $phpClassPath);
@@ -444,7 +498,7 @@ class FontConversion extends tao_actions_CommonModule
 
         $icons = array_map(static function ($item) {
             return $item->properties->name;
-        }, $json['icons']);
+        }, $json->icons);
 
         asort($icons);
 
