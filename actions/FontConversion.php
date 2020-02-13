@@ -23,7 +23,7 @@ use common_Logger;
 use Exception;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PsrPrinter;
-use oat\tao\model\icon\IconBuilderTrait;
+use oat\tao\model\iconBuilder\IconBuilderTrait;
 use RuntimeException;
 use tao_actions_CommonModule;
 use tao_helpers_File;
@@ -362,11 +362,11 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-Copyright (c) 2014-2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+Copyright (c) 2014-%s (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
 LICENSE;
 
         $file = new PhpFile();
-        $file->addComment($license);
+        $file->addComment(sprintf($license, date('Y')));
         $file->addUse(IconBuilderTrait::class);
 
         $class = $file->addClass('tao_helpers_Icon');
