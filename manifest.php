@@ -27,11 +27,11 @@ return [
     'label' => 'Development Tools',
     'description' => 'Developer tools that can assist you in creating new extensions, run scripts, destroy your install',
     'license' => 'GPL-2.0',
-    'version' => '6.3.0',
+    'version' => '6.4.0',
     'author' => 'Open Assessment Technologies',
     'requires' => [
         'generis' => '>=11.1.0',
-        'tao' => '>=37.0.0'
+        'tao' => '>=40.10.0'
     ],
     'managementRole' => 'http://www.tao.lu/Ontologies/TAO.rdf#TaoDevToolsRole',
     'acl' => [
