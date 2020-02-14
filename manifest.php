@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,35 +20,35 @@
  *
  */
 
-$extpath = dirname(__FILE__).DIRECTORY_SEPARATOR;
+$extpath = dirname(__FILE__) . DIRECTORY_SEPARATOR;
 
-return array(
+return [
     'name' => 'taoDevTools',
     'label' => 'Development Tools',
     'description' => 'Developer tools that can assist you in creating new extensions, run scripts, destroy your install',
     'license' => 'GPL-2.0',
-    'version' => '6.2.1',
+    'version' => '6.4.0',
     'author' => 'Open Assessment Technologies',
-    'requires' => array(
+    'requires' => [
         'generis' => '>=11.1.0',
         'tao' => '>=37.0.0'
-    ),
+    ],
     'managementRole' => 'http://www.tao.lu/Ontologies/TAO.rdf#TaoDevToolsRole',
-    'acl' => array(
-        array('grant', 'http://www.tao.lu/Ontologies/TAO.rdf#SysAdminRole', array('ext'=>'taoDevTools')),
-    ),
-    'uninstall' => array(
-    ),
+    'acl' => [
+        ['grant', 'http://www.tao.lu/Ontologies/TAO.rdf#SysAdminRole', ['ext' => 'taoDevTools']],
+    ],
+    'uninstall' => [
+    ],
     'update' => 'oat\\taoDevTools\\scripts\\update\\Updater',
-    'routes' => array(
+    'routes' => [
         '/taoDevTools' => 'oat\\taoDevTools\\actions'
-    ),
-    'constants' => array(
+    ],
+    'constants' => [
         # actions directory
-        "DIR_ACTIONS"            => $extpath."actions".DIRECTORY_SEPARATOR,
+        "DIR_ACTIONS"            => $extpath . "actions" . DIRECTORY_SEPARATOR,
 
         # views directory
-        "DIR_VIEWS"                => $extpath."views".DIRECTORY_SEPARATOR,
+        "DIR_VIEWS"                => $extpath . "views" . DIRECTORY_SEPARATOR,
 
         # default module name
         'DEFAULT_MODULE_NAME'    => 'Groups',
@@ -56,6 +57,6 @@ return array(
         'DEFAULT_ACTION_NAME'    => 'index',
 
         #BASE URL (usually the domain root)
-        'BASE_URL'                => ROOT_URL .'taoDevTools/',
-    )
-);
+        'BASE_URL'                => ROOT_URL . 'taoDevTools/',
+    ]
+];

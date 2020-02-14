@@ -3,7 +3,7 @@
 class UDPListener
 {
 
-    private static $COLOR = array(
+    private static $COLOR = [
         '0' => '1;30', // dark grey
         '1' => '0;37', // light grey
         '2' => '0;32', // green
@@ -11,11 +11,11 @@ class UDPListener
         '4' => '1;31', // red
         '5' => '1;31', // red
         'h' => '1;36', // cyan
-    );
+    ];
 
-    private static $FILTER = array(
+    private static $FILTER = [
         "/pg_fetch_row\(\): Unable to jump to row -2 on PostgreSQL result index/"
-    );
+    ];
 
     private $url;
     private $socket;
@@ -61,14 +61,14 @@ class UDPListener
 
             $blacklisted = false;
             foreach (self::$FILTER as $pattern) {
-                if (preg_match($pattern, $code['d']) > 0)
+                if (preg_match($pattern, $code['d']) > 0) {
                     $blacklisted = true;
+                }
             }
 
             if (!$blacklisted) {
                 $this->render($code);
             }
-
         } while ($received !== false);
     }
     
@@ -88,7 +88,7 @@ class UDPListener
             } elseif (in_array('DEPRECATED', $pData['t']) && isset($pData['b'][1])) {
                 $trace = "\t" . $pData['b'][1]['file'] . '(' . $pData['b'][1]['line'] . ")\n";
             } else {
-                $trace = '';   
+                $trace = '';
             }
             
             $fullMessage = $message . $trace;
@@ -104,7 +104,7 @@ class UDPListener
                     $now = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
                     echo $now->format('[H:i:s.u]');
                 }
-                echo $message; 
+                echo $message;
                 echo $this->colorize() . "\n";
                 echo $trace;
             }
@@ -113,14 +113,16 @@ class UDPListener
 
     public function renderBacktrace($pData)
     {
-        $file = array();
+        $file = [];
         $maxlen = 0;
-        foreach ($pData as $row)
+        foreach ($pData as $row) {
             if (isset($row["file"])) {
                 $file[] = $row["file"];
-                if (strlen($row["file"]) > $maxlen)
+                if (strlen($row["file"]) > $maxlen) {
                     $maxlen = strlen($row["file"]);
+                }
             }
+        }
         $prefixlen = strlen($this->getCommonPrefix($file));
 
         $backtrace = '';

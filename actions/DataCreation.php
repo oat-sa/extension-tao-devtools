@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -42,7 +43,7 @@ class DataCreation extends \tao_actions_Main
 
         DataGenerator::generateItems($count);
 
-        echo 'created '.$count.' items';
+        echo 'created ' . $count . ' items';
     }
 
     public function createTesttakers()
@@ -50,7 +51,6 @@ class DataCreation extends \tao_actions_Main
         $count = $this->hasRequestParameter('count') ? $this->getRequestParameter('count') : 1000;
 
         DataGenerator::generateTesttakers($count);
-        echo 'created '.$count.' testakers';
+        echo 'created ' . $count . ' testakers';
     }
-
 }

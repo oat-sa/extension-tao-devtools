@@ -54,33 +54,33 @@ class taoDevTools_scripts_TaoDiffExt extends tao_scripts_Runner
      *            array options
      * @return mixed
      */
-    public function __construct($inputFormat = array(), $options = array())
+    public function __construct($inputFormat = [], $options = [])
     {
         if (count($inputFormat) == 0) {
             // Autoconfigure the script.
-            $inputFormat = array(
+            $inputFormat = [
                 'min' => 3,
-                'parameters' => array(
-                    array(
+                'parameters' => [
+                    [
                         'name' => 'previous',
                         'type' => 'string',
                         'shortcut' => 'p',
                         'description' => 'Previous extension manifest'
-                    ),
-                    array(
+                    ],
+                    [
                         'name' => 'current',
                         'type' => 'string',
                         'shortcut' => 'c',
                         'description' => 'Current extension manifest'
-                    ),
-                    array(
+                    ],
+                    [
                         'name' => 'output',
                         'type' => 'string',
                         'shortcut' => 'o',
                         'description' => 'Output file'
-                    )
-                )
-            );
+                    ]
+                ]
+            ];
         }
         
         parent::__construct($inputFormat, $options);

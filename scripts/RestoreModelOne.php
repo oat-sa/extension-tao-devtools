@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,6 +19,7 @@
  *
  *
  */
+
 namespace oat\taoDevTools\scripts;
 
 use oat\tao\model\TaoOntology;
@@ -29,22 +31,22 @@ use oat\generis\model\OntologyAwareTrait;
 
 /**
  * Restores a minimal viable model 1
- * 
+ *
  * @author joel.bout
  */
 class RestoreModelOne implements Action, ServiceLocatorAwareInterface
 {
-
     use OntologyAwareTrait;
     use ServiceLocatorAwareTrait;
     
-    public function __invoke($params) {
+    public function __invoke($params)
+    {
         
         // recreate languages
         $modelCreator = new \tao_install_utils_ModelCreator(LOCAL_NAMESPACE);
         $models = $modelCreator->getLanguageModels();
-        foreach ($models as $ns => $modelFiles){
-            foreach ($modelFiles as $file){
+        foreach ($models as $ns => $modelFiles) {
+            foreach ($modelFiles as $file) {
                 $modelCreator->insertLocalModel($file);
             }
         }

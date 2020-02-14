@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @Author      Antoine Delamarre <antoine.delamarre@vesperiagroup.com>
  * @Date        10/02/15
@@ -53,9 +54,9 @@ class AdvKeyValueProxyDriver implements \common_persistence_AdvKvDriver
      */
     public function __destruct()
     {
-        \common_Logger::i($this->count.' calls to '.$this->id);
+        \common_Logger::i($this->count . ' calls to ' . $this->id);
         if ($this->seeks > 0) {
-            \common_Logger::w($this->seeks.' seeks in '.$this->id);
+            \common_Logger::w($this->seeks . ' seeks in ' . $this->id);
         }
     }
     
@@ -63,7 +64,7 @@ class AdvKeyValueProxyDriver implements \common_persistence_AdvKvDriver
     {
         $this->count++;
         if ($this->detailedLogging) {
-            \common_Logger::d('Call for '.$key.' ('.$call.')');
+            \common_Logger::d('Call for ' . $key . ' (' . $call . ')');
         }
     }
 
@@ -105,7 +106,7 @@ class AdvKeyValueProxyDriver implements \common_persistence_AdvKvDriver
     {
         $this->seeks++;
         if ($this->detailedLogging) {
-            \common_Logger::w('Call for '.$key.' ('.$call.')');
+            \common_Logger::w('Call for ' . $key . ' (' . $call . ')');
         }
         return $this->persistence->keys($pattern);
     }
