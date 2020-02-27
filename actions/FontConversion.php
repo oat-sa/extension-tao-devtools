@@ -44,7 +44,6 @@ class FontConversion extends tao_actions_CommonModule
 
     protected const DO_NOT_EDIT_TEXT = '/* Do not edit */';
 
-    private $workingDirectory;
     private $temporaryDirectory;
     private $assetsDirectory;
     private $currentSelection;
@@ -63,10 +62,11 @@ class FontConversion extends tao_actions_CommonModule
 
     protected function init()
     {
+        $workingDirectory = str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__));
+
         $this->temporaryDirectory = tao_helpers_File::createTempDir();
-        $this->workingDirectory = str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__));
-        $this->taoCoreExtensionDirectory = dirname($this->workingDirectory) . '/tao';
-        $this->assetsDirectory = $this->workingDirectory . '/fontConversion/assets';
+        $this->taoCoreExtensionDirectory = dirname($workingDirectory) . '/tao';
+        $this->assetsDirectory = $workingDirectory . '/fontConversion/assets';
         $this->currentSelection = $this->assetsDirectory . '/selection.json';
 
         $writable = [
@@ -241,9 +241,11 @@ class FontConversion extends tao_actions_CommonModule
         $newSet = $this->dataToGlyphSet($currentSelection);
         $oldSet = $this->dataToGlyphSet($oldSelection);
 
-        return (bool)count(array_diff($oldSet, $newSet))
-            ? $this->error(__('Font incomplete! Is the extension in sync width git? Have you removed any glyphs?'))
-            : true;
+        if (!empty(array_diff($oldSet, $newSet))) {
+            return $this->error(__('Font incomplete! Is the extension in sync with git? Have you removed any glyphs?'));
+        }
+
+        return true;
     }
 
     /**
