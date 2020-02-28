@@ -1,5 +1,7 @@
 <?php
 
+use oat\taoDevTools\scripts\update\Updater;
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,12 +17,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2013 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
- *
- *
+ * Copyright (c) 2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  */
 
-$extpath = dirname(__FILE__) . DIRECTORY_SEPARATOR;
+$extPath = __DIR__ . DIRECTORY_SEPARATOR;
 
 return [
     'name' => 'taoDevTools',
@@ -31,32 +31,31 @@ return [
     'author' => 'Open Assessment Technologies',
     'requires' => [
         'generis' => '>=11.1.0',
-        'tao' => '>=37.0.0'
+        'tao' => '>=40.10.0'
     ],
     'managementRole' => 'http://www.tao.lu/Ontologies/TAO.rdf#TaoDevToolsRole',
     'acl' => [
         ['grant', 'http://www.tao.lu/Ontologies/TAO.rdf#SysAdminRole', ['ext' => 'taoDevTools']],
     ],
-    'uninstall' => [
-    ],
-    'update' => 'oat\\taoDevTools\\scripts\\update\\Updater',
+    'uninstall' => [],
+    'update' => Updater::class,
     'routes' => [
-        '/taoDevTools' => 'oat\\taoDevTools\\actions'
+        '/taoDevTools' => 'oat\\taoDevTools\\actions',
     ],
     'constants' => [
         # actions directory
-        "DIR_ACTIONS"            => $extpath . "actions" . DIRECTORY_SEPARATOR,
+        'DIR_ACTIONS' => $extPath . 'actions' . DIRECTORY_SEPARATOR,
 
         # views directory
-        "DIR_VIEWS"                => $extpath . "views" . DIRECTORY_SEPARATOR,
+        'DIR_VIEWS' => $extPath . 'views' . DIRECTORY_SEPARATOR,
 
         # default module name
-        'DEFAULT_MODULE_NAME'    => 'Groups',
+        'DEFAULT_MODULE_NAME' => 'Groups',
 
         #default action name
-        'DEFAULT_ACTION_NAME'    => 'index',
+        'DEFAULT_ACTION_NAME' => 'index',
 
         #BASE URL (usually the domain root)
-        'BASE_URL'                => ROOT_URL . 'taoDevTools/',
-    ]
+        'BASE_URL' => ROOT_URL . 'taoDevTools/',
+    ],
 ];

@@ -29,7 +29,6 @@ namespace oat\taoDevTools\scripts\update;
 class Updater extends \common_ext_ExtensionUpdater
 {
     /**
-     *
      * @param string $initialVersion
      * @return string $versionUpdatedTo
      */
