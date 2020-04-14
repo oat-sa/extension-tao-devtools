@@ -24,6 +24,7 @@ namespace oat\taoDevTools\scripts\tools;
 use oat\oatbox\extension\script\ScriptAction;
 use DirectoryIterator;
 use common_report_Report as Report;
+use SplFileInfo;
 
 class DepsInfo extends ScriptAction
 {
@@ -38,9 +39,7 @@ class DepsInfo extends ScriptAction
      */
     protected function provideDescription()
     {
-        $message = 'Analyzer of Tao extension dependencies' . PHP_EOL;
-
-        return $message;
+        return 'Analyzer of Tao extension dependencies' . PHP_EOL;;
     }
 
     /**
@@ -51,15 +50,15 @@ class DepsInfo extends ScriptAction
     protected function provideOptions()
     {
         return [
-            'render'   => [
-                'prefix'       => 'r',
+            'render' => [
+                'prefix'       => '-r',
                 'longPrefix'   => 'render',
-                'required' => false,
-                'flag' => true,
-                'description'  => 'Return HTML rendered table as a result',
-                'defaultValue' => false
+                'cast'         => 'string',
+                'required'     => false,
+                'description'  => 'JSON|HTML',
+                'defaultValue' => 'JSON'
             ],
-            'extension'       => [
+            'extension' => [
                 'prefix'       => 'e',
                 'longPrefix'   => 'extension',
                 'cast'         => 'string',
@@ -75,10 +74,22 @@ class DepsInfo extends ScriptAction
         $result = $this->getDeps();
         $this->checkСyclicDep($result);
 
-        if ($this->getOption('render')) {
-            $result = $this->render($result);
+        foreach ($result as $extId => &$row) {
+            $row['redundant'] = array_values(array_diff($row['manifestDeps'], $row['realDeps']));
+            $row['missed'] = array_values(array_diff($row['realDeps'], $row['manifestDeps']));
         }
-        return Report::createInfo('Extension dependencies analyzed.', $result);
+
+        $renderer = $this->getOption('render');
+
+        if ($renderer === 'JSON') {
+            $result = $this->renderJson($result, $this->getOption('render'));
+        }  else if ($renderer === 'HTML') {
+            $result = $this->renderHtml($result, $this->getOption('render'));
+        } else {
+            throw new \Exception(sprintf('Renderer %s not found', $renderer));
+        }
+
+        return Report::createInfo($result, $result);
     }
 
     /**
@@ -87,7 +98,7 @@ class DepsInfo extends ScriptAction
     private function getDeps()
     {
         if ($this->getOption('extension')) {
-            $extRoot = new \SplFileInfo(ROOT_PATH.$this->getOption('extension'));
+            $extRoot = new SplFileInfo(ROOT_PATH.$this->getOption('extension'));
             $result = $this->getExtensionDeps($extRoot);
         } else {
             $result = [];
@@ -135,9 +146,18 @@ class DepsInfo extends ScriptAction
 
     /**
      * @param $result
+     * @return false|string
+     */
+    private function renderJson($result)
+    {
+        return json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * @param $result
      * @return string
      */
-    private function render($result)
+    private function renderHtml($result)
     {
         $resultHtml = '<style>
 table, th, td {
@@ -163,16 +183,14 @@ color: darkred;
 <th>Cyclic dependencies</th>
 </tr>';
         foreach ($result as $extId => $row) {
-            $redundant = array_diff($row['manifestDeps'], $row['realDeps']);
-            $notMentioned = array_diff($row['realDeps'], $row['manifestDeps']);
             $classes = $row['classes'];
             $resultHtml .= '<tr>
                 <td>'.$extId.'</td>
                 <td><div class="classlist">'.implode('<br>', $classes).'</div></td>
                 <td>'.implode('<br>', $row['manifestDeps']).'</td>
                 <td>'.implode('<br>', $row['realDeps']).'</td>
-                <td>'.implode('<br>', $redundant).'</td>
-                <td><div class="missed">'.implode('<br>', $notMentioned).'</div></td>
+                <td>'.implode('<br>', $row['redundant']).'</td>
+                <td><div class="missed">'.implode('<br>', $row['missed']).'</div></td>
                 <td><div class="missed">'.implode('<br>', $row['cyclicDeps']).'</div></td>
                 </tr>';
         }
@@ -185,7 +203,7 @@ color: darkred;
      * @param DirectoryIterator $fileInfo
      * @return mixed|null
      */
-    private function getManifest(DirectoryIterator $fileInfo)
+    private function getManifest(SplFileInfo $fileInfo)
     {
         $path = $fileInfo->getRealPath().DIRECTORY_SEPARATOR.'manifest.php';
         if (file_exists($path)) {
@@ -198,10 +216,15 @@ color: darkred;
      * @param DirectoryIterator $fileInfo
      * @return string|null
      */
-    private function getDependClasses(DirectoryIterator $fileInfo)
+    private function getDependClasses(SplFileInfo $fileInfo)
     {
         $result = [];
-        $dependencies = shell_exec('dephpend.bat text '.$fileInfo);
+        $pathToDephpend = ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR
+            . 'dephpend' . DIRECTORY_SEPARATOR
+            . 'dephpend' . DIRECTORY_SEPARATOR
+            . 'bin' . DIRECTORY_SEPARATOR . 'dephpend';
+        $command = 'php ' . $pathToDephpend . ' text ' . $fileInfo;
+        $dependencies = shell_exec($command);
         $dependenciesArray = preg_split("/\r\n|\n|\r/", $dependencies);
         $dependenciesArray = array_filter($dependenciesArray);
         foreach ($dependenciesArray as $dependency) {
