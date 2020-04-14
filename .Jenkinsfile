@@ -60,12 +60,17 @@ mkdir -p tao/views/locales/en-US/
                     }
                     steps {
                         dir('build'){
-                            def DEPS_JSON_STR = sh(
-                                label: 'Run dependency checker',
-                                returnStdout: true,
-                                script: 'oat\\taoDevTools\\scripts\\tools\\DepsInfo -e taoDevTools'
-                            ).trim()
-                            echo "${DEPS_JSON_STR}"
+                            script {
+                                deps = bat(returnStdout: true, script: 'php -n index.php oat\\taoDevTools\\scripts\\tools\\DepsInfo -e taoDevTools').trim()
+                                deps = deps.substring(deps.indexOf('\n')+1);
+                                def propsJson = readJSON text: deps
+                                missedDeps = propsJson['taoDevTools']['missed'].toString()
+                                try {
+                                    assert missedDeps == "[]"
+                                } catch(Throwable t) {
+                                    error("Missed dependencies found: $missedDeps")
+                                }
+                            }
                         }
                     }
                 }
