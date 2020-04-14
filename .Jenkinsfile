@@ -24,7 +24,7 @@ pipeline {
                     )
                 }
                 script {
-                    deps = bat(returnStdout: true, script: 'php -n index.php oat\\taoDevTools\\scripts\\tools\\DepsInfo -e taoDevTools').trim()
+                    deps = sh(returnStdout: true, script: 'php -n index.php oat\\taoDevTools\\scripts\\tools\\DepsInfo -e taoDevTools').trim()
                     deps = deps.substring(deps.indexOf('\n')+1);
                     def propsJson = readJSON text: deps
                     missedDeps = propsJson['taoDevTools']['missed'].toString()
