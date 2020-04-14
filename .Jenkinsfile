@@ -4,6 +4,10 @@ pipeline {
     }
     stages {
         stage('Resolve TAO dependencies') {
+            environment {
+                GITHUB_ORGANIZATION='oat-sa'
+                REPO_NAME='oat-sa/extension-tao-devtools'
+            }
             steps {
                 sh(
                     label : 'Create build build directory',
@@ -31,8 +35,8 @@ pipeline {
                         script: 'COMPOSER_DISCARD_CHANGES=true composer update --no-interaction --no-ansi --no-progress --no-scripts'
                     )
                     sh(
-                        label: 'Add dephpend',
-                        script: 'composer require dephpend/dephpend:^0.6'
+                        label: 'Add phpunit',
+                        script: 'composer require phpunit/phpunit:^8.5'
                     )
                     sh(
                         label: "Extra filesystem mocks",
@@ -46,9 +50,9 @@ mkdir -p tao/views/locales/en-US/
                 }
             }
         }
-        stage('Checks') {
+        stage('Tests') {
             parallel {
-                stage('Dependencies Tests') {
+                stage('Backend Tests') {
                     agent {
                         docker {
                             image 'alexwijn/docker-git-php-composer'
