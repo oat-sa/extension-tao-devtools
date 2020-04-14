@@ -60,10 +60,11 @@ mkdir -p tao/views/locales/en-US/
                     }
                     steps {
                         dir('build'){
-                            DEPS_JSON_STR = sh(
+                            def DEPS_JSON_STR = sh(
                                 label: 'Run dependency checker',
+                                returnStdout: true,
                                 script: 'oat\\taoDevTools\\scripts\\tools\\DepsInfo -e taoDevTools'
-                            )
+                            ).trim()
                             echo "${DEPS_JSON_STR}"
                         }
                     }
