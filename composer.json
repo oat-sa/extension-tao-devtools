@@ -48,6 +48,7 @@
 		"oat-sa/oatbox-extension-installer": "~1.1||dev-master",
 		"oat-sa/tao-core": "*",
 		"oat-sa/generis": "*",
+		"symfony/process": "^5.0",
 		"ccampbell/chromephp": "~4.1.0",
 		"nette/php-generator": "~3.3.0",
 		"dephpend/dephpend": "^0.6.3"

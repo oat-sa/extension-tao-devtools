@@ -25,11 +25,16 @@ use oat\oatbox\extension\script\ScriptAction;
 use DirectoryIterator;
 use common_report_Report as Report;
 use SplFileInfo;
+use Symfony\Component\Process\PhpProcess;
 
 class DepsInfo extends ScriptAction
 {
     private $namespaceMap = [
-        'oatbox' => 'generis'
+        'oatbox' => 'generis',
+        'common' => 'generis',
+        'core' => 'generis',
+        'kernel' => 'tao',
+        'test' => 'tao',
     ];
 
     /**
@@ -74,11 +79,6 @@ class DepsInfo extends ScriptAction
         $result = $this->getDeps();
         $this->checkСyclicDep($result);
 
-        foreach ($result as $extId => &$row) {
-            $row['redundant'] = array_values(array_diff($row['manifestDeps'], $row['realDeps']));
-            $row['missed'] = array_values(array_diff($row['realDeps'], $row['manifestDeps']));
-        }
-
         $renderer = $this->getOption('render');
 
         if ($renderer === 'JSON') {
@@ -121,10 +121,21 @@ class DepsInfo extends ScriptAction
         $result = [];
         $manifest = $this->getManifest($fileInfo);
         $classes = $this->getDependClasses($fileInfo);
+        $missedExtensions = [];
+        $missedClasses = [];
         sort($classes);
         $extensions = [];
+        $autoloadScript = ROOT_PATH.'vendor/autoload.php';
         foreach ($classes as $class) {
-            $extensions[] = $this->classToExtensionId($class);
+            $extId = $this->classToExtensionId($class);
+            if ($extId === $manifest['name']) {
+                continue;
+            }
+            $extensions[] = $extId;
+            if (!$this->_class_exists($autoloadScript, $class)) {
+                $missedExtensions[] = $extId;
+                $missedClasses[] = $class;
+            }
         }
         $extensions = array_unique($extensions);
         $extensions = array_filter($extensions);
@@ -139,7 +150,9 @@ class DepsInfo extends ScriptAction
         $result[$manifest['name']] = [
             'classes' => $classes,
             'manifestDeps' => $manifestDeps,
-            'realDeps' => $extensions
+            'realDeps' => $extensions,
+            'missedExtensions' => array_unique($missedExtensions),
+            'missedClasses' => array_unique($missedClasses),
         ];
         return $result;
     }
@@ -213,6 +226,16 @@ color: darkred;
     }
 
     /**
+     * @param SplFileInfo $fileInfo
+     * @return false|string
+     */
+    private function getComposer(SplFileInfo $fileInfo)
+    {
+        $path = $fileInfo->getRealPath().DIRECTORY_SEPARATOR.'composer.json';
+        return json_decode(file_get_contents($path), true);
+    }
+
+    /**
      * @param DirectoryIterator $fileInfo
      * @return string|null
      */
@@ -240,9 +263,9 @@ color: darkred;
      */
     private function classToExtensionId(string $class)
     {
-        preg_match('/oat\\\([a-zA-Z]+).*/', $class, $matches);
-
-        if (isset($matches[1])) {
+        if (preg_match('/oat\\\([a-zA-Z]+).*/', $class, $matches) && isset($matches[1])) {
+            return $this->mapNamespace($matches[1]);
+        } else if (preg_match('/^([^_]+)/', $class, $matches) && isset($matches[1])) {
             return $this->mapNamespace($matches[1]);
         }
         return null;
@@ -270,5 +293,21 @@ color: darkred;
                 }
             }
         }
+    }
+
+    private function _class_exists(string $autoloadScript, string $class, bool $autoload = true): bool
+    {
+        $process = new PhpProcess(sprintf(
+            '<?php require_once %s; exit((class_exists(%s, %s) || interface_exists(%s, %s) || trait_exists(%s, %s)) ? 0 : 1);',
+            var_export($autoloadScript, true),
+            var_export($class, true),
+            var_export($autoload, true),
+            var_export($class, true),
+            var_export($autoload, true),
+            var_export($class, true),
+            var_export($autoload, true)
+        ));
+
+        return 1 !== $process->run();
     }
 }
