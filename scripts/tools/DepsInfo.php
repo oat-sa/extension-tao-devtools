@@ -29,12 +29,16 @@ use Symfony\Component\Process\PhpProcess;
 
 class DepsInfo extends ScriptAction
 {
+
+    private $classExistsCache = [];
+
     private $namespaceMap = [
         'oatbox' => 'generis',
         'common' => 'generis',
         'core' => 'generis',
         'kernel' => 'tao',
         'test' => 'tao',
+        'helpers' => 'generis',
     ];
 
     /**
@@ -76,9 +80,7 @@ class DepsInfo extends ScriptAction
 
     public function run()
     {
-        $result = $this->getDeps();
-        $this->checkСyclicDep($result);
-
+        $result = $this->analyze();
         $renderer = $this->getOption('render');
 
         if ($renderer === 'JSON') {
@@ -95,11 +97,12 @@ class DepsInfo extends ScriptAction
     /**
      * @return array
      */
-    private function getDeps()
+    private function analyze()
     {
         if ($this->getOption('extension')) {
             $extRoot = new SplFileInfo(ROOT_PATH.$this->getOption('extension'));
-            $result = $this->getExtensionDeps($extRoot);
+            $manifest = $this->getManifest($extRoot);
+            $result[$manifest['name']] = $this->getUsedClasses($extRoot);
         } else {
             $result = [];
             foreach (new DirectoryIterator(ROOT_PATH) as $fileInfo) {
@@ -107,54 +110,65 @@ class DepsInfo extends ScriptAction
                     continue;
                 }
                 $manifest = $this->getManifest($fileInfo);
-                if ($manifest === null) {
+                $composer = $this->getComposer($fileInfo);
+                if ($composer === null || $manifest === null) {
                     continue;
                 }
-                $result = array_merge($result, $this->getExtensionDeps($fileInfo));
+                $result[$manifest['name']] = array_merge($result, $this->getUsedClasses($fileInfo));
             }
         }
+
+        foreach ($result as $extId => &$extResult) {
+            if (isset($manifest['requires']) && is_array($manifest['requires'])) {
+                $manifestDeps = array_keys($manifest['requires']);
+                sort($manifestDeps);
+            } else {
+                $manifestDeps = [];
+            }
+            $extResult['manifestDeps'] = $manifestDeps;
+
+            $realExtDependencies = [];
+            foreach ($extResult['classes'] as $class) {
+                $realExtDependency = $this->classToExtensionId($class);
+                if ($realExtDependency !== $extId) {
+                    $realExtDependencies[] = $realExtDependency;
+                }
+            }
+            $extResult['realDeps'] = array_values(array_unique(array_filter($realExtDependencies)));
+            $extResult['redundantInManifest'] = array_values(array_unique(array_diff($extResult['manifestDeps'], $extResult['realDeps'])));
+            $extResult['notMentionedInManifest'] = array_values(array_unique(array_diff($extResult['realDeps'], $extResult['manifestDeps'])));
+            $this->getMissedClasses($extResult, $extId);
+        }
+        $this->checkСyclicDep($result);
+
         return $result;
     }
 
-    private function getExtensionDeps(\SplFileInfo $fileInfo)
+    private function getMissedClasses(&$extResult, $extId)
     {
-        $result = [];
-        $manifest = $this->getManifest($fileInfo);
-        $classes = $this->getDependClasses($fileInfo);
-        $missedExtensions = [];
-        $missedClasses = [];
-        sort($classes);
-        $extensions = [];
         $autoloadScript = ROOT_PATH.'vendor/autoload.php';
-        foreach ($classes as $class) {
-            $extId = $this->classToExtensionId($class);
-            if ($extId === $manifest['name']) {
+        $missedClasses = [];
+        $missedExtensions = [];
+        foreach ($extResult['classes'] as $class) {
+            $classExtension = $this->classToExtensionId($class);
+            if ($classExtension === $extId) {
                 continue;
             }
-            $extensions[] = $extId;
+            $extensions[] = $classExtension;
             if (!$this->_class_exists($autoloadScript, $class)) {
-                $missedExtensions[] = $extId;
+                $missedExtensions[] = $classExtension;
                 $missedClasses[] = $class;
             }
         }
-        $extensions = array_unique($extensions);
-        $extensions = array_filter($extensions);
-        $extensions = array_diff($extensions, [$manifest['name']]);
-        sort($extensions);
-        if (isset($manifest['requires']) && is_array($manifest['requires'])) {
-            $manifestDeps = array_keys($manifest['requires']);
-            sort($manifestDeps);
-        } else {
-            $manifestDeps = [];
-        }
-        $result[$manifest['name']] = [
-            'classes' => $classes,
-            'manifestDeps' => $manifestDeps,
-            'realDeps' => $extensions,
-            'missedExtensions' => array_unique($missedExtensions),
-            'missedClasses' => array_unique($missedClasses),
+        $extResult['missedClasses'] = $missedClasses;
+    }
+
+    private function getUsedClasses(\SplFileInfo $fileInfo)
+    {
+        $classes = $this->getDependClasses($fileInfo);
+        return  [
+            'classes' => array_unique($classes)
         ];
-        return $result;
     }
 
     /**
@@ -202,8 +216,8 @@ color: darkred;
                 <td><div class="classlist">'.implode('<br>', $classes).'</div></td>
                 <td>'.implode('<br>', $row['manifestDeps']).'</td>
                 <td>'.implode('<br>', $row['realDeps']).'</td>
-                <td>'.implode('<br>', $row['redundant']).'</td>
-                <td><div class="missed">'.implode('<br>', $row['missed']).'</div></td>
+                <td>'.implode('<br>', $row['redundantInManifest']).'</td>
+                <td><div class="missed">'.implode('<br>', $row['notMentionedInManifest']).'</div></td>
                 <td><div class="missed">'.implode('<br>', $row['cyclicDeps']).'</div></td>
                 </tr>';
         }
@@ -232,7 +246,10 @@ color: darkred;
     private function getComposer(SplFileInfo $fileInfo)
     {
         $path = $fileInfo->getRealPath().DIRECTORY_SEPARATOR.'composer.json';
-        return json_decode(file_get_contents($path), true);
+        if (file_exists($path)) {
+            return json_decode(file_get_contents($path), true);
+        }
+        return null;
     }
 
     /**
@@ -263,9 +280,9 @@ color: darkred;
      */
     private function classToExtensionId(string $class)
     {
-        if (preg_match('/oat\\\([a-zA-Z]+).*/', $class, $matches) && isset($matches[1])) {
+        if (preg_match('/^oat\\\([a-zA-Z]+).*/', $class, $matches) && isset($matches[1])) {
             return $this->mapNamespace($matches[1]);
-        } else if (preg_match('/^([^_]+)/', $class, $matches) && isset($matches[1])) {
+        } else if (preg_match('/^([^_\\\]+)_/', $class, $matches) && isset($matches[1])) {
             return $this->mapNamespace($matches[1]);
         }
         return null;
@@ -297,17 +314,20 @@ color: darkred;
 
     private function _class_exists(string $autoloadScript, string $class, bool $autoload = true): bool
     {
-        $process = new PhpProcess(sprintf(
-            '<?php require_once %s; exit((class_exists(%s, %s) || interface_exists(%s, %s) || trait_exists(%s, %s)) ? 0 : 1);',
-            var_export($autoloadScript, true),
-            var_export($class, true),
-            var_export($autoload, true),
-            var_export($class, true),
-            var_export($autoload, true),
-            var_export($class, true),
-            var_export($autoload, true)
-        ));
+        if (!isset($this->classExistsCache[$class])) {
+            $process = new PhpProcess(sprintf(
+                '<?php require_once %s; exit((class_exists(%s, %s) || interface_exists(%s, %s) || trait_exists(%s, %s)) ? 0 : 1);',
+                var_export($autoloadScript, true),
+                var_export($class, true),
+                var_export($autoload, true),
+                var_export($class, true),
+                var_export($autoload, true),
+                var_export($class, true),
+                var_export($autoload, true)
+            ));
 
-        return 1 !== $process->run();
+            $this->classExistsCache[$class] = (1 !== $process->run());
+        }
+        return $this->classExistsCache[$class];
     }
 }
