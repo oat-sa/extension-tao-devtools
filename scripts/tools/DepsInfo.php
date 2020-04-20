@@ -139,7 +139,10 @@ class DepsInfo extends ScriptAction
             $extResult['notMentionedInManifest'] = array_values(array_unique(array_diff($extResult['realDeps'], $extResult['manifestDeps'])));
             $this->getMissedClasses($extResult, $extId);
         }
-        $this->checkСyclicDep($result);
+        
+        if (!$this->getOption('extension')) {
+            $this->checkСyclicDep($result);
+        }
 
         return $result;
     }
