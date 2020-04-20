@@ -4,8 +4,11 @@
  */
 $rootPath = realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..');
 define('ROOT_PATH', $rootPath.DIRECTORY_SEPARATOR);
-//ROOT_URL constant is used in some mamifest files
+//ROOT_URL constant is used in some manifest files
 define('ROOT_URL', '');
 require_once $rootPath . '/vendor/autoload.php';
+if (!isset($argv[1])) {
+    throw new Exception('Specify extension id');
+}
 $extId = $argv[1];
 echo (new \oat\taoDevTools\scripts\tools\DepsInfo())(['-e', $extId]);
