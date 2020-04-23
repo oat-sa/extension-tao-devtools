@@ -319,14 +319,12 @@ color: darkred;
     {
         if (!isset($this->classExistsCache[$class])) {
             $process = new PhpProcess(sprintf(
-                '<?php require_once %s; exit((class_exists(%s, %s) || interface_exists(%s, %s) || trait_exists(%s, %s)) ? 0 : 1);',
+                '<?php require_once %s; exit((class_exists(%s, true) || interface_exists(%s, true) || trait_exists(%s, true) || is_callable(%s)) ? 0 : 1);',
                 var_export($autoloadScript, true),
                 var_export($class, true),
-                var_export($autoload, true),
                 var_export($class, true),
-                var_export($autoload, true),
                 var_export($class, true),
-                var_export($autoload, true)
+                var_export($class, true)
             ));
 
             $this->classExistsCache[$class] = (1 !== $process->run());
