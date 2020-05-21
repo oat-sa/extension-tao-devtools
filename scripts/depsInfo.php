@@ -11,4 +11,5 @@ if (!isset($argv[1])) {
     throw new Exception('Specify extension id');
 }
 $extId = $argv[1];
-echo (new \oat\taoDevTools\scripts\tools\DepsInfo())(['-e', $extId]);
+$result = (new \oat\taoDevTools\scripts\tools\DepsInfo())(['-e', $extId]);
+echo $result->getData();

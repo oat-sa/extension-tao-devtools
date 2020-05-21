@@ -84,13 +84,12 @@ class DepsInfo extends ScriptAction
         $renderer = $this->getOption('render');
 
         if ($renderer === 'JSON') {
-            $result = $this->renderJson($result, $this->getOption('render'));
+            $result = $this->renderJson($result);
         }  else if ($renderer === 'HTML') {
-            $result = $this->renderHtml($result, $this->getOption('render'));
+            $result = $this->renderHtml($result);
         } else {
             throw new \Exception(sprintf('Renderer %s not found', $renderer));
         }
-
         return Report::createInfo($result, $result);
     }
 
@@ -102,7 +101,7 @@ class DepsInfo extends ScriptAction
         if ($this->getOption('extension')) {
             $extRoot = new SplFileInfo(ROOT_PATH.$this->getOption('extension'));
             $manifest = $this->getManifest($extRoot);
-            $result[$manifest['name']] = $this->getUsedClasses($extRoot);
+            $result[$manifest['name']] = $this->analiseExtension($extRoot);
         } else {
             $result = [];
             foreach (new DirectoryIterator(ROOT_PATH) as $fileInfo) {
@@ -114,32 +113,10 @@ class DepsInfo extends ScriptAction
                 if ($composer === null || $manifest === null) {
                     continue;
                 }
-                $result[$manifest['name']] = array_merge($result, $this->getUsedClasses($fileInfo));
+                $result[$manifest['name']] = $this->analiseExtension($fileInfo);
             }
         }
 
-        foreach ($result as $extId => &$extResult) {
-            if (isset($manifest['requires']) && is_array($manifest['requires'])) {
-                $manifestDeps = array_keys($manifest['requires']);
-                sort($manifestDeps);
-            } else {
-                $manifestDeps = [];
-            }
-            $extResult['manifestDeps'] = $manifestDeps;
-
-            $realExtDependencies = [];
-            foreach ($extResult['classes'] as $class) {
-                $realExtDependency = $this->classToExtensionId($class);
-                if ($realExtDependency !== $extId) {
-                    $realExtDependencies[] = $realExtDependency;
-                }
-            }
-            $extResult['realDeps'] = array_values(array_unique(array_filter($realExtDependencies)));
-            $extResult['redundantInManifest'] = array_values(array_unique(array_diff($extResult['manifestDeps'], $extResult['realDeps'])));
-            $extResult['notMentionedInManifest'] = array_values(array_unique(array_diff($extResult['realDeps'], $extResult['manifestDeps'])));
-            $this->getMissedClasses($extResult, $extId);
-        }
-        
         if (!$this->getOption('extension')) {
             $this->checkСyclicDep($result);
         }
@@ -147,12 +124,12 @@ class DepsInfo extends ScriptAction
         return $result;
     }
 
-    private function getMissedClasses(&$extResult, $extId)
+    private function getMissedClasses($classes, $extId)
     {
         $autoloadScript = ROOT_PATH.'vendor/autoload.php';
         $missedClasses = [];
         $missedExtensions = [];
-        foreach ($extResult['classes'] as $class) {
+        foreach ($classes as $class) {
             $classExtension = $this->classToExtensionId($class);
             if ($classExtension === $extId) {
                 continue;
@@ -163,15 +140,36 @@ class DepsInfo extends ScriptAction
                 $missedClasses[] = $class;
             }
         }
-        $extResult['missedClasses'] = $missedClasses;
+        return $missedClasses;
     }
 
-    private function getUsedClasses(\SplFileInfo $fileInfo)
+    private function analiseExtension(\SplFileInfo $extRoot)
     {
-        $classes = $this->getDependClasses($fileInfo);
-        return  [
-            'classes' => array_unique($classes)
-        ];
+        $result = [];
+        $result['classes'] = array_unique($this->getDependClasses($extRoot));
+        $manifest = $this->getManifest($extRoot);
+        $extId = $manifest['name'];
+        if (isset($manifest['requires']) && is_array($manifest['requires'])) {
+            $manifestDeps = array_keys($manifest['requires']);
+            sort($manifestDeps);
+        } else {
+            $manifestDeps = [];
+        }
+        $result['manifestDeps'] = $manifestDeps;
+        $realExtDependencies = [];
+
+        foreach ($result['classes'] as $class) {
+            $realExtDependency = $this->classToExtensionId($class);
+            if ($realExtDependency !== $extId) {
+                $realExtDependencies[] = $realExtDependency;
+            }
+        }
+        $result['realDeps'] = array_values(array_unique(array_filter($realExtDependencies)));
+        $result['redundantInManifest'] = array_values(array_unique(array_diff($result['manifestDeps'], $result['realDeps'])));
+        $result['notMentionedInManifest'] = array_values(array_unique(array_diff($result['realDeps'], $result['manifestDeps'])));
+        $result['missedClasses'] = $this->getMissedClasses($result['classes'], $extId);
+
+        return $result;
     }
 
     /**
@@ -180,7 +178,7 @@ class DepsInfo extends ScriptAction
      */
     private function renderJson($result)
     {
-        return json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        return json_encode($result);
     }
 
     /**
@@ -284,7 +282,7 @@ color: darkred;
     private function classToExtensionId(string $class)
     {
         if (preg_match('/^oat\\\([a-zA-Z]+).*/', $class, $matches) && isset($matches[1])) {
-            return $this->mapNamespace($matches[1]);
+            return $this->mapNamespace($matches[1], $matches[1]);
         } else if (preg_match('/^([^_\\\]+)_/', $class, $matches) && isset($matches[1])) {
             return $this->mapNamespace($matches[1]);
         }
@@ -295,9 +293,9 @@ color: darkred;
      * @param $namespace
      * @return bool
      */
-    private function mapNamespace($namespace)
+    private function mapNamespace($namespace, $default = null)
     {
-        return isset($this->namespaceMap[$namespace]) ? $this->namespaceMap[$namespace] : $namespace;
+        return isset($this->namespaceMap[$namespace]) ? $this->namespaceMap[$namespace] : $default;
     }
 
     /**
@@ -328,6 +326,7 @@ color: darkred;
             ));
 
             $this->classExistsCache[$class] = (1 !== $process->run());
+            unset($process);
         }
         return $this->classExistsCache[$class];
     }

@@ -51,7 +51,8 @@
 		"symfony/process": "^5.0",
 		"ccampbell/chromephp": "~4.1.0",
 		"nette/php-generator": "~3.3.0",
-		"dephpend/dephpend": "^0.6.3"
+		"dephpend/dephpend": "^0.6.3",
+        "czproject/git-php": "dev-master"
 	},
 	"autoload": {
 		"psr-4": {
