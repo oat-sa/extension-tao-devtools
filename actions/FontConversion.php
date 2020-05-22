@@ -72,7 +72,6 @@ class FontConversion extends tao_actions_CommonModule
         $writable = [
             $this->taoCoreExtensionDirectory . '/views/css/font/tao/',
             $this->taoCoreExtensionDirectory . '/views/scss/inc/fonts/',
-            $this->taoCoreExtensionDirectory . '/views/js/lib/ckeditor/skins/tao/scss/inc/',
             $this->taoCoreExtensionDirectory . '/helpers/',
             $this->assetsDirectory,
         ];
@@ -125,8 +124,6 @@ class FontConversion extends tao_actions_CommonModule
             $this->returnJson($scssGenerationResult);
             return false;
         }
-
-        $this->generateCkScss(); // return path to the generated file, but not used anywhere
 
         // php generation result is either the path to the php class or an array with errors
         $phpGenerationResult = $this->generatePhpClass($currentSelection->icons);
@@ -317,31 +314,6 @@ class FontConversion extends tao_actions_CommonModule
     }
 
     /**
-     * Generate scss for CK editor
-     *
-     * @return string
-     */
-    protected function generateCkScss()
-    {
-        $ckIni = parse_ini_file($this->assetsDirectory . '/ck-editor-classes.ini');
-
-        // ck toolbar icons
-        $cssContent = '@import "inc/bootstrap";' . PHP_EOL;
-        $cssContent .= '.cke_button_icon, .cke_button { @include tao-icon-setup;}' . PHP_EOL;
-
-        foreach ($ckIni as $ckIcon => $taoIcon) {
-            if (!$taoIcon) {
-                continue;
-            }
-            $cssContent .= sprintf('.%s:before { @include %s; }', $ckIcon, $taoIcon) . PHP_EOL;
-        }
-
-        file_put_contents($this->temporaryDirectory . '/_ck-icons.scss', self::DO_NOT_EDIT_TEXT . $cssContent);
-
-        return $this->temporaryDirectory . '/_ck-icons.scss';
-    }
-
-    /**
      * Generate PHP icon class
      *
      * @param $iconSet
@@ -445,11 +417,6 @@ LICENSE;
             if (!copy($scss, $this->taoCoreExtensionDirectory . '/views/scss/inc/fonts/' . basename($scss))) {
                 return $this->error(__('Failed to copy ') . $scss);
             }
-        }
-
-        // copy ck editor styles
-        if (!copy($temporaryDirectory . '/_ck-icons.scss', $this->taoCoreExtensionDirectory . '/views/js/lib/ckeditor/skins/tao/scss/inc/_ck-icons.scss')) {
-            return $this->error(__('Failed to copy ') . $temporaryDirectory . '/_ck-icons.scss');
         }
 
         // copy helper class
