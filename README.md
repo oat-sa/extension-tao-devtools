@@ -4,18 +4,16 @@ extension-tao-devtools
 extension that gather develepment tools for TAO
 
 # Scripts
-##Item generator
+## Item generator
 
 Generates given number of items and classes. 
 
-###Run
+### Run
 ```shell script
 php index.php '\oat\taoDevTools\models\ItemGenerator'
 ```
-###Info
+### Options
 ```
-Tool to generate items
-
   Optional Arguments:
     -i items_count, --items-count items_count (default: "2")
       Number of items in class. Can be int or range. Example: 5, 1-5
