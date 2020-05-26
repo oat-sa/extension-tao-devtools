@@ -10,7 +10,7 @@ Generates given number of items and classes.
 
 ### Run
 ```shell script
-php index.php '\oat\taoDevTools\models\ItemGenerator'
+php index.php '\oat\taoDevTools\models\ItemTreeGenerator'
 ```
 ### Options
 ```

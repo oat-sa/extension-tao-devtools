@@ -35,7 +35,7 @@ use oat\taoDevTools\helper\NameGenerator;
 use oat\taoQtiItem\model\qti\ImportService;
 use RuntimeException;
 
-class ItemGenerator extends ScriptAction
+class ItemTreeGenerator extends ScriptAction
 {
     private const OPTION_ITEMS_COUNT = 'items_count';
     private const OPTION_CLASS_COUNT = 'class_count';
@@ -223,7 +223,7 @@ class ItemGenerator extends ScriptAction
         $sampleFile = $this->getQtiFilePath();
 
         for ($i = 0; $i < $count; $i++) {
-            $report = ImportService::singleton()->importQTIFile($sampleFile, $class, false);
+            $report = $this->getImportService()->importQTIFile($sampleFile, $class, false);
             $item = $report->getData();
             $item->setLabel(sprintf('Item_%s', $i));
             ++$this->itemsCount;
@@ -247,5 +247,11 @@ class ItemGenerator extends ScriptAction
             ->getExtensionById('taoDevTools');
 
         return $ext->getDir() . 'data/items/sampleItem.xml';
+    }
+
+    private function getImportService(): ImportService
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->serviceLocator->get(ImportService::SERVICE_ID);
     }
 }
