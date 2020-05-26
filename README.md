@@ -9,7 +9,7 @@ extension that gather development tools for TAO
 Generates a tree of items. 
 
 ### Run
-```shell script
+```shell
 php index.php '\oat\taoDevTools\models\ItemTreeGenerator'
 ```
 ### Options
