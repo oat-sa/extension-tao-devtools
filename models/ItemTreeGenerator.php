@@ -60,21 +60,21 @@ class ItemTreeGenerator extends ScriptAction
                 'longPrefix'   => 'class-count',
                 'prefix'       => 'c',
                 'required'     => false,
-                'description'  => 'Number of classes in class. Can be int or range. Example: 5, 1-5\',',
+                'description'  => 'Number of classes in class. Can be int or range. Example: 5, 1-5',
                 'defaultValue' => '2'
             ],
             self::OPTION_NESTING_LEVEL => [
                 'longPrefix'   => 'nesting-level',
                 'prefix'       => 'n',
                 'required'     => false,
-                'description'  => 'Nesting level. Can be int or range. Example: 5, 1-5\',',
+                'description'  => 'Nesting level. Can be int or range. Example: 5, 1-5',
                 'defaultValue' => '3'
             ],
             self::OPTION_OWN_ROOT      => [
                 'longPrefix'   => self::OPTION_OWN_ROOT,
                 'prefix'       => 'r',
                 'required'     => false,
-                'description'  => 'All classes create under own root',
+                'description'  => 'Create a tree under individual root',
                 'defaultValue' => true
             ],
             self::OPTION_ROOT_CLASS    => [
@@ -98,7 +98,7 @@ class ItemTreeGenerator extends ScriptAction
 
     protected function provideDescription(): string
     {
-        return 'Tool to generate items';
+        return 'Tool to generate a tree of items';
     }
 
     /**
