@@ -119,11 +119,18 @@ class ItemTreeGenerator extends ScriptAction
 
         $this->createClasses($rootClass, 1);
 
+        if ($ownRoot) {
+            $rootClass->setLabel(
+                $this->createClassName(1, $this->classesCount)
+            );
+        }
+
         return common_report_Report::createSuccess(
             sprintf(
-                '%s classes, %s items created. Root class: %s',
+                '%s classes, %s items created. Root class: "%s" (%s)',
                 $this->classesCount,
                 $this->itemsCount,
+                $rootClass->getLabel(),
                 $rootClass->getUri()
             )
         );
@@ -145,12 +152,34 @@ class ItemTreeGenerator extends ScriptAction
         for ($i = 0; $i < $classCount; ++$i) {
             $class = $this->createClass($parentClass);
 
+            $from = $this->classesCount;
+
             if ($this->getNestingLevel() > $level) {
                 $this->createClasses($class, $level + 1);
             }
 
+            $class->setLabel(
+                $this->createClassName($from, $this->classesCount)
+            );
+
             $this->generateItem($class, $this->getItemCount());
         }
+    }
+
+    private function createClass(RdfClass $parentClass, ?string $name = null): RdfClass
+    {
+        ++$this->classesCount;
+
+        return $parentClass->createSubClass($name);
+    }
+
+    private function createClassName(int $from, int $to): string
+    {
+        $generationId = NameGenerator::generateRandomString(4);
+
+        return $from === $to
+            ? sprintf('Class %s %s ', $from, $generationId)
+            : sprintf('Class %s-%s %s ', $from, $to, $generationId);
     }
 
     /**
@@ -225,20 +254,9 @@ class ItemTreeGenerator extends ScriptAction
         for ($i = 0; $i < $count; $i++) {
             $report = $this->getImportService()->importQTIFile($sampleFile, $class, false);
             $item = $report->getData();
-            $item->setLabel(sprintf('Item_%s', $i));
+            $item->setLabel(sprintf('Item %s', $i));
             ++$this->itemsCount;
         }
-    }
-
-    private function createClass(RdfClass $parentClass): RdfClass
-    {
-        $generationId = NameGenerator::generateRandomString(4);
-
-        ++$this->classesCount;
-
-        return $parentClass->createSubClass(
-            sprintf('Class %s %s ', $this->classesCount, $generationId)
-        );
     }
 
     private function getQtiFilePath(): string
