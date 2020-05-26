@@ -90,8 +90,8 @@ class ItemTreeGenerator extends ScriptAction
     protected function provideUsage(): array
     {
         return [
-            'prefix' => 'h',
-            'longPrefix' => 'help',
+            'prefix'      => 'h',
+            'longPrefix'  => 'help',
             'description' => 'Prints a help statement'
         ];
     }
@@ -236,7 +236,9 @@ class ItemTreeGenerator extends ScriptAction
 
         ++$this->classesCount;
 
-        return $parentClass->createSubClass('Generation ' . $generationId);
+        return $parentClass->createSubClass(
+            sprintf('Class %s %s ', $this->classesCount, $generationId)
+        );
     }
 
     private function getQtiFilePath(): string
