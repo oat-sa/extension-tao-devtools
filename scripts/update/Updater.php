@@ -22,11 +22,13 @@
 
 namespace oat\taoDevTools\scripts\update;
 
+use common_ext_ExtensionUpdater;
+
 /**
  *
  * @author Joel Bout <joel@taotesting.com>
  */
-class Updater extends \common_ext_ExtensionUpdater
+class Updater extends common_ext_ExtensionUpdater
 {
     /**
      * @param string $initialVersion
@@ -34,6 +36,6 @@ class Updater extends \common_ext_ExtensionUpdater
      */
     public function update($initialVersion)
     {
-        $this->skip('0', '6.6.0');
+        $this->skip('0', '6.7.0');
     }
 }
