@@ -26,13 +26,10 @@ use PDO;
 
 class SqlProxyDriver implements \common_persistence_sql_Driver
 {
+    const OPTION_PERSISTENCE = 'persistenceId';
 
-    private $count = 0;
-    
-    /**
-     * @var string
-     */
-    protected $id;
+    /** @var QueryCounter */
+    private $counter;
 
     /**
      * @var \common_persistence_sql_Driver
@@ -49,8 +46,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
      */
     function connect($id, array $params)
     {
-
-        $this->id = $id;
+        $this->counter = new QueryCounter($id);
 
         $this->persistence = \common_persistence_SqlPersistence::getPersistence($params['persistenceId']);
 
@@ -70,7 +66,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
      */
     public function query($statement, $params, array $types = [])
     {
-        $this->count++;
+        $this->counter->count(__FUNCTION__, $statement);
         try {
             return $this->persistence->query($statement, $params, $types);
         } catch (DBALException $e) {
@@ -90,7 +86,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
      */
     public function exec($statement, $params, array $types = [])
     {
-        $this->count++;
+        $this->counter->count(__FUNCTION__, $statement);
         try {
             return $this->persistence->exec($statement, $params, $types);
         } catch (DBALException $e) {
@@ -110,7 +106,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
      */
     public function insert($tableName, array $data, array $types = [])
     {
-        $this->count++;
+        $this->counter->count(__FUNCTION__, $tableName);
         try {
             return $this->persistence->insert($tableName, $data, $types);
         } catch (DBALException $e) {
@@ -129,7 +125,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
      */
     public function insertMultiple($tableName, array $data)
     {
-        $this->count++;
+        $this->counter->count(__FUNCTION__, $tableName);
         try {
             return $this->persistence->insertMultiple($tableName, $data);
         } catch (DBALException $e) {
@@ -146,7 +142,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
      */
     public function updateMultiple($tableName, array $data)
     {
-        $this->count++;
+        $this->counter->count(__FUNCTION__, $tableName);
         try {
             return $this->persistence->updateMultiple($tableName, $data);
         } catch (DBALException $e) {
@@ -170,7 +166,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
      */
     public function getPlatForm()
     {
-        return $this->persistence->getPlatForm();
+        return new PlatformProxy($this->getDbalConnection(), $this->counter);
     }
 
     /**
@@ -194,11 +190,6 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
     public function quote($parameter, $parameter_type = PDO::PARAM_STR)
     {
         return $this->persistence->quote($parameter, $parameter_type);
-    }
-    
-    public function __destruct()
-    {
-        \common_Logger::i($this->count . ' queries to ' . $this->id);
     }
 
     /**
