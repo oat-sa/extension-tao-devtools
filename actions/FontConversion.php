@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -76,7 +77,7 @@ class FontConversion extends tao_actions_CommonModule
             $this->assetsDirectory,
         ];
 
-        foreach ($writable as $location ) {
+        foreach ($writable as $location) {
             if (!is_writable($location)) {
                 throw new RuntimeException(implode("\n<br>", $writable) . ' must be writable');
             }

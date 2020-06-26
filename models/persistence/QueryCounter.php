@@ -34,7 +34,8 @@ class QueryCounter implements LoggerAwareInterface
 
     private $functions = [];
 
-    public function __construct(string $persistenceId) {
+    public function __construct(string $persistenceId)
+    {
         $this->id = $persistenceId;
     }
 

@@ -21,10 +21,10 @@
 
 namespace oat\taoDevTools\models\logger;
 
-use \ChromePhp;
-use \common_log_BaseAppender;
-use \common_log_Item;
-use \common_Logger;
+use ChromePhp;
+use common_log_BaseAppender;
+use common_log_Item;
+use common_Logger;
 
 /**
  * Send log to the browser
