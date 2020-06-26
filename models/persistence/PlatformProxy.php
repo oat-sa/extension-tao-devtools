@@ -21,6 +21,8 @@
 
 namespace oat\taoDevTools\models\persistence;
 
+use Doctrine\DBAL\Query\QueryBuilder;
+
 class PlatformProxy extends \common_persistence_sql_Platform
 {
     /** @var QueryCounter */
@@ -32,7 +34,7 @@ class PlatformProxy extends \common_persistence_sql_Platform
         $this->counter = $counter;
     }
 
-    public function getQueryBuilder()
+    public function getQueryBuilder(): QueryBuilder
     {
         return new QueryBuilderProxy($this->dbalConnection, $this->counter);
     }

@@ -41,6 +41,7 @@ class QueryCounter implements LoggerAwareInterface
 
     function count(string $functionName, string $sqlStatement): void
     {
+        // for quick and dirty debugging
         //$this->logDebug('    '.$functionName.' '.substr(str_replace('\n', ' ', $sqlStatement), 0, 100));
         $this->count++;
         $this->functions[$functionName] = isset($this->functions[$functionName])

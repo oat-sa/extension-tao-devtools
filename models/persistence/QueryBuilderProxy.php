@@ -35,6 +35,10 @@ class QueryBuilderProxy extends QueryBuilder
         $this->counter = $counter;
     }
 
+    /**
+     * {@inheritDoc}
+     * @see \Doctrine\DBAL\Query\QueryBuilder::execute()
+     */
     public function execute()
     {
         $this->counter->count(__FUNCTION__, '');
