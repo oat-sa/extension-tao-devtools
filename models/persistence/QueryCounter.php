@@ -50,8 +50,13 @@ class QueryCounter implements LoggerAwareInterface
         ;
     }
 
+    public function getCount(): int
+    {
+        return $this->count;
+    }
+
     public function __destruct()
     {
-        $this->logInfo($this->count . ' queries to ' . $this->id, array_keys($this->functions));
+        $this->logInfo($this->getCount() . ' queries to ' . $this->id, array_keys($this->functions));
     }
 }

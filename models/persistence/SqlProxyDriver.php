@@ -23,9 +23,14 @@ namespace oat\taoDevTools\models\persistence;
 
 use Doctrine\DBAL\DBALException;
 use PDO;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\ServiceManager\ServiceLocatorAwareTrait;
+use oat\generis\persistence\PersistenceManager;
 
-class SqlProxyDriver implements \common_persistence_sql_Driver
+class SqlProxyDriver implements \common_persistence_sql_Driver, ServiceLocatorAwareInterface
 {
+    use ServiceLocatorAwareTrait;
+
     const OPTION_PERSISTENCE = 'persistenceId';
 
     /** @var QueryCounter */
@@ -48,7 +53,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
     {
         $this->counter = new QueryCounter($id);
 
-        $this->persistence = \common_persistence_SqlPersistence::getPersistence($params['persistenceId']);
+        $this->persistence = $this->getServiceLocator()->get(PersistenceManager::class)->getPersistenceById($params['persistenceId']);
 
         unset($params['persistenceId']);
 
@@ -198,5 +203,10 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
     public function getDbalConnection()
     {
         return $this->persistence->getDriver()->getDbalConnection();
+    }
+
+    public function getCounter(): ?QueryCounter
+    {
+        return $this->counter;
     }
 }
