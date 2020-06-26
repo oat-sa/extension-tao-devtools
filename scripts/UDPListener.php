@@ -23,10 +23,12 @@ class UDPListener
     private $contentFilter;
     private $highlightFilter;
     private $showTime;
+    private $showColor;
 
     public function __construct($pUrl, $pOptions = [])
     {
         $this->url = $pUrl;
+        $this->showColor = isset($pOptions['nocolor']) ? !$pOptions['nocolor'] : true;
         $this->showTime = isset($pOptions['time']) ? $pOptions['time'] : false;
         $this->prefixFilter = $this->forceRegExp(isset($pOptions['prefix']) ? $pOptions['prefix'] : null);
         $this->contentFilter = $this->forceRegExp(isset($pOptions['filter']) ? $pOptions['filter'] : null);
@@ -74,7 +76,7 @@ class UDPListener
     
     private function colorize($color = 0)
     {
-        return "\033[${color}m";
+        return $this->showColor ? "\033[${color}m" : '';
     }
 
     public function render($pData)
@@ -214,7 +216,7 @@ class Parameters
     }
 }
 
-$parameters = new Parameters(['h:', 'p:', 'x:', 'f:', 's:', 't'], ['host:', 'port:', 'prefix:', 'filter:', 'show:', 'time', 'help']);
+$parameters = new Parameters(['h:', 'p:', 'x:', 'f:', 's:', 't'], ['host:', 'port:', 'prefix:', 'filter:', 'show:', 'time', 'nocolor', 'help']);
 
 if ($parameters->has('help')) {
     die(
@@ -229,6 +231,7 @@ if ($parameters->has('help')) {
         "\t-f | --filter <filter>\tOnly show messages that match the provided filter\n" .
         "\t-s | --show <filter>\tHighlights messages that match the provided filter\n" .
         "\t-t | --time\t\tDisplay time for each message\n" .
+        "\t-nc| --no color\t\tDo not use colors\n" .
         "\t--help\t\t\tDisplay this help\n" .
         "\n"
     );
@@ -240,6 +243,7 @@ $udr = new UDPListener($url, [
     'filter' => $parameters->get('f', 'filter'),
     'prefix' => $parameters->get('x', 'prefix'),
     'highlight' => $parameters->get('s', 'show'),
-    'time' => $parameters->has('t', 'time')
+    'time' => $parameters->has('t', 'time'),
+    'nocolor' => $parameters->has('nc', 'nocolor')
 ]);
 $udr->listen();
