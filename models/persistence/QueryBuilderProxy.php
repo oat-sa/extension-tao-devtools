@@ -15,33 +15,33 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014 (original work) Open Assessment Technologies SA;
- *
+ * Copyright (c) 2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
-namespace oat\taoDevTools\scripts\update;
+namespace oat\taoDevTools\models\persistence;
 
-use common_ext_ExtensionUpdater;
+use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Connection;
 
-/**
- *
- * @author Joel Bout <joel@taotesting.com>
- * @deprecated use migrations instead. See https://github.com/oat-sa/generis/wiki/Tao-Update-Process
- */
-class Updater extends common_ext_ExtensionUpdater
+class QueryBuilderProxy extends QueryBuilder
 {
-    /**
-     * @param string $initialVersion
-     * @return string $versionUpdatedTo
-     */
-    public function update($initialVersion)
-    {
-        $this->skip('0', '6.7.0');
-        
-        //Updater files are deprecated. Please use migrations.
-        //See: https://github.com/oat-sa/generis/wiki/Tao-Update-Process
+    /** @var QueryCounter */
+    private $counter;
 
-        $this->setVersion($this->getExtension()->getManifest()->getVersion());
+    public function __construct(Connection $connection, QueryCounter $counter)
+    {
+        parent::__construct($connection);
+        $this->counter = $counter;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see \Doctrine\DBAL\Query\QueryBuilder::execute()
+     */
+    public function execute()
+    {
+        $this->counter->count(__FUNCTION__, '');
+        return parent::execute();
     }
 }

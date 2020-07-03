@@ -48,7 +48,8 @@ class DepsInfo extends ScriptAction
      */
     protected function provideDescription()
     {
-        return 'Analyzer of Tao extension dependencies' . PHP_EOL;;
+        return 'Analyzer of Tao extension dependencies' . PHP_EOL;
+        ;
     }
 
     /**
@@ -85,7 +86,7 @@ class DepsInfo extends ScriptAction
 
         if ($renderer === 'JSON') {
             $result = $this->renderJson($result, $this->getOption('render'));
-        }  else if ($renderer === 'HTML') {
+        } elseif ($renderer === 'HTML') {
             $result = $this->renderHtml($result, $this->getOption('render'));
         } else {
             throw new \Exception(sprintf('Renderer %s not found', $renderer));
@@ -100,7 +101,7 @@ class DepsInfo extends ScriptAction
     private function analyze()
     {
         if ($this->getOption('extension')) {
-            $extRoot = new SplFileInfo(ROOT_PATH.$this->getOption('extension'));
+            $extRoot = new SplFileInfo(ROOT_PATH . $this->getOption('extension'));
             $manifest = $this->getManifest($extRoot);
             $result[$manifest['name']] = $this->getUsedClasses($extRoot);
         } else {
@@ -149,7 +150,7 @@ class DepsInfo extends ScriptAction
 
     private function getMissedClasses(&$extResult, $extId)
     {
-        $autoloadScript = ROOT_PATH.'vendor/autoload.php';
+        $autoloadScript = ROOT_PATH . 'vendor/autoload.php';
         $missedClasses = [];
         $missedExtensions = [];
         foreach ($extResult['classes'] as $class) {
@@ -203,7 +204,7 @@ overflow-y: scroll;
 color: darkred;
 }
 </style>';
-        $resultHtml .='<table><tr>
+        $resultHtml .= '<table><tr>
 <th>Extension ID</th>
 <th>Used Classes</th>
 <th>Dependencies in manifest</th>
@@ -215,13 +216,13 @@ color: darkred;
         foreach ($result as $extId => $row) {
             $classes = $row['classes'];
             $resultHtml .= '<tr>
-                <td>'.$extId.'</td>
-                <td><div class="classlist">'.implode('<br>', $classes).'</div></td>
-                <td>'.implode('<br>', $row['manifestDeps']).'</td>
-                <td>'.implode('<br>', $row['realDeps']).'</td>
-                <td>'.implode('<br>', $row['redundantInManifest']).'</td>
-                <td><div class="missed">'.implode('<br>', $row['notMentionedInManifest']).'</div></td>
-                <td><div class="missed">'.implode('<br>', $row['cyclicDeps']).'</div></td>
+                <td>' . $extId . '</td>
+                <td><div class="classlist">' . implode('<br>', $classes) . '</div></td>
+                <td>' . implode('<br>', $row['manifestDeps']) . '</td>
+                <td>' . implode('<br>', $row['realDeps']) . '</td>
+                <td>' . implode('<br>', $row['redundantInManifest']) . '</td>
+                <td><div class="missed">' . implode('<br>', $row['notMentionedInManifest']) . '</div></td>
+                <td><div class="missed">' . implode('<br>', $row['cyclicDeps']) . '</div></td>
                 </tr>';
         }
         $resultHtml .=  '</table>';
@@ -235,7 +236,7 @@ color: darkred;
      */
     private function getManifest(SplFileInfo $fileInfo)
     {
-        $path = $fileInfo->getRealPath().DIRECTORY_SEPARATOR.'manifest.php';
+        $path = $fileInfo->getRealPath() . DIRECTORY_SEPARATOR . 'manifest.php';
         if (file_exists($path)) {
             return require $path;
         }
@@ -248,7 +249,7 @@ color: darkred;
      */
     private function getComposer(SplFileInfo $fileInfo)
     {
-        $path = $fileInfo->getRealPath().DIRECTORY_SEPARATOR.'composer.json';
+        $path = $fileInfo->getRealPath() . DIRECTORY_SEPARATOR . 'composer.json';
         if (file_exists($path)) {
             return json_decode(file_get_contents($path), true);
         }
@@ -285,7 +286,7 @@ color: darkred;
     {
         if (preg_match('/^oat\\\([a-zA-Z]+).*/', $class, $matches) && isset($matches[1])) {
             return $this->mapNamespace($matches[1]);
-        } else if (preg_match('/^([^_\\\]+)_/', $class, $matches) && isset($matches[1])) {
+        } elseif (preg_match('/^([^_\\\]+)_/', $class, $matches) && isset($matches[1])) {
             return $this->mapNamespace($matches[1]);
         }
         return null;
@@ -303,7 +304,7 @@ color: darkred;
     /**
      * @param $deps
      */
-    private function checkСyclicDep(&$deps):void
+    private function checkСyclicDep(&$deps): void
     {
         foreach ($deps as $extId => &$extDeps) {
             $extDeps['cyclicDeps'] = [];
