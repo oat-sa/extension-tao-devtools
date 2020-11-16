@@ -1,5 +1,7 @@
 <?php
 
+use oat\taoDevTools\scripts\update\Updater;
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -36,6 +38,7 @@ return [
         ['grant', 'http://www.tao.lu/Ontologies/TAO.rdf#SysAdminRole', ['ext' => 'taoDevTools']],
     ],
     'uninstall' => [],
+    'update' => Updater::class,
     'routes' => [
         '/taoDevTools' => 'oat\\taoDevTools\\actions',
     ],
