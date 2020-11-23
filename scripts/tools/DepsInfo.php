@@ -48,7 +48,7 @@ class DepsInfo extends ScriptAction
      */
     protected function provideDescription()
     {
-        return 'Analyzer of Tao extension dependencies' . PHP_EOL;;
+        return 'Analyzer of Tao extension dependencies' . PHP_EOL;
     }
 
     /**
@@ -99,7 +99,7 @@ class DepsInfo extends ScriptAction
     private function analyze()
     {
         if ($this->getOption('extension')) {
-            $extRoot = new SplFileInfo(ROOT_PATH.$this->getOption('extension'));
+            $extRoot = new SplFileInfo(ROOT_PATH . $this->getOption('extension'));
             $manifest = $this->getManifest($extRoot);
             $result[$manifest['name']] = $this->analiseExtension($extRoot);
         } else {
@@ -126,7 +126,7 @@ class DepsInfo extends ScriptAction
 
     private function getMissedClasses($classes, $extId)
     {
-        $autoloadScript = ROOT_PATH.'vendor/autoload.php';
+        $autoloadScript = ROOT_PATH . 'vendor/autoload.php';
         $missedClasses = [];
         $missedExtensions = [];
         foreach ($classes as $class) {
@@ -178,7 +178,7 @@ class DepsInfo extends ScriptAction
      */
     private function renderJson($result)
     {
-        return json_encode($result);
+        return json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 
     /**
@@ -201,7 +201,7 @@ overflow-y: scroll;
 color: darkred;
 }
 </style>';
-        $resultHtml .='<table><tr>
+        $resultHtml .= '<table><tr>
 <th>Extension ID</th>
 <th>Used Classes</th>
 <th>Dependencies in manifest</th>
@@ -213,13 +213,13 @@ color: darkred;
         foreach ($result as $extId => $row) {
             $classes = $row['classes'];
             $resultHtml .= '<tr>
-                <td>'.$extId.'</td>
-                <td><div class="classlist">'.implode('<br>', $classes).'</div></td>
-                <td>'.implode('<br>', $row['manifestDeps']).'</td>
-                <td>'.implode('<br>', $row['realDeps']).'</td>
-                <td>'.implode('<br>', $row['redundantInManifest']).'</td>
-                <td><div class="missed">'.implode('<br>', $row['notMentionedInManifest']).'</div></td>
-                <td><div class="missed">'.implode('<br>', $row['cyclicDeps']).'</div></td>
+                <td>' . $extId . '</td>
+                <td><div class="classlist">' . implode('<br>', $classes) . '</div></td>
+                <td>' . implode('<br>', $row['manifestDeps']) . '</td>
+                <td>' . implode('<br>', $row['realDeps']) . '</td>
+                <td>' . implode('<br>', $row['redundantInManifest']) . '</td>
+                <td><div class="missed">' . implode('<br>', $row['notMentionedInManifest']) . '</div></td>
+                <td><div class="missed">' . implode('<br>', $row['cyclicDeps']) . '</div></td>
                 </tr>';
         }
         $resultHtml .=  '</table>';
@@ -233,7 +233,7 @@ color: darkred;
      */
     private function getManifest(SplFileInfo $fileInfo)
     {
-        $path = $fileInfo->getRealPath().DIRECTORY_SEPARATOR.'manifest.php';
+        $path = $fileInfo->getRealPath() . DIRECTORY_SEPARATOR . 'manifest.php';
         if (file_exists($path)) {
             return require $path;
         }
@@ -246,7 +246,7 @@ color: darkred;
      */
     private function getComposer(SplFileInfo $fileInfo)
     {
-        $path = $fileInfo->getRealPath().DIRECTORY_SEPARATOR.'composer.json';
+        $path = $fileInfo->getRealPath() . DIRECTORY_SEPARATOR . 'composer.json';
         if (file_exists($path)) {
             return json_decode(file_get_contents($path), true);
         }
@@ -301,7 +301,7 @@ color: darkred;
     /**
      * @param $deps
      */
-    private function checkСyclicDep(&$deps):void
+    private function checkСyclicDep(&$deps): void
     {
         foreach ($deps as $extId => &$extDeps) {
             $extDeps['cyclicDeps'] = [];

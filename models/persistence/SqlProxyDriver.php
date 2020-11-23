@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2020 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
@@ -23,16 +23,18 @@ namespace oat\taoDevTools\models\persistence;
 
 use Doctrine\DBAL\DBALException;
 use PDO;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\ServiceManager\ServiceLocatorAwareTrait;
+use oat\generis\persistence\PersistenceManager;
 
-class SqlProxyDriver implements \common_persistence_sql_Driver
+class SqlProxyDriver implements \common_persistence_sql_Driver, ServiceLocatorAwareInterface
 {
+    use ServiceLocatorAwareTrait;
 
-    private $count = 0;
-    
-    /**
-     * @var string
-     */
-    protected $id;
+    const OPTION_PERSISTENCE = 'persistenceId';
+
+    /** @var QueryCounter */
+    private $counter;
 
     /**
      * @var \common_persistence_sql_Driver
@@ -49,10 +51,9 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
      */
     function connect($id, array $params)
     {
+        $this->counter = new QueryCounter($id);
 
-        $this->id = $id;
-
-        $this->persistence = \common_persistence_SqlPersistence::getPersistence($params['persistenceId']);
+        $this->persistence = $this->getServiceLocator()->get(PersistenceManager::class)->getPersistenceById($params['persistenceId']);
 
         unset($params['persistenceId']);
 
@@ -70,7 +71,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
      */
     public function query($statement, $params, array $types = [])
     {
-        $this->count++;
+        $this->counter->count(__FUNCTION__, $statement);
         try {
             return $this->persistence->query($statement, $params, $types);
         } catch (DBALException $e) {
@@ -90,7 +91,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
      */
     public function exec($statement, $params, array $types = [])
     {
-        $this->count++;
+        $this->counter->count(__FUNCTION__, $statement);
         try {
             return $this->persistence->exec($statement, $params, $types);
         } catch (DBALException $e) {
@@ -110,7 +111,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
      */
     public function insert($tableName, array $data, array $types = [])
     {
-        $this->count++;
+        $this->counter->count(__FUNCTION__, $tableName);
         try {
             return $this->persistence->insert($tableName, $data, $types);
         } catch (DBALException $e) {
@@ -129,7 +130,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
      */
     public function insertMultiple($tableName, array $data)
     {
-        $this->count++;
+        $this->counter->count(__FUNCTION__, $tableName);
         try {
             return $this->persistence->insertMultiple($tableName, $data);
         } catch (DBALException $e) {
@@ -146,7 +147,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
      */
     public function updateMultiple($tableName, array $data)
     {
-        $this->count++;
+        $this->counter->count(__FUNCTION__, $tableName);
         try {
             return $this->persistence->updateMultiple($tableName, $data);
         } catch (DBALException $e) {
@@ -170,7 +171,7 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
      */
     public function getPlatForm()
     {
-        return $this->persistence->getPlatForm();
+        return new PlatformProxy($this->getDbalConnection(), $this->counter);
     }
 
     /**
@@ -195,11 +196,6 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
     {
         return $this->persistence->quote($parameter, $parameter_type);
     }
-    
-    public function __destruct()
-    {
-        \common_Logger::i($this->count . ' queries to ' . $this->id);
-    }
 
     /**
      * @return \Doctrine\DBAL\Connection
@@ -207,5 +203,10 @@ class SqlProxyDriver implements \common_persistence_sql_Driver
     public function getDbalConnection()
     {
         return $this->persistence->getDriver()->getDbalConnection();
+    }
+
+    public function getCounter(): ?QueryCounter
+    {
+        return $this->counter;
     }
 }
