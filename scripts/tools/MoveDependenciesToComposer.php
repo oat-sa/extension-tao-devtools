@@ -58,6 +58,14 @@ class MoveDependenciesToComposer extends ScriptAction
         'taoTestTaker' => [
             'taoGroups',//check if taoGroups enabled
         ],
+        'taoItems' => [
+            'taoQtiItem',
+        ],
+        'taoMediaManager' => [
+            'taoQtiItem',
+            'taoItems',
+            'taoRevision',
+        ],
         'taoQtiTest' => [
             'taoDelivery',
             'taoProctoring',
@@ -68,8 +76,10 @@ class MoveDependenciesToComposer extends ScriptAction
             'taoResultServer',
         ],
         'taoDeliveryRdf' => [
-            'taoResultServer'
-        ]
+            'taoResultServer',
+            'taoGroups',
+        ],
+
     ];
 
     /**
@@ -115,13 +125,10 @@ class MoveDependenciesToComposer extends ScriptAction
         $deps = $this->getDependencies();
         $dir = new DirectoryIterator(ROOT_PATH);
         foreach ($dir as $extDir) {
-            if ($extDir->isDot()) {
-                continue;
-            }
             $composerPath = $extDir->getRealPath() . DIRECTORY_SEPARATOR . 'composer.json';
             $composerArray = $this->getComposer($composerPath);
             $extId = $composerArray['extra']['tao-extension-name'];
-            if ($extId !== 'taoGroups') {
+            if ($extDir->isDot() || !isset($deps[$extId])) {
                 continue;
             }
             if ($composerArray === null || in_array($extId, $this->extToSkip)) {
@@ -130,10 +137,9 @@ class MoveDependenciesToComposer extends ScriptAction
             $this->extReport = new Report(Report::TYPE_INFO, sprintf('Processing extension %s ...', $extDir));
             $this->extReport->add($this->prepareLocalRepo($extDir));
             $this->extReport->add($this->updateComposerJson($extDir, $deps[$extId]));
-            $this->extReport->add($this->createJenkinsFile($extDir, $composerArray['name'], $extId));
-            if ($extId === 'taoGroups') {
-                $this->extReport->add($this->pushChanges($extDir));
-            }
+            //if ($extId === 'taoGroups') {
+            //    $this->extReport->add($this->pushChanges($extDir));
+            // }
             $this->report->add($this->extReport);
         }
         return $this->report;
@@ -157,26 +163,16 @@ class MoveDependenciesToComposer extends ScriptAction
         $composerPath = $extDir->getRealPath() . DIRECTORY_SEPARATOR . 'composer.json';
         $composerArray = $this->getComposer($composerPath);
         $extId = $composerArray['extra']['tao-extension-name'];
-        foreach ($extDeps['realDeps'] as $realDep) {
-            if (isset($taoPackages[$realDep]) && !$this->skipDependency($extId, $realDep)) {
-                $composerArray['require'][$taoPackages[$realDep]] = '*';
+        if (is_array($extDeps['manifestDeps'])) {
+            foreach ($extDeps['manifestDeps'] as $realDep) {
+                if (isset($taoPackages[$realDep]) && !$this->skipDependency($extId, $realDep)) {
+                    $composerArray['require'][$taoPackages[$realDep]] = '*';
+                }
             }
+            $composerJson = json_encode($composerArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            file_put_contents($composerPath, $composerJson);
         }
-        $composerJson = json_encode($composerArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-        file_put_contents($composerPath, $composerJson);
         return Report::createInfo(sprintf('Composer file of %s has been updated', $extId));
-    }
-
-    private function createJenkinsFile(SplFileInfo $extDir, $extRepo, $extId)
-    {
-        $replacements = [
-            '<repoName>' => $extRepo,
-            '<extName>' => $extId,
-        ];
-        $filePath = $extDir->getRealPath() . DIRECTORY_SEPARATOR.'.Jenkinsfile';
-        $code = strtr($this->getTemplate(), $replacements);
-        file_put_contents($filePath, $code);
-        return Report::createInfo(sprintf('Jenkinsfile file of %s has been created', $extId));
     }
 
     private function prepareLocalRepo(SplFileInfo $extDir)
@@ -185,6 +181,7 @@ class MoveDependenciesToComposer extends ScriptAction
         $repo = new GitRepository($extDir->getRealPath());
         $message = array_merge($message, $repo->execute(['add', '.']));
         $message = array_merge($message, $repo->execute(['reset', '--hard']));
+        /*
         $message = array_merge($message, $repo->execute(['checkout', 'develop']));
         try {
             $message = array_merge($message, $repo->execute(['branch', '-D', self::GIT_BRANCH_NAME]));
@@ -192,6 +189,7 @@ class MoveDependenciesToComposer extends ScriptAction
             //branch does not exist. Do nothing
         }
         $message = array_merge($message, $repo->execute(['checkout', '-b', self::GIT_BRANCH_NAME]));
+         */
         return Report::createInfo(implode(PHP_EOL, $message));
     }
 
@@ -200,7 +198,7 @@ class MoveDependenciesToComposer extends ScriptAction
         $message = ['Push changes to the remote repository:'];
         $repo = new GitRepository($extDir->getRealPath());
         $message = array_merge($message, $repo->execute(['add', '.']));
-        $message = array_merge($message, $repo->execute(['commit', '-m', 'Move dependencies to composer.json; Add Jenkinsfile;']));
+        $message = array_merge($message, $repo->execute(['commit', '-m', 'Move dependencies to composer.json;']));
         try {
             $message = array_merge($message, $repo->execute(['push', '-d', 'origin', self::GIT_BRANCH_NAME]));
         } catch (GitException $e) {
@@ -208,15 +206,6 @@ class MoveDependenciesToComposer extends ScriptAction
         }
         $message = array_merge($message, $repo->execute(['push', 'origin', self::GIT_BRANCH_NAME]));
         return Report::createInfo(implode(PHP_EOL, $message));
-    }
-
-    /**
-     * @return string
-     */
-    private function getTemplate()
-    {
-        $path = __DIR__.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.'jenkinsfile_tpl';
-        return file_get_contents($path);
     }
 
     /**

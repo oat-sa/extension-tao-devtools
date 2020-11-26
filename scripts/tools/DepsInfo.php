@@ -60,7 +60,7 @@ class DepsInfo extends ScriptAction
     {
         return [
             'render' => [
-                'prefix'       => '-r',
+                'prefix'       => 'r',
                 'longPrefix'   => 'render',
                 'cast'         => 'string',
                 'required'     => false,
@@ -124,25 +124,6 @@ class DepsInfo extends ScriptAction
         return $result;
     }
 
-    private function getMissedClasses($classes, $extId)
-    {
-        $autoloadScript = ROOT_PATH . 'vendor/autoload.php';
-        $missedClasses = [];
-        $missedExtensions = [];
-        foreach ($classes as $class) {
-            $classExtension = $this->classToExtensionId($class);
-            if ($classExtension === $extId) {
-                continue;
-            }
-            $extensions[] = $classExtension;
-            if (!$this->_class_exists($autoloadScript, $class)) {
-                $missedExtensions[] = $classExtension;
-                $missedClasses[] = $class;
-            }
-        }
-        return $missedClasses;
-    }
-
     private function analiseExtension(\SplFileInfo $extRoot)
     {
         $result = [];
@@ -170,6 +151,25 @@ class DepsInfo extends ScriptAction
         $result['missedClasses'] = $this->getMissedClasses($result['classes'], $extId);
 
         return $result;
+    }
+
+    private function getMissedClasses($classes, $extId)
+    {
+        $autoloadScript = ROOT_PATH . 'vendor/autoload.php';
+        $missedClasses = [];
+        $missedExtensions = [];
+        foreach ($classes as $class) {
+            $classExtension = $this->classToExtensionId($class);
+            if ($classExtension === $extId) {
+                continue;
+            }
+            $extensions[] = $classExtension;
+            if (!$this->_class_exists($autoloadScript, $class)) {
+                $missedExtensions[] = $classExtension;
+                $missedClasses[] = $class;
+            }
+        }
+        return $missedClasses;
     }
 
     /**
