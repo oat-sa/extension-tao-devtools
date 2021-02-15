@@ -124,15 +124,12 @@ class ExtensionCreator
         $map = [
             '{id}' => $this->id,
             '{name}' => self::escape($this->label),
-            '{version}' => self::escape($this->version),
             '{author}' => self::escape($this->author),
             '{license}' => self::escape($this->license),
             '{description}' => self::escape($this->description),
             '{authorNs}' => $this->authorNamespace,
             '{dependencies}' => 'array(\'' . implode('\',\'', array_keys($this->requires)) . '\')',
-            '{requires}' => \common_Utils::toHumanReadablePhpString($this->requires, 1),
             '{managementRole}' => GenerisRdf::GENERIS_NS . '#' . $this->id . 'Manager',
-            '{licenseBlock}' => $this->getLicense(),
             '{installScripts}' => $this->substituteConstantTemplates(\common_Utils::toHumanReadablePhpString($this->installScripts, 1)),
             '{devtools}' => \common_ext_ExtensionsManager::singleton()->getInstalledVersion('taoDevTools')
         ];
