@@ -21,6 +21,7 @@ namespace oat\taoDevTools\test\unit\models\persistence;
 
 use oat\generis\test\TestCase;
 use oat\generis\test\SqlMockTrait;
+use oat\oatbox\log\LoggerService;
 use oat\taoDevTools\models\persistence\SqlProxyDriver;
 use oat\generis\persistence\PersistenceManager;
 
@@ -33,7 +34,8 @@ class SqlProxyDriverTest extends TestCase
         $persistenceManager = $this->getSqlMock('memory');
         $driver = new SqlProxyDriver();
         $driver->setServiceLocator($this->getServiceLocatorMock([
-            PersistenceManager::class => $persistenceManager
+            PersistenceManager::class => $persistenceManager,
+            'generis/log' => $this->createMock(LoggerService::class)
         ]));
         $persistence = $driver->connect('proxy', ['persistenceId' => 'memory']);
         $this->assertInstanceOf(\common_persistence_SqlPersistence::class, $persistence);
