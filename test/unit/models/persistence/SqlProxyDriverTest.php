@@ -41,6 +41,7 @@ class SqlProxyDriverTest extends TestCase
         $this->assertInstanceOf(\common_persistence_SqlPersistence::class, $persistence);
 
         $counter = $driver->getCounter();
+        $counter->setLogger($this->createMock(LoggerService::class));
         $this->assertEquals(0, $counter->getCount());
         $persistence->query('SELECT 1;');
         $this->assertEquals(1, $counter->getCount());
