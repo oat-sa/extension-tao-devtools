@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint116\n"
-"PO-Revision-Date: 2019-12-06T15:10:04\n"
+"Project-Id-Version: TAO 3.4.0-sprint149\n"
+"PO-Revision-Date: 2021-02-26T10:01:43\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: en-US\n"
@@ -74,6 +74,9 @@ msgstr ""
 msgid "Create new extension"
 msgstr ""
 
+msgid "CSS compilation failed"
+msgstr ""
+
 msgid "Description"
 msgstr ""
 
@@ -106,10 +109,13 @@ msgstr ""
 msgid "Extensions manager"
 msgstr ""
 
+msgid "Failed to copy "
+msgstr ""
+
 msgid "File upload failed"
 msgstr ""
 
-msgid "Font incomplete!  Is the extension in sync width git?  Have you removed any glyphs?"
+msgid "Font incomplete! Is the extension in sync with git? Have you removed any glyphs?"
 msgstr ""
 
 msgid "Generate"
@@ -155,9 +161,6 @@ msgstr ""
 
 #, tao-public
 msgid "Key checker"
-msgstr ""
-
-msgid "License"
 msgstr ""
 
 msgid "Movable"
@@ -245,6 +248,9 @@ msgid "TAO Icon Font"
 msgstr ""
 
 msgid "Testtakers generated in class %s"
+msgstr ""
+
+msgid "The TAO icon font has been updated"
 msgstr ""
 
 msgid "Tool description"
