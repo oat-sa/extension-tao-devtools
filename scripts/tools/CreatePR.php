@@ -27,7 +27,13 @@ use SplFileInfo;
 use Cz\Git\GitRepository;
 use Cz\Git\GitException;
 
-class AddActions extends ScriptAction
+/**
+ * NOTE: install github cli: https://github.com/cli/cli
+ *
+ * Class CreatePR
+ * @package oat\taoDevTools\scripts\tools
+ */
+class CreatePR extends ScriptAction
 {
     private const GIT_BRANCH_NAME = 'ci/automated_release';
     private const GIT_COMMIT_MESSAGE = 'ci: add automated release github action';
@@ -58,7 +64,7 @@ class AddActions extends ScriptAction
                 'longPrefix'   => 'extension',
                 'cast'         => 'string',
                 'required'     => true,
-                'description'  => 'Extensions id. All extensions will be precessed if not given',
+                'description'  => 'Extensions id.',
                 'defaultValue' => ''
             ]
         ];
