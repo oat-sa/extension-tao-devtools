@@ -46,13 +46,16 @@
 	"minimum-stability": "dev",
 	"require": {
 		"oat-sa/oatbox-extension-installer": "~1.1||dev-master",
-		"oat-sa/tao-core": "*",
-		"oat-sa/generis": "*",
 		"symfony/process": "^5.0",
 		"ccampbell/chromephp": "~4.1.0",
 		"nette/php-generator": "~3.3.0",
 		"dephpend/dephpend": "^0.6.3",
-        "czproject/git-php": "dev-master"
+		"oat-sa/generis" : ">=14.0.0",
+		"oat-sa/tao-core" : ">=47.0.0",
+		"oat-sa/extension-tao-group" : ">=7.0.0",
+		"oat-sa/extension-tao-item" : ">=11.0.0",
+		"oat-sa/extension-tao-itemqti" : ">=27.0.0",
+		"czproject/git-php": "dev-master"
 	},
 	"autoload": {
 		"psr-4": {
