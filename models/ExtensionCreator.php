@@ -31,23 +31,23 @@ use oat\generis\model\GenerisRdf;
  */
 class ExtensionCreator
 {
-    
+
     private $id;
-    
+
     private $label;
-    
+
     private $version;
-    
+
     private $author;
-    
+
     private $authorNamespace;
-    
+
     private $license;
-    
+
     private $description;
-    
+
     private $requires;
-    
+
     private $options;
 
     private $installScripts = [];
@@ -68,14 +68,14 @@ class ExtensionCreator
         }
         $this->options = $options;
     }
-    
+
     private function validate()
     {
         // is root writable
         // does extension exist?
         return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, __('Extension can be created'));
     }
-    
+
     public function run()
     {
         try {
@@ -90,14 +90,14 @@ class ExtensionCreator
             $this->writebaseFiles();
             $this->addAutoloader();
             $this->prepareLanguages();
-            
+
             return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, __('Extension %s created. Before you install the extension make sure you add it to /vendor/composer/autoload_psr4.php', $this->label));
         } catch (\Exception $e) {
             \common_Logger::w('Failed creating extension "' . $this->id . '": ' . $e->getMessage());
             return new \common_report_Report(\common_report_Report::TYPE_ERROR, __('Unable to create extension %s, please consult log.', $this->label));
         }
     }
-    
+
     protected function createDirectoryStructure()
     {
         $extDir = $this->getDestinationDirectory();
@@ -105,7 +105,7 @@ class ExtensionCreator
             $extDir . 'locales',
             $extDir . 'model'
         ];
-        
+
         foreach ($dirs as $dirPath) {
             if (!file_exists($dirPath) && !mkdir($dirPath, 0770, true)) {
                 throw new \common_Exception('Could not create directory "' . $dirPath . '"');
@@ -113,7 +113,7 @@ class ExtensionCreator
         }
         return $extDir;
     }
-    
+
     protected function copyFile($file, $destination = null, $extra = [])
     {
         $sample = file_get_contents(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . $file . '.sample');
@@ -121,6 +121,8 @@ class ExtensionCreator
         if (!file_exists(dirname($destination))) {
             mkdir(dirname($destination), 0770, true);
         }
+        $dependencies = 'array(\'' . implode('\',\'', array_keys($this->requires)) . '\')';
+
         $map = [
             '{id}' => $this->id,
             '{name}' => self::escape($this->label),
@@ -128,22 +130,24 @@ class ExtensionCreator
             '{license}' => self::escape($this->license),
             '{description}' => self::escape($this->description),
             '{authorNs}' => $this->authorNamespace,
-            '{dependencies}' => 'array(\'' . implode('\',\'', array_keys($this->requires)) . '\')',
+            '{dependencies}' => $dependencies,
+            '{requires}' => $dependencies,
             '{managementRole}' => GenerisRdf::GENERIS_NS . '#' . $this->id . 'Manager',
             '{installScripts}' => $this->substituteConstantTemplates(\common_Utils::toHumanReadablePhpString($this->installScripts, 1)),
-            '{devtools}' => \common_ext_ExtensionsManager::singleton()->getInstalledVersion('taoDevTools')
+            '{devtools}' => \common_ext_ExtensionsManager::singleton()->getInstalledVersion('taoDevTools'),
+            '{licenseBlock}' => '/** Test */' //@TODO Add proper doc
         ];
         $map = array_merge($map, $extra);
         $content = str_replace(array_keys($map), array_values($map), $sample);
         return file_put_contents($destination, $content);
     }
-    
+
     protected function writeBaseFiles()
     {
         $this->copyFile('manifest.php');
         $this->copyFile('composer.json');
     }
-    
+
     protected function addSampleStructure()
     {
         $controllerName = ucfirst($this->id);
@@ -187,7 +191,7 @@ class ExtensionCreator
         foreach ($paths as $path) {
             $templates = array_merge($templates, glob($samplePath . implode(DIRECTORY_SEPARATOR, $path)));
         }
-        
+
         foreach ($templates as $template) {
             $template = \tao_helpers_File::getRelPath($samplePath, $template);
             $template = substr($template, 0, strrpos($template, '.'));
@@ -209,7 +213,7 @@ class ExtensionCreator
         ];
         new \tao_scripts_TaoTranslate([], $options);
     }
-    
+
     /**
      * Add the autoloader manually to the composer,
      * will break on next update
@@ -218,20 +222,20 @@ class ExtensionCreator
     {
         $autoloaderFile = VENDOR_PATH . 'composer/autoload_psr4.php';
         $content = file_get_contents($autoloaderFile);
-        
+
         $lineToAdd = PHP_EOL . '    \'' . $this->authorNamespace . '\\\\' . $this->id . '\\\\\' => array($baseDir . \'/' . $this->id . '\'),';
         $content = str_replace('return array(', 'return array(' . $lineToAdd, $content);
-        
+
         $content = file_put_contents($autoloaderFile, $content);
     }
-    
+
     // UTILS
-    
+
     protected function getDestinationDirectory()
     {
         return EXTENSION_PATH . $this->id . DIRECTORY_SEPARATOR;
     }
-    
+
     protected function getLicense()
     {
         $licenseDirectory = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'licenses' . DIRECTORY_SEPARATOR;
@@ -247,7 +251,7 @@ class ExtensionCreator
             $content
         );
     }
-    
+
     protected static function escape($value)
     {
         return str_replace('\'', '\\\'', str_replace('\\', '\\\\', $value));
