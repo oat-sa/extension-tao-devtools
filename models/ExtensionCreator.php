@@ -135,7 +135,8 @@ class ExtensionCreator
             '{managementRole}' => GenerisRdf::GENERIS_NS . '#' . $this->id . 'Manager',
             '{installScripts}' => $this->substituteConstantTemplates(\common_Utils::toHumanReadablePhpString($this->installScripts, 1)),
             '{devtools}' => \common_ext_ExtensionsManager::singleton()->getInstalledVersion('taoDevTools'),
-            '{licenseBlock}' => '/** Test */' //@TODO Add proper doc
+            '{licenseBlock}' => $this->getDocblock(),
+            '{version}' => $this->version,
         ];
         $map = array_merge($map, $extra);
         $content = str_replace(array_keys($map), array_values($map), $sample);
@@ -291,5 +292,27 @@ class ExtensionCreator
             $lines[] = str_replace([$quote . $quote . '.', '.' . $quote . $quote], '', $line);
         }
         return implode(PHP_EOL, $lines);
+    }
+
+    private function getDocblock(): string
+    {
+        return '/*        
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; under version 2
+ * of the License (non-upgradable).
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * Copyright (c) ' . date('Y'). ' (original work) Open Assessment Technologies SA;
+ */';
     }
 }
