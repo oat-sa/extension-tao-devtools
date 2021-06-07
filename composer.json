@@ -51,10 +51,10 @@
 		"nette/php-generator": "~3.3.0",
 		"dephpend/dephpend": "^0.6.3",
 		"oat-sa/generis" : ">=14.0.0",
-		"oat-sa/tao-core" : ">=47.0.0",
+		"oat-sa/tao-core" : ">=48.11.0",
 		"oat-sa/extension-tao-group" : ">=7.0.0",
 		"oat-sa/extension-tao-item" : ">=11.0.0",
-		"oat-sa/extension-tao-itemqti" : ">=27.0.0"
+		"oat-sa/extension-tao-itemqti" : ">=28.2.0"
 	},
 	"autoload": {
 		"psr-4": {
