@@ -1,5 +1,8 @@
 <?php
 
+use EasyRdf\Format;
+use EasyRdf\Graph;
+
 class taoDevTools_models_RdfDiff
 {
 
@@ -65,13 +68,13 @@ class taoDevTools_models_RdfDiff
         }
         
        
-        $modelDefinition = new EasyRdf_Graph();
+        $modelDefinition = new Graph();
         $modelDefinition->parseFile($file);
         /*
         $graph = $modelDefinition->toRdfPhp();
         $resources = $modelDefinition->resources();
         */
-        $format = EasyRdf_Format::getFormat('php');
+        $format = Format::getFormat('php');
         $data = $modelDefinition->serialise($format);
         
         $triples = [];

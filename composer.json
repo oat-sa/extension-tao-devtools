@@ -50,7 +50,7 @@
 		"ccampbell/chromephp": "~4.1.0",
 		"nette/php-generator": "~3.3.0",
 		"dephpend/dephpend": "^0.6.3",
-		"oat-sa/generis" : ">=14.0.0",
+		"oat-sa/generis" : ">=15.17.0",
 		"oat-sa/tao-core" : ">=48.11.0",
 		"oat-sa/extension-tao-group" : ">=7.0.0",
 		"oat-sa/extension-tao-item" : ">=11.0.0",
