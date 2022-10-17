@@ -23,6 +23,8 @@ namespace oat\taoDevTools\models;
 
 use Jig\Utils\StringUtils;
 use oat\generis\model\GenerisRdf;
+use oat\oatbox\extension\ComposerInfo;
+use oat\oatbox\service\ServiceManager;
 
 /**
  * Creates a new extension
@@ -31,12 +33,9 @@ use oat\generis\model\GenerisRdf;
  */
 class ExtensionCreator
 {
-
     private $id;
 
     private $label;
-
-    private $version;
 
     private $author;
 
@@ -52,11 +51,10 @@ class ExtensionCreator
 
     private $installScripts = [];
 
-    public function __construct($id, $name, $version, $author, $namespace, $license, $description, $dependencies, $options)
+    public function __construct($id, $name, $author, $namespace, $license, $description, $dependencies, $options)
     {
         $this->id = $id;
         $this->label = $name;
-        $this->version = $version;
         $this->author = $author;
         $this->authorNamespace = $namespace;
         $this->license = $license;
@@ -123,6 +121,8 @@ class ExtensionCreator
         }
         $dependencies = 'array(\'' . implode('\',\'', array_keys($this->requires)) . '\')';
 
+        $requires = $this->getComposerRequires();
+
         $map = [
             '{id}' => $this->id,
             '{name}' => self::escape($this->label),
@@ -131,12 +131,11 @@ class ExtensionCreator
             '{description}' => self::escape($this->description),
             '{authorNs}' => $this->authorNamespace,
             '{dependencies}' => $dependencies,
-            '{requires}' => $dependencies,
+            '{requires}' => $requires,
             '{managementRole}' => GenerisRdf::GENERIS_NS . '#' . $this->id . 'Manager',
             '{installScripts}' => $this->substituteConstantTemplates(\common_Utils::toHumanReadablePhpString($this->installScripts, 1)),
             '{devtools}' => \common_ext_ExtensionsManager::singleton()->getInstalledVersion('taoDevTools'),
-            '{licenseBlock}' => $this->getDocblock(),
-            '{version}' => $this->version,
+            '{licenseBlock}' => $this->getDocblock()
         ];
         $map = array_merge($map, $extra);
         $content = str_replace(array_keys($map), array_values($map), $sample);
@@ -294,9 +293,27 @@ class ExtensionCreator
         return implode(PHP_EOL, $lines);
     }
 
+    private function getComposerRequires(): string
+    {
+        /** @var \common_ext_ExtensionsManager $service */
+        $service = ServiceManager::getServiceManager()->get(\common_ext_ExtensionsManager::SERVICE_ID);
+        $requires = [];
+
+        foreach ($this->requires as $id => $version) {
+            $composerInfo = new ComposerInfo($service->getExtensionById($id)->getDir());
+            $requires[]  = sprintf('"%s": "%s"', $composerInfo->getPackageId(), $version);
+        }
+
+        if (!empty($requires)) {
+            return implode(',', $requires);
+        } else {
+            return '';
+        }
+    }
+
     private function getDocblock(): string
     {
-        return '/*        
+        return '/**        
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

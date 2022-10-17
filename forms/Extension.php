@@ -75,11 +75,6 @@ class Extension extends \tao_helpers_form_FormContainer
         $idElt->addValidator(\tao_helpers_form_FormFactory::getValidator('NotEmpty'));
         $idElt->addValidator(\tao_helpers_form_FormFactory::getValidator('AlphaNum'));
         $this->form->addElement($idElt);
-
-        $verElt = \tao_helpers_form_FormFactory::getElement('version', 'Textbox');
-        $verElt->setDescription(__('Version'));
-        $verElt->addValidator(\tao_helpers_form_FormFactory::getValidator('NotEmpty'));
-        $this->form->addElement($verElt);
         
         $authorElt = \tao_helpers_form_FormFactory::getElement('author', 'Textbox');
         $authorElt->setDescription(__('Author'));
