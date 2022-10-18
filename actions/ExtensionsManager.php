@@ -71,7 +71,6 @@ class ExtensionsManager extends \tao_actions_ExtensionsManager
             $creator = new ExtensionCreator(
                 $myForm->getValue('name'),
                 $myForm->getValue('label'),
-                $myForm->getValue('version'),
                 $myForm->getValue('author'),
                 $myForm->getValue('authorNs'),
                 $myForm->getValue('license'),
