@@ -9,9 +9,7 @@ return array(
     'label' => '{name}',
     'description' => '{description}',
     'license' => '{license}',
-    'version' => '{version}',
     'author' => '{author}',
-    'requires' => {requires},
     'managementRole' => '{managementRole}',
     'acl' => array(
         array('grant', '{managementRole}', array('ext'=>'{id}')),
