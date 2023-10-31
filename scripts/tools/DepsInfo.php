@@ -267,6 +267,11 @@ color: darkred;
             . 'dephpend' . DIRECTORY_SEPARATOR
             . 'dephpend' . DIRECTORY_SEPARATOR
             . 'bin' . DIRECTORY_SEPARATOR . 'dephpend';
+        if (!file_exists($pathToDephpend)) {
+            throw new \RuntimeException(
+                'dePHPend extension is not installed, please install it before running command.'
+            );
+        }
         $command = 'php ' . $pathToDephpend . ' text ' . $fileInfo;
         $dependencies = shell_exec($command);
         $dependenciesArray = preg_split("/\r\n|\n|\r/", $dependencies);
