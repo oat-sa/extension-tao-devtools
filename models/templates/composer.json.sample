@@ -1,5 +1,4 @@
 {
-
     "name": "{authorNs}/{id}",
     "description" : "{description}",
     "type" : "tao-extension",
@@ -21,7 +20,7 @@
     },
     "minimum-stability" : "dev",
     "require": {
-        "oat-sa/oatbox-extension-installer": "dev-master"
+        {requires}
     },
     "autoload" : {
         "psr-4" : {

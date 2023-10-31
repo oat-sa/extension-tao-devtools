@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Creates a new student tool based on a template
  *
@@ -10,20 +11,19 @@ namespace oat\taoDevTools\actions;
 
 use Jig\Utils\StringUtils;
 
-
-class StudentToolGenerator extends \tao_actions_CommonModule {
-
+class StudentToolGenerator extends \tao_actions_CommonModule
+{
 
     /**
      * @var array
      */
-    private $data = array();
+    private $data = [];
 
 
     public function index()
     {
         $this->setView('studentToolGenerator/view.tpl');
-        if($_POST){
+        if ($_POST) {
             try {
                 $targetPath = $this -> generateTool();
                 $this->setData('message', 'Created skeleton in ' . $targetPath);
@@ -31,8 +31,7 @@ class StudentToolGenerator extends \tao_actions_CommonModule {
                     $this->setData('errorMessage', $this->getRequestParameter('errorMessage'));
                 }
                 return false;
-            }
-            catch(\Exception $e) {
+            } catch (\Exception $e) {
                 $this->setData('errorMessage', $e -> getMessage());
             }
         }
@@ -44,7 +43,8 @@ class StudentToolGenerator extends \tao_actions_CommonModule {
      *
      * @throws \Exception
      */
-    protected function generateTool() {
+    protected function generateTool()
+    {
 
         $this->data = $this->getMappedArguments();
         $generatorPath = str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__)) . '/studentToolGenerator';
@@ -56,17 +56,16 @@ class StudentToolGenerator extends \tao_actions_CommonModule {
         $patterns = $this -> getPatterns();
         $replacements = $this -> getReplacements();
 
-        foreach($objects as $tplFile => $cursor){
-            if(in_array(basename($tplFile), array('.', '..'))) {
+        foreach ($objects as $tplFile => $cursor) {
+            if (in_array(basename($tplFile), ['.', '..'])) {
                 continue;
             }
 
             $toolFile = str_replace($templatePath, $targetPath, $tplFile);
 
-            if($cursor->isDir() && !is_dir($toolFile)) {
+            if ($cursor->isDir() && !is_dir($toolFile)) {
                 mkdir($toolFile, 0755, true);
-            }
-            else if($cursor->isFile()){
+            } elseif ($cursor->isFile()) {
                 $toolFile = dirname($toolFile) . '/' . str_replace('template', $this->data['tool-base'], basename($toolFile));
                 $toolContent = str_replace($patterns, $replacements, file_get_contents($tplFile));
                 file_put_contents($toolFile, $toolContent);
@@ -84,7 +83,7 @@ class StudentToolGenerator extends \tao_actions_CommonModule {
      */
     protected function getMappedArguments()
     {
-        $requiredArgs = array(
+        $requiredArgs = [
             'client'       => 'Prefix',
             'tool-title'   => 'Tool title',
             'transparent'  => '(1 or 0)',
@@ -92,7 +91,7 @@ class StudentToolGenerator extends \tao_actions_CommonModule {
             'movable'      => '(1 or 0)',
             'adjustable-x' => '(1 or 0)',
             'adjustable-y' => '(1 or 0)',
-        );
+        ];
         $argHelp = "<p>Required arguments are:</p><ul>";
         foreach ($requiredArgs as $key => $value) {
             $argHelp .= '<li>' . $key . ': ' . $value . '</li>';
@@ -107,7 +106,7 @@ class StudentToolGenerator extends \tao_actions_CommonModule {
             }
             // trim all, cast 0|1 to bool
             $_POST[$key] = trim($_POST[$key]);
-            if (in_array($_POST[$key], array('0', '1'))) {
+            if (in_array($_POST[$key], ['0', '1'])) {
                 $_POST[$key] = (bool)$_POST[$key];
             }
         }
@@ -151,9 +150,10 @@ class StudentToolGenerator extends \tao_actions_CommonModule {
      *
      * @return array
      */
-    protected function getPatterns() {
-        $patterns = array();
-        foreach($this->data as $pattern => $replacement) {
+    protected function getPatterns()
+    {
+        $patterns = [];
+        foreach ($this->data as $pattern => $replacement) {
             $patterns[]     = '{' . $pattern . '}';
         }
         return $patterns;
@@ -164,7 +164,8 @@ class StudentToolGenerator extends \tao_actions_CommonModule {
      *
      * @return array
      */
-    protected function getReplacements() {
+    protected function getReplacements()
+    {
         return array_values($this -> data);
     }
-} 
+}

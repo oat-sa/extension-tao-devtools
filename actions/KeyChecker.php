@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,6 +17,7 @@
  *
  * Copyright (c) 2016 (original work) Open Assessment Technologies SA ;
  */
+
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  */
@@ -31,7 +33,8 @@ namespace oat\taoDevTools\actions;
  */
 class KeyChecker extends \tao_actions_CommonModule
 {
-    public function index() {
+    public function index()
+    {
         $this->setView('KeyChecker/index.tpl');
     }
 }

@@ -16,7 +16,6 @@
 					<th class=" install"></th>
 				<th></th>
 					<th><?= __('Description'); ?></th>
-					<th><?= __('License'); ?></th>
 					<th class=" require"><?= __('Requires'); ?></th>
 					<th class=" version"><?= __('Version'); ?></th>
 					<th class=" version"><?= __('Installed'); ?></th>
@@ -35,12 +34,11 @@
 					</td>
 				<td class="ext-name "><?= $ext->getId(); ?></td>
 					<td><?= $ext->getManifest()->getLabel(); ?> (<?= $ext->getManifest()->getDescription(); ?>)</td>
-					<td><?= $ext->getManifest()->getLicense(); ?></td>
 					<td class="dependencies ">
 						<ul class="plain">
 						<?php foreach ($ext->getDependencies() as $req => $version): ?>
 						  <?php if (!in_array($req, get_data('installedIds'))) : ?>
-							<li class="ext-id ext-<?= $req ?>" rel="<?= $req ?>"><?= $req ?></li>
+							<li class="ext-id ext-<?= $req ?>" rel="<?= $req ?>"><a href="#<?= $req ?>"><?= $req ?></a></li>
 							<?php endif;?>
 						<?php endforeach; ?>
 						</ul>
@@ -64,9 +62,18 @@
 			</tbody>
 		</table>
 	</form>
-
-<div id="installProgress" title="<?= __('Installation...') ?>">
-	<div class="progress"><div class="bar"></div></div>
-	<p class="status">...</p>
-	<div class="console"></div>
+<div id="installProgress" class="modal" title="<?= __('Installation...') ?>">
+    <div class="modal-body">
+        <div class="progress"><div class="bar"></div></div>
+        <p class="status">...</p>
+        <div class="console"></div>
+        <div class="buttons rgt">
+            <button class="btn-info small key-navigation-highlight" data-control="cancel" type="button">
+                <span class="label"><?= __('No') ?></span>
+            </button>
+            <button class="btn-info small key-navigation-highlight" data-control="confirm" type="button">
+                <span class="label"><?= __('Yes') ?></span>
+            </button>
+        </div>
+    </div>
 </div>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,21 +19,29 @@
  *
  *
  */
+
 namespace oat\taoDevTools\scripts\update;
+
+use common_ext_ExtensionUpdater;
 
 /**
  *
  * @author Joel Bout <joel@taotesting.com>
+ * @deprecated use migrations instead. See https://github.com/oat-sa/generis/wiki/Tao-Update-Process
  */
-class Updater extends \common_ext_ExtensionUpdater
+class Updater extends common_ext_ExtensionUpdater
 {
     /**
-     *
      * @param string $initialVersion
      * @return string $versionUpdatedTo
      */
     public function update($initialVersion)
     {
-        $this->skip('0', '3.1.0');
+        $this->skip('0', '6.7.0');
+        
+        //Updater files are deprecated. Please use migrations.
+        //See: https://github.com/oat-sa/generis/wiki/Tao-Update-Process
+
+        $this->setVersion($this->getExtension()->getManifest()->getVersion());
     }
 }

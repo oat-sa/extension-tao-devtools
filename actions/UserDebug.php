@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,13 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2014 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2014-2019 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *
  */
 
 namespace oat\taoDevTools\actions;
 
 use oat\taoDevTools\forms\UserDebugRoles;
+use tao_helpers_form_FormContainer as FormContainer;
 
 /**
  * This controller provide the actions to manage the user settings
@@ -31,59 +33,51 @@ use oat\taoDevTools\forms\UserDebugRoles;
  * @subpackage actions
  *
  */
-class UserDebug extends \tao_actions_CommonModule {
+class UserDebug extends \tao_actions_CommonModule
+{
 
-	/**
-	 * @access protected
-	 * @var tao_models_classes_UserService
-	 */
-	protected $userService = null;
+    protected function getUserService()
+    {
+        return $this->getServiceLocator()->get(\tao_models_classes_UserService::SERVICE_ID);
+    }
 
-	/**
-	 * initialize the services
-	 */
-	public function __construct(){
-		parent::__construct();
-		$this->userService = \tao_models_classes_UserService::singleton();
-	}
+    /**
+     * Action dedicated to fake roles
+     */
+    public function roles()
+    {
+        $currentSession = $this->getSession();
+        if ($currentSession instanceof \common_session_RestrictedSession) {
+            $this->setData('roles', $currentSession->getUserRoles());
+            $this->setView('userdebug/restore.tpl');
+        } else {
+            $myFormContainer = new UserDebugRoles([], [FormContainer::CSRF_PROTECTION_OPTION => true]);
+            $myForm = $myFormContainer->getForm();
 
-	/**
-	 * Action dedicated to fake roles
-	 */
-	public function roles(){
+            if ($myForm->isSubmited() && $myForm->isValid()) {
+                $userUri = $myForm->getValue('user');
+                if ($userUri != $currentSession->getUserUri()) {
+                    throw new \common_exception_Error('Security exception, user to be changed is not the current user');
+                }
+                $session = new \common_session_RestrictedSession($this->getSession(), $myForm->getValue('rolefilter'));
+                \common_session_SessionManager::startSession($session);
+                $this->setData('roles', $currentSession->getUserRoles());
+                $this->setView('userdebug/restore.tpl');
+            } else {
+                $this->setData('formTitle', __('Restrict Roles'));
+                $this->setData('myForm', $myForm->render());
 
-	    $currentSession = \common_session_SessionManager::getSession();
-	    if ($currentSession instanceof \common_session_RestrictedSession) {
-	        $this->setData('roles', $currentSession->getUserRoles());
-	        $this->setView('userdebug/restore.tpl');
-	    } else {
-	        $myFormContainer = new UserDebugRoles();
-	        $myForm = $myFormContainer->getForm();
-	        if($myForm->isSubmited() && $myForm->isValid()){
-				$user = $this->userService->getCurrentUser();
-				$filter = $myForm->getValue('rolefilter');
-				$userUri = $myForm->getValue('user');
-				if ($userUri != \common_session_SessionManager::getSession()->getUserUri()) {
-				    throw new \common_exception_Error('Security exception, user to be changed is not the current user');
-				}
-				$session = new \common_session_RestrictedSession(\common_session_SessionManager::getSession(), $myForm->getValue('rolefilter'));
-				\common_session_SessionManager::startSession($session);
-				$this->setData('roles', $currentSession->getUserRoles());
-				$this->setView('userdebug/restore.tpl');
-	        } else {
-    	        $this->setData('formTitle'	, __("Restrict Roles"));
-    	        $this->setData('myForm'		, $myForm->render());
-    	        
-    	        $this->setView('form.tpl', 'tao');
-	        }
-	    }
-	}
-	
-	public function restore(){
-	    $currentSession = \common_session_SessionManager::getSession();
-	    if ($currentSession instanceof \common_session_RestrictedSession) {
-	        $currentSession->restoreOriginal();
-	    }
-	    $this->redirect(_url('index','Main','tao'));
-	}
+                $this->setView('form.tpl', 'tao');
+            }
+        }
+    }
+
+    public function restore()
+    {
+        $currentSession = $this->getSession();
+        if ($currentSession instanceof \common_session_RestrictedSession) {
+            $currentSession->restoreOriginal();
+        }
+        $this->redirect(_url('index', 'Main', 'tao'));
+    }
 }

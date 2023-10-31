@@ -1,67 +1,64 @@
 {
-
-    "name": "oat-sa/extension-tao-devtools",
-    "description" : "extension that gather developement tools for TAO",
-    "type" : "tao-extension",
-    "authors" : [
-		{
-		"name" : "Open Assessment Technologies S.A.",
-		"homepage" : "http://www.taotesting.com"
-		},
-		{
+	"name": "oat-sa/extension-tao-devtools",
+	"description": "Extension that gathers development tools for TAO",
+	"type": "tao-extension",
+	"authors": [{
+		"name": "Open Assessment Technologies S.A.",
+		"homepage": "http://www.taotesting.com"
+	}, {
 		"name": "Jérôme Bogaerts",
 		"role": "Developer"
-		},
-		{
+	}, {
 		"name": "Joel Bout",
 		"role": "Developer"
-		},
-		{
+	}, {
 		"name": "Bertrand Chevrier",
 		"role": "Developer"
-		},
-		{
+	}, {
 		"name": "Lionel Lecaque",
 		"role": "Developer"
-		},
-		{
+	}, {
 		"name": "Patrick Plichart",
 		"role": "Developer"
-		},
-		{
+	}, {
 		"name": "Dieter Raber",
 		"role": "Developer"
-		},
-		{
+	}, {
 		"name": "Somsack Sipasseuth",
 		"role": "Developer"
-		}
-	],
+	}],
 	"support": {
-		"forum": "http://forum.taotesting.com",
-		"issues": "http://forge.taotesting.com"
+		"forum": "http://forum.taotesting.com"
 	},
-	"keywords" : [
+	"keywords": [
 		"tao",
 		"oat",
 		"QTI",
 		"computer-based-assessment"
 	],
-	"homepage" : "http://www.taotesting.com",
-	"license" : [
-	"GPL-2.0"
+	"homepage": "http://www.taotesting.com",
+	"license": [
+		"GPL-2.0-only"
 	],
-    "extra" : {
-    	"tao-extension-name" : "taoDevTools"
-    },
-    "minimum-stability" : "dev",
-    "require": {
-        "oat-sa/oatbox-extension-installer": "dev-master",
-        "ccampbell/chromephp" : "dev-master"
-    },
-    "autoload" : {
-        "psr-4" : {
-            "oat\\taoDevTools\\" : ""
-        }
-    }
+	"extra": {
+		"tao-extension-name": "taoDevTools"
+	},
+	"minimum-stability": "dev",
+	"require": {
+		"oat-sa/oatbox-extension-installer": "~1.1||dev-master",
+		"symfony/process": "^5.0",
+		"ccampbell/chromephp": "~4.1.0",
+		"nette/php-generator": "~3.3.0",
+		"dephpend/dephpend": "^0.6.3",
+		"oat-sa/generis" : ">=15.17.0",
+		"oat-sa/tao-core" : ">=48.11.0",
+		"oat-sa/extension-tao-group" : ">=7.0.0",
+		"oat-sa/extension-tao-item" : ">=11.0.0",
+		"oat-sa/extension-tao-itemqti" : ">=28.2.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"oat\\taoDevTools\\": ""
+		}
+	}
 }

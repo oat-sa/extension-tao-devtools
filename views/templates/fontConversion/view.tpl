@@ -26,10 +26,9 @@ $icomoonLink = '<a href="https://icomoon.io/app/#/select" target="_blank">icomoo
 
     <ul class="plain complete-icon-listing clearfix">
         <?php foreach(get_data('icon-listing') as $icon): ?>
-            <?php $name = $icon -> properties -> name ?>
-            <li title="CSS class: icon-<?= $icon -> properties -> name ?>">
-                <div class="icon icon-<?= $icon -> properties -> name ?>"></div>
-                <div class="truncate"><?= $icon -> properties -> name ?></div>
+            <li title="CSS class: icon-<?= $icon ?>">
+                <div class="icon icon-<?= $icon ?>"></div>
+                <div class="truncate"><?= $icon ?></div>
             </li>
         <?php endforeach; ?>
     </ul>

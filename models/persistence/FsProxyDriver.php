@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @Author      Antoine Delamarre <antoine.delamarre@vesperiagroup.com>
  * @Date        10/02/15
@@ -25,7 +26,7 @@ class FsProxyDriver extends ConfigurableService implements AdapterInterface
 
     /**
      * (non-PHPdoc)
-     * @see \oat\oatbox\filesystem\FlyWrapperTrait::getAdapter()
+     * @see FlyWrapperTrait::getAdapter()
      */
     public function getAdapter()
     {
@@ -39,6 +40,6 @@ class FsProxyDriver extends ConfigurableService implements AdapterInterface
    
     public function __destruct()
     {
-        \common_Logger::i($this->count.' calls to filesystem '.$this->getOption('inner'));
+        \common_Logger::i($this->count . ' calls to filesystem ' . $this->getOption('inner'));
     }
 }

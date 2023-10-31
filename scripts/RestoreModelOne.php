@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,34 +19,34 @@
  *
  *
  */
+
 namespace oat\taoDevTools\scripts;
 
+use oat\tao\model\TaoOntology;
 use oat\tao\scripts\update\OntologyUpdater;
-use oat\tao\model\accessControl\func\AclProxy;
 use Zend\ServiceManager\ServiceLocatorAwareTrait;
 use Zend\ServiceManager\ServiceLocatorAwareInterface;
 use oat\oatbox\action\Action;
 use oat\generis\model\OntologyAwareTrait;
-use oat\tao\model\accessControl\func\AccessRule;
 
 /**
  * Restores a minimal viable model 1
- * 
+ *
  * @author joel.bout
  */
 class RestoreModelOne implements Action, ServiceLocatorAwareInterface
 {
-
     use OntologyAwareTrait;
     use ServiceLocatorAwareTrait;
     
-    public function __invoke($params) {
+    public function __invoke($params)
+    {
         
         // recreate languages
         $modelCreator = new \tao_install_utils_ModelCreator(LOCAL_NAMESPACE);
         $models = $modelCreator->getLanguageModels();
-        foreach ($models as $ns => $modelFiles){
-            foreach ($modelFiles as $file){
+        foreach ($models as $ns => $modelFiles) {
+            foreach ($modelFiles as $file) {
                 $modelCreator->insertLocalModel($file);
             }
         }
@@ -64,8 +65,8 @@ class RestoreModelOne implements Action, ServiceLocatorAwareInterface
         if (count($params) >= 2) {
             $login = array_shift($params);
             $password = array_shift($params);
-            $sysAdmin = $this->getResource(INSTANCE_ROLE_SYSADMIN);
-            $userClass = $this->getClass(CLASS_TAO_USER);
+            $sysAdmin = $this->getResource(TaoOntology::PROPERTY_INSTANCE_ROLE_SYSADMIN);
+            $userClass = $this->getClass(TaoOntology::CLASS_URI_TAO_USER);
             \core_kernel_users_Service::singleton()->addUser($login, $password, $sysAdmin, $userClass);
         }
         

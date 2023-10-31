@@ -20,7 +20,7 @@ class taoDevTools_models_ExtDiff extends taoDevTools_models_RdfDiff
 
     private function getAllModelFiles(common_ext_Manifest $manifest)
     {
-        $returnValue = array();
+        $returnValue = [];
         $localesPath = dirname($manifest->getFilePath()) . DIRECTORY_SEPARATOR . 'locales' . DIRECTORY_SEPARATOR;
         foreach ($manifest->getInstallModelFiles() as $rdfpath) {
             $returnValue[] = $rdfpath;
