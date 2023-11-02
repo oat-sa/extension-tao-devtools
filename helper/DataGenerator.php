@@ -33,16 +33,17 @@ use oat\taoGroups\models\GroupsService;
 
 class DataGenerator
 {
-    public static function generateTests($count = 100) {
-        $count = 200;
-        $fileClass = new \core_kernel_classes_Class('http://www.tao.lu/Ontologies/generis.rdf#File');
-        $generationId = NameGenerator::generateRandomString(4);
+    public static function generateTests($count = 100, string $sampleFile = null)
+    {
         $ext = \common_ext_ExtensionsManager::singleton()->getExtensionById('taoDevTools');
         $service = \taoQtiTest_models_classes_QtiTestService::singleton();
-        $topClass = new \core_kernel_classes_Class(TAO_TEST_CLASS);
+        $topClass = new \core_kernel_classes_Class(TaoOntology::CLASS_URI_TEST);
 
+        $generationId = NameGenerator::generateRandomString(4);
         $class = $topClass->createSubClass('Generation ' . $generationId);
-        $sampleFile = $ext->getDir() . 'data/tests/sample_test_1503673792.zip';
+        if ($sampleFile === null) {
+            $sampleFile = $ext->getDir() . 'data/tests/test_10.zip';
+        }
 
         helpers_TimeOutHelper::setTimeOutLimit(helpers_TimeOutHelper::LONG);
         for ($i = 0; $i < $count; $i++) {
