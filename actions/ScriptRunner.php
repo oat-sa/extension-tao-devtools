@@ -47,6 +47,7 @@ class ScriptRunner extends tao_actions_CommonModule
             'reindex' => __('Reindex all resources'),
             'generatePo' => __('Regenerate locales files'),
             'createItems' => __('Create 100 qti Items'),
+            'createTests' => __('Create 100 qti Tests'),
             'createTesttakers' => __('Create 1000 test takers'),
             'createGlobalManager' => __('Create 100 global managers'),
             'sendSelfMsg' => __('Send a message to yourself')
@@ -97,6 +98,14 @@ class ScriptRunner extends tao_actions_CommonModule
             'success' => true,
             'message' => __('Items generated in class %s', $class->getLabel())
         ]);
+    }
+
+    public function createTests() {
+        $class = DataGenerator::generateTests(10);
+        return $this->returnJson(array(
+            'success' => true,
+            'message' => __('Tests generated in class %s', $class->getLabel())
+        ));
     }
 
     public function createTesttakers()
