@@ -112,9 +112,8 @@ class DataGenerator
         return $class;
     }
 
-    protected static function generateUsers($count, $class, $role, $label, $prefix)
+    public static function generateUsers($count, $class, $role, $label, $prefix)
     {
-
         $userExists = \tao_models_classes_UserService::singleton()->loginExists($prefix . '0');
         if ($userExists) {
             throw new \common_exception_Error($label . ' 0 already exists, Generator already run?');
@@ -125,12 +124,13 @@ class DataGenerator
 
         helpers_TimeOutHelper::setTimeOutLimit(helpers_TimeOutHelper::LONG);
         for ($i = 0; $i < $count; $i++) {
-            $tt = $subClass->createInstanceWithProperties([
+            $subClass->createInstanceWithProperties([
                 OntologyRdfs::RDFS_LABEL => $label . ' ' . $i,
                 GenerisRdf::PROPERTY_USER_UILG  => 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
                 GenerisRdf::PROPERTY_USER_DEFLG => 'http://www.tao.lu/Ontologies/TAO.rdf#Langen-US',
                 GenerisRdf::PROPERTY_USER_LOGIN => $prefix . $i,
-                GenerisRdf::PROPERTY_USER_PASSWORD => \core_kernel_users_Service::getPasswordHash()->encrypt('pass' . $i),
+                GenerisRdf::PROPERTY_USER_PASSWORD =>
+                    \core_kernel_users_Service::getPasswordHash()->encrypt('Password_' . $i),
                 GenerisRdf::PROPERTY_USER_ROLES => $role,
                 GenerisRdf::PROPERTY_USER_FIRSTNAME => $label . ' ' . $i,
                 GenerisRdf::PROPERTY_USER_LASTNAME => 'Family ' . $generationId
