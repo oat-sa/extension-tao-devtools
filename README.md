@@ -8,10 +8,26 @@ extension that gather development tools for TAO
 
 Generates a tree of items. 
 
-### Run
-```shell
-php index.php '\oat\taoDevTools\models\ItemTreeGenerator'
+## To install the extension for the dev tools do the following 
+
+Step 1:
+Go the directory where your System is installed
+
+Step 2:
+Make sure Composer is working on your local machine by running the following command inside tao-project root,
 ```
+composer 
+```
+Step 3:
+Run the command
+```
+composer require "oat-sa/extension-tao-devtools":"4.2.3"
+```
+Step 4:
+Go-to Extension Manager dashboard and enable taoDevTools.
+
+You will see the Change in UI of Extensions manager.
+
 ### Options
 ```
   Optional Arguments:
