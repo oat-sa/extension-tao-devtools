@@ -30,6 +30,7 @@ module.exports = function(grunt) {
                     extension : 'taoDevTools',
                     outputDir : 'loader',
                     paths: require('./paths.json'),
+                    babelPreTransform: { enabled: true },
                     bundles : [{
                         name : 'taoDevTools',
                         default : true
